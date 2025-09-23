@@ -8,35 +8,59 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
+    /* Hop Hop Brand Colors - Playful & Kid-Friendly */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 221 39% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 221 39% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 221 39% 11%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary Brand Colors from Logo */
+    --primary: 196 91% 48%; /* Bright Blue */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 4 91% 58%; /* Red from Logo */
+    --secondary-foreground: 0 0% 100%;
+
+    /* Accent Colors from Mascot */
+    --accent: 67 76% 53%; /* Green */
+    --accent-foreground: 221 39% 11%;
+
+    --warning: 39 97% 58%; /* Yellow */
+    --warning-foreground: 221 39% 11%;
+
+    --orange: 24 95% 53%; /* Orange */
+    --orange-foreground: 0 0% 100%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --ring: 196 91% 48%;
 
-    --radius: 0.5rem;
+    --radius: 1rem; /* More rounded for playful feel */
+
+    /* Playful Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(196 91% 48%), hsl(196 91% 58%));
+    --gradient-secondary: linear-gradient(135deg, hsl(4 91% 58%), hsl(4 91% 68%));
+    --gradient-fun: linear-gradient(135deg, hsl(196 91% 48%), hsl(4 91% 58%), hsl(39 97% 58%));
+    --gradient-hero: linear-gradient(135deg, hsl(196 91% 48%), hsl(4 91% 58%));
+    
+    /* Fun Shadows */
+    --shadow-playful: 0 8px 25px -8px hsl(196 91% 48% / 0.3);
+    --shadow-card: 0 4px 20px -4px hsl(0 0% 0% / 0.1);
+    --shadow-mascot: 0 10px 30px -10px hsl(4 91% 58% / 0.4);
+
+    /* Animations */
+    --bounce-duration: 0.6s;
+    --hop-duration: 0.4s;
 
     --sidebar-background: 0 0% 98%;
 
@@ -56,33 +80,33 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 221 39% 11%;
+    --foreground: 0 0% 100%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 221 39% 15%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 221 39% 15%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 196 91% 58%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 4 91% 68%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 217.2 32.6% 17.5%;
+    --muted: 221 39% 20%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 67 76% 63%;
+    --accent-foreground: 221 39% 11%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 221 39% 25%;
+    --input: 221 39% 25%;
+    --ring: 196 91% 58%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -100,6 +124,62 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
   }
+
+  .hop-bounce {
+    animation: hop-bounce var(--hop-duration) ease-in-out infinite;
+  }
+
+  .float-animation {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .mascot-hover {
+    transition: transform 0.3s ease;
+  }
+
+  .mascot-hover:hover {
+    transform: scale(1.05) rotate(2deg);
+  }
+}
+
+@layer utilities {
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .gradient-secondary {
+    background: var(--gradient-secondary);
+  }
+  
+  .gradient-fun {
+    background: var(--gradient-fun);
+  }
+  
+  .gradient-hero {
+    background: var(--gradient-hero);
+  }
+  
+  .shadow-playful {
+    box-shadow: var(--shadow-playful);
+  }
+  
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+  
+  .shadow-mascot {
+    box-shadow: var(--shadow-mascot);
+  }
+}
+
+@keyframes hop-bounce {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
 }
