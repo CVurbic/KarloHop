@@ -69,9 +69,9 @@ const BookingSection = () => {
                       <SelectValue placeholder="Odaberite napuhanac" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="dvorac">Dvorac Avantura - 150kn</SelectItem>
-                      <SelectItem value="morska">Morska Pustolovština - 120kn</SelectItem>
-                      <SelectItem value="sportski">Sportski Centar - 180kn</SelectItem>
+                      <SelectItem value="princeza">Princeza dvorac - 110kn</SelectItem>
+                      <SelectItem value="legoland">Legoland - 120kn</SelectItem>
+                      <SelectItem value="dzungla">Mala džungla - 100kn</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -111,7 +111,7 @@ const BookingSection = () => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-center">
                     <Phone className="h-5 w-5 text-primary mr-3" />
-                    <span className="text-lg font-semibold">01/234-5678</span>
+                    <span className="text-lg font-semibold">095 865 5213</span>
                   </div>
                   <div className="flex items-center justify-center">
                     <Clock className="h-5 w-5 text-primary mr-3" />

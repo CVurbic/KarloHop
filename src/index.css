@@ -61,6 +61,10 @@ All colors MUST be HSL.
     /* Animations */
     --bounce-duration: 0.6s;
     --hop-duration: 0.4s;
+    
+    /* Glass effects */
+    --glass-blue-bg: rgba(173, 216, 230, 0.2);
+    --glass-blue-border: rgba(173, 216, 230, 0.3);
 
     --sidebar-background: 0 0% 98%;
 
@@ -171,6 +175,12 @@ All colors MUST be HSL.
   
   .shadow-mascot {
     box-shadow: var(--shadow-mascot);
+  }
+  
+  .glass-blue {
+    background: var(--glass-blue-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-blue-border);
   }
 }
 

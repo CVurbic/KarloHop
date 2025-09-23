@@ -28,11 +28,11 @@ const DeliverySection = () => {
               </div>
               <div className="flex items-center justify-center lg:justify-start">
                 <MapPin className="h-5 w-5 text-primary mr-3" />
-                <span className="text-lg">Dostava u okolici 50kn</span>
+                <span className="text-lg">Dostava u okolici do 30km</span>
               </div>
               <div className="flex items-center justify-center lg:justify-start">
                 <MapPin className="h-5 w-5 text-primary mr-3" />
-                <span className="text-lg">Brza dostava u roku od 2 sata</span>
+                <span className="text-lg">Brza dostava unutar 24 sata</span>
               </div>
             </div>
           </div>

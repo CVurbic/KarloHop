@@ -71,7 +71,7 @@ const ContactSection = () => {
                     </div>
                     <div>
                       <h4 className="font-semibold text-foreground mb-1">Telefon</h4>
-                      <p className="text-muted-foreground">01/234-5678</p>
+                      <p className="text-muted-foreground">095 865 5213</p>
                       <p className="text-sm text-muted-foreground">Brz odgovor i rezervacija</p>
                     </div>
                   </div>

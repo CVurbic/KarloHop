@@ -45,7 +45,7 @@ const HeroSection = () => {
               <Button 
                 variant="outline" 
                 size="lg" 
-                className="border-white/30 text-white hover:bg-white/10 backdrop-blur-sm text-lg px-8 py-6 rounded-full"
+                className="border-white text-white hover:bg-white hover:text-primary backdrop-blur-sm text-lg px-8 py-6 rounded-full"
               >
                 Pogledaj ponudu
               </Button>
@@ -55,11 +55,13 @@ const HeroSection = () => {
           {/* Mascot Image */}
           <div className="flex justify-center lg:justify-end">
             <div className="relative">
+            <div className="glass-blue rounded-3xl p-8">
               <img 
-                src="/assets/mascot-jumping.png" 
+                src="/assets/mascot-jumping-new.png" 
                 alt="Hop Hop Mascot jumping with kids on bounce house" 
                 className="w-full max-w-md lg:max-w-lg xl:max-w-xl h-auto hop-bounce"
               />
+            </div>
             </div>
           </div>
         </div>
