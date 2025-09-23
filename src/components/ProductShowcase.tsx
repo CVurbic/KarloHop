@@ -54,7 +54,7 @@ const ProductShowcase = () => {
                   <img 
                     src={product.image} 
                     alt={product.name} 
-                    className="w-full h-48 object-contain mascot-hover"
+                    className="w-full h-48 object-cover mascot-hover"
                   />
                 </div>
               </CardHeader>
