@@ -67,9 +67,9 @@ const BookingSection = () => {
                       <SelectValue placeholder="Odaberite napuhanac" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="princeza">Princeza dvorac - 110kn</SelectItem>
-                      <SelectItem value="legoland">Legoland - 120kn</SelectItem>
-                      <SelectItem value="dzungla">Mala džungla - 100kn</SelectItem>
+                      <SelectItem value="princeza">Princeza dvorac - 110€</SelectItem>
+                      <SelectItem value="legoland">Legoland - 120€</SelectItem>
+                      <SelectItem value="dzungla">Mala džungla - 100€</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
