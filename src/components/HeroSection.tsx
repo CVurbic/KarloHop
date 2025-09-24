@@ -3,7 +3,7 @@ import { Star, Sparkles } from "lucide-react";
 
 const HeroSection = () => {
   return (
-    <section id="home" className="relative min-h-screen flex items-center gradient-hero overflow-hidden">
+    <section id="home" className="relative min-h-screen flex items-center glass-blue overflow-hidden">
       {/* Background Decorations */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-20 left-10 text-warning opacity-80">
@@ -45,7 +45,7 @@ const HeroSection = () => {
               <Button 
                 variant="outline" 
                 size="lg" 
-                className="border-white text-white hover:bg-white hover:text-primary backdrop-blur-sm text-lg px-8 py-6 rounded-full"
+                className="border-white text-warning hover:bg-white hover:text-primary backdrop-blur-sm text-lg px-8 py-6 rounded-full"
               >
                 Pogledaj ponudu
               </Button>
@@ -54,15 +54,11 @@ const HeroSection = () => {
 
           {/* Mascot Image */}
           <div className="flex justify-center lg:justify-end">
-            <div className="relative">
-            <div className="glass-blue rounded-3xl p-8">
-              <img 
-                src="/assets/mascot-jumping-new.png" 
-                alt="Hop Hop Mascot jumping with kids on bounce house" 
-                className="w-full max-w-md lg:max-w-lg xl:max-w-xl h-auto hop-bounce"
-              />
-            </div>
-            </div>
+            <img 
+              src="/assets/mascot-jumping-new.png" 
+              alt="Hop Hop Mascot jumping with kids on bounce house" 
+              className="w-full max-w-md lg:max-w-lg xl:max-w-xl h-auto hop-bounce"
+            />
           </div>
         </div>
       </div>

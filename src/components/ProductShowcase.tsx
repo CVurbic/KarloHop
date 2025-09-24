@@ -50,11 +50,11 @@ const ProductShowcase = () => {
               className="overflow-hidden shadow-card hover:shadow-playful transition-all duration-300 hover:-translate-y-2 border-2 hover:border-primary/20"
             >
               <CardHeader className="p-0">
-                <div className="relative overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10 p-8">
+                <div className="relative overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10 aspect-square">
                   <img 
                     src={product.image} 
                     alt={product.name} 
-                    className="w-full h-48 object-contain mascot-hover"
+                    className="w-full h-full object-cover mascot-hover"
                   />
                 </div>
               </CardHeader>
@@ -70,7 +70,7 @@ const ProductShowcase = () => {
                 </p>
                 <div className="flex items-center justify-between">
                   <div className="text-2xl font-bold text-primary">
-                    {product.price}kn<span className="text-sm text-muted-foreground">/dan</span>
+                    {product.price}€<span className="text-sm text-muted-foreground">/dan</span>
                   </div>
                   <Button 
                     variant="default"
