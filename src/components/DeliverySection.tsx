@@ -12,10 +12,7 @@ const DeliverySection = () => {
               </h2>
             </div>
             
-            <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-              Naš tim brzo i sigurno dostavlja napuhance direktno na vašu lokaciju. 
-              Pokrivamo cijeli Zagreb i okolna mjesta do 30km udaljenosti.
-            </p>
+            <p className="text-xl text-muted-foreground mb-8 leading-relaxed">Naš tim brzo i sigurno dostavlja napuhance direktno na vašu lokaciju. Pokrivamo cijeli Zagreb i okolna mjesta do 30km udaljenosti. Veće udaljenosti uz dogovor i plaćanje putem poziva.</p>
 
             <div className="space-y-4">
               <div className="flex items-center justify-center lg:justify-start">

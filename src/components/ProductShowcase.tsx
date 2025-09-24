@@ -1,61 +1,44 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
 const ProductShowcase = () => {
-  const products = [
-    {
-      id: 1,
-      name: "Princeza dvorac",
-      price: "110",
-      image: "/assets/princeza-dvorac.png",
-      description: "Čarobni dvorac za male princeze",
-      dimensions: "5 x 5.8 x 4m"
-    },
-    {
-      id: 2,
-      name: "Legoland",
-      price: "120",
-      image: "/assets/legoland.png",
-      description: "Avantura poput Lego svijeta",
-      dimensions: "6 x 3.5 x 4.5m"
-    },
-    {
-      id: 3,
-      name: "Mala džungla",
-      price: "100",
-      image: "/assets/mala-dzungla.png",
-      description: "Safari avantura u vlastitom dvorištu",
-      dimensions: "5 x 4 x 3.6m"
-    }
-  ];
-
-  return (
-    <section id="products" className="py-20 bg-background">
+  const products = [{
+    id: 1,
+    name: "Princeza dvorac",
+    price: "110",
+    image: "/assets/princeza-dvorac.png",
+    description: "Čarobni dvorac za male princeze",
+    dimensions: "5 x 5.8 x 4m"
+  }, {
+    id: 2,
+    name: "Legoland",
+    price: "120",
+    image: "/assets/legoland.png",
+    description: "Avantura poput Lego svijeta",
+    dimensions: "6 x 3.5 x 4.5m"
+  }, {
+    id: 3,
+    name: "Mala džungla",
+    price: "100",
+    image: "/assets/mala-dzungla.png",
+    description: "Safari avantura u vlastitom dvorištu",
+    dimensions: "5 x 4 x 3.6m"
+  }];
+  return <section id="products" className="py-20 bg-background">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-bold text-foreground mb-6">
             Naši <span className="text-primary">Napuhanci</span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Biramo kvalitetne i sigurne napuhance za nezaboravnu zabavu vaše djece
-          </p>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Najam napuhanaca za dječje rođendane i proslave. Sigurni, kvalitetni i zabavni dvorci, tobogani i avanture na napuhavanje za nezaboravnu igru i osmijehe.</p>
         </div>
 
         {/* Product Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {products.map((product) => (
-            <Card 
-              key={product.id} 
-              className="overflow-hidden shadow-card hover:shadow-playful transition-all duration-300 hover:-translate-y-2 border-2 hover:border-primary/20"
-            >
+          {products.map(product => <Card key={product.id} className="overflow-hidden shadow-card hover:shadow-playful transition-all duration-300 hover:-translate-y-2 border-2 hover:border-primary/20">
               <CardHeader className="p-0">
                 <div className="relative overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10 aspect-square">
-                  <img 
-                    src={product.image} 
-                    alt={product.name} 
-                    className="w-full h-full object-cover mascot-hover"
-                  />
+                  <img src={product.image} alt={product.name} className="w-full h-full object-cover mascot-hover" />
                 </div>
               </CardHeader>
               <CardContent className="p-6">
@@ -72,16 +55,12 @@ const ProductShowcase = () => {
                   <div className="text-2xl font-bold text-primary">
                     {product.price}€<span className="text-sm text-muted-foreground">/dan</span>
                   </div>
-                  <Button 
-                    variant="default"
-                    className="gradient-secondary hover:shadow-playful transition-all duration-300"
-                  >
+                  <Button variant="default" className="gradient-secondary hover:shadow-playful transition-all duration-300">
                     Rezerviraj
                   </Button>
                 </div>
               </CardContent>
-            </Card>
-          ))}
+            </Card>)}
         </div>
 
         {/* Special Offer */}
@@ -96,8 +75,6 @@ const ProductShowcase = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default ProductShowcase;

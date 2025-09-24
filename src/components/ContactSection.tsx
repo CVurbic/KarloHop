@@ -4,19 +4,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Mail, Phone, MapPin, Clock } from "lucide-react";
-
 const ContactSection = () => {
-  return (
-    <section id="contact" className="py-20 bg-background">
+  return <section id="contact" className="py-20 bg-background">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-bold text-foreground mb-6">
-            Kontaktirajte <span className="text-secondary">Nas</span>
+            Kontaktirajte <span className="text-secondary">Hop Hop</span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Nazovite nas ili pošaljite upit - tu smo da odgovorimo na sva vaša pitanja!
-          </p>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Nazovite ili pošaljite upit! Tu smo da odgovorimo na sva vaša pitanja!</p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-12">
@@ -41,16 +37,10 @@ const ContactSection = () => {
 
               <div>
                 <Label htmlFor="contact-poruka">Poruka</Label>
-                <Textarea 
-                  id="contact-poruka" 
-                  placeholder="Vaše pitanje ili poruka..."
-                  rows={5}
-                />
+                <Textarea id="contact-poruka" placeholder="Vaše pitanje ili poruka..." rows={5} />
               </div>
 
-              <Button 
-                className="w-full gradient-secondary hover:shadow-playful transition-all duration-300 text-lg py-6"
-              >
+              <Button className="w-full gradient-secondary hover:shadow-playful transition-all duration-300 text-lg py-6">
                 Pošaljite poruku
               </Button>
             </CardContent>
@@ -115,21 +105,14 @@ const ContactSection = () => {
             {/* CTA Card */}
             <Card className="gradient-fun text-white shadow-mascot">
               <CardContent className="p-8 text-center">
-                <img 
-                  src="/assets/mascot-jumping.png" 
-                  alt="Hop Hop mascot" 
-                  className="w-24 h-24 mx-auto mb-4 object-contain"
-                />
+                <img src="/assets/mascot-jumping.png" alt="Hop Hop mascot" className="w-24 h-24 mx-auto mb-4 object-contain" />
                 <h3 className="text-2xl font-bold mb-3">
                   Spremni za zabavu?
                 </h3>
                 <p className="mb-6 opacity-90">
                   Kontaktirajte nas danas i rezervirajte svoj napuhanac!
                 </p>
-                <Button 
-                  variant="secondary"
-                  className="bg-white text-primary hover:bg-white/90"
-                >
+                <Button variant="secondary" className="bg-white text-primary hover:bg-white/90">
                   Rezerviraj sada
                 </Button>
               </CardContent>
@@ -137,8 +120,6 @@ const ContactSection = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default ContactSection;

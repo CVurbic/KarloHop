@@ -5,10 +5,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar, Clock, Phone } from "lucide-react";
-
 const BookingSection = () => {
-  return (
-    <section id="booking" className="py-20 bg-gradient-to-br from-primary/5 to-accent/5">
+  return <section id="booking" className="py-20 bg-gradient-to-br from-primary/5 to-accent/5">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -79,16 +77,10 @@ const BookingSection = () => {
 
               <div>
                 <Label htmlFor="poruka">Dodatne napomene</Label>
-                <Textarea 
-                  id="poruka" 
-                  placeholder="Posebni zahtjevi ili pitanja..."
-                  rows={3}
-                />
+                <Textarea id="poruka" placeholder="Posebni zahtjevi ili pitanja..." rows={3} />
               </div>
 
-              <Button 
-                className="w-full gradient-primary hover:shadow-playful transition-all duration-300 text-lg py-6"
-              >
+              <Button className="w-full gradient-primary hover:shadow-playful transition-all duration-300 text-lg py-6">
                 Pošaljite rezervaciju
               </Button>
             </CardContent>
@@ -99,11 +91,7 @@ const BookingSection = () => {
             <Card className="shadow-card">
               <CardContent className="p-8 text-center">
                 <div className="mb-6">
-                  <img 
-                    src="/assets/mascot-chill.png" 
-                    alt="Hop Hop mascot relaxing" 
-                    className="w-32 h-32 mx-auto object-contain mascot-hover"
-                  />
+                  <img src="/assets/mascot-chill.png" alt="Hop Hop mascot relaxing" className="w-32 h-32 mx-auto object-contain mascot-hover" />
                 </div>
                 <h3 className="text-2xl font-bold text-foreground mb-4">
                   Ili nas nazovite direktno!
@@ -115,13 +103,10 @@ const BookingSection = () => {
                   </div>
                   <div className="flex items-center justify-center">
                     <Clock className="h-5 w-5 text-primary mr-3" />
-                    <span>Radnim danima 8:00 - 20:00</span>
+                    <span>Svakim danom od 8:00 - 20:00</span>
                   </div>
                 </div>
-                <Button 
-                  variant="outline" 
-                  className="mt-6 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
-                >
+                <Button variant="outline" className="mt-6 border-primary text-primary hover:bg-primary hover:text-primary-foreground">
                   Nazovite nas
                 </Button>
               </CardContent>
@@ -141,8 +126,6 @@ const BookingSection = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default BookingSection;
