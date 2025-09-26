@@ -14,36 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
-      "HOP HOP REZERVACIJE": {
+      bookings: {
         Row: {
-          Datum: string | null
-          "Dodatne napomene": string | null
-          Email: string | null
-          Ime: string
-          "Izbor napuhanca": string | null
-          "Lokacija dostave": string | null
-          Prezime: string
-          Telefon: number | null
+          additional_notes: string | null
+          booking_date: string | null
+          created_at: string | null
+          delivery_address: string | null
+          email: string | null
+          id: string
+          name: string
+          phone: string | null
+          selected_bounce_house: string | null
+          surname: string
         }
         Insert: {
-          Datum?: string | null
-          "Dodatne napomene"?: string | null
-          Email?: string | null
-          Ime: string
-          "Izbor napuhanca"?: string | null
-          "Lokacija dostave"?: string | null
-          Prezime: string
-          Telefon?: number | null
+          additional_notes?: string | null
+          booking_date?: string | null
+          created_at?: string | null
+          delivery_address?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          selected_bounce_house?: string | null
+          surname: string
         }
         Update: {
-          Datum?: string | null
-          "Dodatne napomene"?: string | null
-          Email?: string | null
-          Ime?: string
-          "Izbor napuhanca"?: string | null
-          "Lokacija dostave"?: string | null
-          Prezime?: string
-          Telefon?: number | null
+          additional_notes?: string | null
+          booking_date?: string | null
+          created_at?: string | null
+          delivery_address?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          selected_bounce_house?: string | null
+          surname?: string
         }
         Relationships: []
       }

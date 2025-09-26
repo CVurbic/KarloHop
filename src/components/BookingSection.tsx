@@ -4,8 +4,74 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Calendar, Clock, Phone } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
+import { useState } from "react";
+// Form validation schema
+const formSchema = z.object({
+  name: z.string().min(2, "Ime mora imati najmanje 2 znakova").max(50, "Ime ne smije biti duže od 50 znakova"),
+  surname: z.string().min(2, "Prezime mora imati najmanje 2 znakova").max(50, "Prezime ne smije biti duže od 50 znakova"),
+  email: z.string().email("Unesite valjanu email adresu").max(255, "Email ne smije biti duži od 255 znakova"),
+  phone: z.string().min(8, "Broj telefona mora imati najmanje 8 znamenki").max(20, "Broj telefona ne smije biti duži od 20 znamenki"),
+  delivery_address: z.string().min(5, "Adresa mora biti duža od 5 znakova").max(255, "Adresa ne smije biti duža od 255 znakova"),
+  booking_date: z.string().min(1, "Molimo odaberite datum"),
+  selected_bounce_house: z.string().min(1, "Molimo odaberite napuhanac"),
+  additional_notes: z.string().max(500, "Napomene ne smiju biti duže od 500 znakova").optional(),
+});
+
+type FormData = z.infer<typeof formSchema>;
+
 const BookingSection = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      surname: "",
+      email: "",
+      phone: "",
+      delivery_address: "",
+      booking_date: "",
+      selected_bounce_house: "",
+      additional_notes: "",
+    },
+  });
+
+  const onSubmit = async (values: FormData) => {
+    setIsSubmitting(true);
+    
+    try {
+      const { error } = await supabase
+        .from('bookings')
+        .insert([values]);
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Rezervacija uspješno poslana!",
+        description: "Vaša rezervacija je uspješno zabilježena. Kontaktirat ćemo Vas uskoro.",
+      });
+
+      form.reset();
+    } catch (error) {
+      console.error('Error submitting booking:', error);
+      toast({
+        title: "Greška pri slanju rezervacije",
+        description: "Došlo je do greške. Molimo pokušajte ponovo ili nas nazovite direktno.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   return <section id="booking" className="py-20 bg-gradient-to-br from-primary/5 to-accent/5">
       <div className="container mx-auto px-4">
         {/* Section Header */}
@@ -28,61 +94,141 @@ const BookingSection = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="ime">Ime</Label>
-                  <Input id="ime" placeholder="Vaše ime" />
-                </div>
-                <div>
-                  <Label htmlFor="prezime">Prezime</Label>
-                  <Input id="prezime" placeholder="Vaše prezime" />
-                </div>
-              </div>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Ime</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Vaše ime" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="surname"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Prezime</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Vaše prezime" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="vaš@email.com" />
-                </div>
-                <div>
-                  <Label htmlFor="telefon">Telefon</Label>
-                  <Input id="telefon" placeholder="01/234-5678" />
-                </div>
-              </div>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <Input type="email" placeholder="vaš@email.com" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Telefon</FormLabel>
+                          <FormControl>
+                            <Input placeholder="01/234-5678" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
-              <div>
-                <Label htmlFor="lokacija">Lokacija dostave</Label>
-                <Input id="lokacija" placeholder="Adresa za dostavu" />
-              </div>
+                  <FormField
+                    control={form.control}
+                    name="delivery_address"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Lokacija dostave</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Adresa za dostavu" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="datum">Datum</Label>
-                  <Input id="datum" type="date" />
-                </div>
-                <div>
-                  <Label htmlFor="napuhanac">Izbor napuhanca</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Odaberite napuhanac" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="princeza">Princeza dvorac - 110€</SelectItem>
-                      <SelectItem value="legoland">Legoland - 120€</SelectItem>
-                      <SelectItem value="dzungla">Mala džungla - 100€</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="booking_date"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Datum</FormLabel>
+                          <FormControl>
+                            <Input type="date" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="selected_bounce_house"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Izbor napuhanca</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Odaberite napuhanac" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="princeza">Princeza dvorac - 110€</SelectItem>
+                              <SelectItem value="legoland">Legoland - 120€</SelectItem>
+                              <SelectItem value="dzungla">Mala džungla - 100€</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
-              <div>
-                <Label htmlFor="poruka">Dodatne napomene</Label>
-                <Textarea id="poruka" placeholder="Posebni zahtjevi ili pitanja..." rows={3} />
-              </div>
+                  <FormField
+                    control={form.control}
+                    name="additional_notes"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Dodatne napomene</FormLabel>
+                        <FormControl>
+                          <Textarea placeholder="Posebni zahtjevi ili pitanja..." rows={3} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <Button className="w-full gradient-primary hover:shadow-playful transition-all duration-300 text-lg py-6">
-                Pošaljite rezervaciju
-              </Button>
+                  <Button 
+                    type="submit" 
+                    disabled={isSubmitting}
+                    className="w-full gradient-primary hover:shadow-playful transition-all duration-300 text-lg py-6"
+                  >
+                    {isSubmitting ? "Šalje se..." : "Pošaljite rezervaciju"}
+                  </Button>
+                </form>
+              </Form>
             </CardContent>
           </Card>
 
