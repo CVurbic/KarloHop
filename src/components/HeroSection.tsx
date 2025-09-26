@@ -42,10 +42,19 @@ const HeroSection = () => {
             </h1>
             <p className="text-xl lg:text-2xl mb-8 leading-relaxed text-slate-800">Dvorci na napuhavanje i tobogani za dječje proslave!</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Button size="lg" className="bg-warning text-warning-foreground hover:bg-warning/90 shadow-playful hover:shadow-mascot transition-all duration-300 text-lg px-8 py-6 rounded-full">
+              <Button 
+                size="lg" 
+                className="bg-warning text-warning-foreground hover:bg-warning/90 shadow-playful hover:shadow-mascot transition-all duration-300 text-lg px-8 py-6 rounded-full"
+                onClick={() => document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth' })}
+              >
                 Rezerviraj svoj napuhanac
               </Button>
-              <Button variant="outline" size="lg" className="border-white text-warning hover:bg-white hover:text-primary backdrop-blur-sm text-lg px-8 py-6 rounded-full">
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="border-white text-warning hover:bg-white hover:text-primary backdrop-blur-sm text-lg px-8 py-6 rounded-full"
+                onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
+              >
                 Pogledaj ponudu
               </Button>
             </div>
