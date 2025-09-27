@@ -11,7 +11,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
+
 // Form validation schema
 const formSchema = z.object({
   name: z.string().min(2, "Ime mora imati najmanje 2 znakova").max(50, "Ime ne smije biti duže od 50 znakova"),
@@ -19,15 +20,26 @@ const formSchema = z.object({
   email: z.string().email("Unesite valjanu email adresu").max(255, "Email ne smije biti duži od 255 znakova"),
   phone: z.string().min(8, "Broj telefona mora imati najmanje 8 znamenki").max(20, "Broj telefona ne smije biti duži od 20 znamenki"),
   delivery_address: z.string().min(5, "Adresa mora biti duža od 5 znakova").max(255, "Adresa ne smije biti duža od 255 znakova"),
-  booking_date: z.string().min(1, "Molimo odaberite datum"),
+  booking_start_date: z.string().min(1, "Molimo odaberite početni datum"),
+  booking_end_date: z.string().min(1, "Molimo odaberite završni datum"),
   selected_bounce_house: z.string().min(1, "Molimo odaberite napuhanac"),
   additional_notes: z.string().max(500, "Napomene ne smiju biti duže od 500 znakova").optional(),
+}).refine((data) => {
+  if (data.booking_start_date && data.booking_end_date) {
+    return new Date(data.booking_start_date) <= new Date(data.booking_end_date);
+  }
+  return true;
+}, {
+  message: "Završni datum mora biti nakon početnog datuma",
+  path: ["booking_end_date"],
 });
 
 type FormData = z.infer<typeof formSchema>;
 
 const BookingSection = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [availability, setAvailability] = useState<{[key: string]: string[]}>({});
+  const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
   
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -37,13 +49,61 @@ const BookingSection = () => {
       email: "",
       phone: "",
       delivery_address: "",
-      booking_date: "",
+      booking_start_date: "",
+      booking_end_date: "",
       selected_bounce_house: "",
       additional_notes: "",
     },
   });
 
+  const checkAvailability = useCallback(async (bounceHouse: string, startDate: string, endDate: string) => {
+    if (!bounceHouse || !startDate || !endDate) return;
+    
+    setIsCheckingAvailability(true);
+    try {
+      const { data, error } = await supabase.rpc('check_bounce_house_availability', {
+        bounce_house_name: bounceHouse,
+        check_start_date: startDate,
+        check_end_date: endDate
+      });
+
+      if (error) throw error;
+
+      const unavailableDates = data?.map((item: any) => item.unavailable_date) || [];
+      setAvailability(prev => ({
+        ...prev,
+        [bounceHouse]: unavailableDates
+      }));
+    } catch (error) {
+      console.error('Error checking availability:', error);
+    } finally {
+      setIsCheckingAvailability(false);
+    }
+  }, []);
+
+  const watchedValues = form.watch(['selected_bounce_house', 'booking_start_date', 'booking_end_date']);
+
+  useEffect(() => {
+    const [bounceHouse, startDate, endDate] = watchedValues;
+    if (bounceHouse && startDate && endDate) {
+      checkAvailability(bounceHouse, startDate, endDate);
+    }
+  }, [watchedValues, checkAvailability]);
+
   const onSubmit = async (values: FormData) => {
+    // Check if dates are available before submitting
+    const bounceHouse = values.selected_bounce_house;
+    const unavailableDates = availability[bounceHouse] || [];
+    
+    if (unavailableDates.length > 0) {
+      toast({
+        title: "Napuhanac nije dostupan",
+        description: `Odabrani napuhanac nije dostupan za datume: ${unavailableDates.join(', ')}`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     
     try {
@@ -61,6 +121,7 @@ const BookingSection = () => {
       });
 
       form.reset();
+      setAvailability({});
     } catch (error) {
       console.error('Error submitting booking:', error);
       toast({
@@ -168,15 +229,42 @@ const BookingSection = () => {
                     )}
                   />
 
+                  <FormField
+                    control={form.control}
+                    name="selected_bounce_house"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Izbor napuhanca</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Odaberite napuhanac" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="princeza">Princeza dvorac - 110€</SelectItem>
+                            <SelectItem value="legoland">Legoland - 120€</SelectItem>
+                            <SelectItem value="dzungla">Mala džungla - 100€</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   <div className="grid md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
-                      name="booking_date"
+                      name="booking_start_date"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Datum</FormLabel>
+                          <FormLabel>Početni datum</FormLabel>
                           <FormControl>
-                            <Input type="date" {...field} />
+                            <Input 
+                              type="date" 
+                              {...field}
+                              min={new Date().toISOString().split('T')[0]}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -184,27 +272,51 @@ const BookingSection = () => {
                     />
                     <FormField
                       control={form.control}
-                      name="selected_bounce_house"
+                      name="booking_end_date"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Izbor napuhanca</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Odaberite napuhanac" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="princeza">Princeza dvorac - 110€</SelectItem>
-                              <SelectItem value="legoland">Legoland - 120€</SelectItem>
-                              <SelectItem value="dzungla">Mala džungla - 100€</SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <FormLabel>Završni datum</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="date" 
+                              {...field}
+                              min={form.watch('booking_start_date') || new Date().toISOString().split('T')[0]}
+                            />
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
                   </div>
+
+                  {/* Availability Status */}
+                  {form.watch('selected_bounce_house') && form.watch('booking_start_date') && form.watch('booking_end_date') && (
+                    <div className="p-4 rounded-lg border">
+                      {isCheckingAvailability ? (
+                        <div className="flex items-center text-muted-foreground">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
+                          Provjeravam dostupnost...
+                        </div>
+                      ) : (
+                        <div>
+                          {availability[form.watch('selected_bounce_house')]?.length > 0 ? (
+                            <div className="text-destructive">
+                              <p className="font-medium mb-2">⚠️ Napuhanac nije dostupan za sljedeće datume:</p>
+                              <ul className="list-disc list-inside text-sm">
+                                {availability[form.watch('selected_bounce_house')].map((date: string) => (
+                                  <li key={date}>{new Date(date).toLocaleDateString('hr-HR')}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          ) : (
+                            <div className="text-green-600">
+                              <p className="font-medium">✅ Napuhanac je dostupan za odabrane datume!</p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   <FormField
                     control={form.control}
@@ -222,7 +334,7 @@ const BookingSection = () => {
 
                   <Button 
                     type="submit" 
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || isCheckingAvailability || (form.watch('selected_bounce_house') && availability[form.watch('selected_bounce_house')]?.length > 0)}
                     className="w-full gradient-primary hover:shadow-playful transition-all duration-300 text-lg py-6"
                   >
                     {isSubmitting ? "Šalje se..." : "Pošaljite rezervaciju"}
