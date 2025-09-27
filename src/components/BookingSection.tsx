@@ -11,7 +11,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { debounce } from "lodash";
 
 // Form validation schema
 const formSchema = z.object({
@@ -40,6 +41,7 @@ const BookingSection = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [availability, setAvailability] = useState<{[key: string]: string[]}>({});
   const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
   
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -59,6 +61,14 @@ const BookingSection = () => {
   const checkAvailability = useCallback(async (bounceHouse: string, startDate: string, endDate: string) => {
     if (!bounceHouse || !startDate || !endDate) return;
     
+    // Cancel any previous request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    
+    // Create new abort controller for this request
+    abortControllerRef.current = new AbortController();
+    
     setIsCheckingAvailability(true);
     try {
       const { data, error } = await supabase.rpc('check_bounce_house_availability', {
@@ -75,20 +85,47 @@ const BookingSection = () => {
         [bounceHouse]: unavailableDates
       }));
     } catch (error) {
-      console.error('Error checking availability:', error);
+      if (error.name !== 'AbortError') {
+        console.error('Error checking availability:', error);
+      }
     } finally {
       setIsCheckingAvailability(false);
     }
   }, []);
+
+  // Debounced version to prevent too many API calls
+  const debouncedCheckAvailability = useCallback(
+    debounce(checkAvailability, 500),
+    [checkAvailability]
+  );
 
   const watchedValues = form.watch(['selected_bounce_house', 'booking_start_date', 'booking_end_date']);
 
   useEffect(() => {
     const [bounceHouse, startDate, endDate] = watchedValues;
     if (bounceHouse && startDate && endDate) {
-      checkAvailability(bounceHouse, startDate, endDate);
+      debouncedCheckAvailability(bounceHouse, startDate, endDate);
+    } else {
+      // Clear availability if any field is empty
+      setAvailability({});
+      setIsCheckingAvailability(false);
     }
-  }, [watchedValues, checkAvailability]);
+    
+    // Cleanup function to cancel debounced call
+    return () => {
+      debouncedCheckAvailability.cancel();
+    };
+  }, [watchedValues, debouncedCheckAvailability]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      debouncedCheckAvailability.cancel();
+    };
+  }, [debouncedCheckAvailability]);
 
   const onSubmit = async (values: FormData) => {
     // Check if dates are available before submitting
