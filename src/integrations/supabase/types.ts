@@ -17,7 +17,8 @@ export type Database = {
       bookings: {
         Row: {
           additional_notes: string | null
-          booking_date: string | null
+          booking_end_date: string
+          booking_start_date: string
           created_at: string | null
           delivery_address: string | null
           email: string | null
@@ -29,7 +30,8 @@ export type Database = {
         }
         Insert: {
           additional_notes?: string | null
-          booking_date?: string | null
+          booking_end_date?: string
+          booking_start_date?: string
           created_at?: string | null
           delivery_address?: string | null
           email?: string | null
@@ -41,7 +43,8 @@ export type Database = {
         }
         Update: {
           additional_notes?: string | null
-          booking_date?: string | null
+          booking_end_date?: string
+          booking_start_date?: string
           created_at?: string | null
           delivery_address?: string | null
           email?: string | null
@@ -58,7 +61,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_bounce_house_availability: {
+        Args: {
+          bounce_house_name: string
+          check_end_date: string
+          check_start_date: string
+        }
+        Returns: {
+          booking_id: string
+          unavailable_date: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
