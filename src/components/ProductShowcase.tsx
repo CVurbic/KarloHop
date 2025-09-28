@@ -1,17 +1,19 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import jednorogSvijet from "@/assets/jednorog-svijet.png";
+
 const ProductShowcase = () => {
   const products = [{
     id: 1,
-    name: "Princeza dvorac",
+    name: "Jednorog svijet",
     price: "110",
-    image: "/assets/princeza-dvorac.png",
-    description: "Čarobni dvorac za male princeze",
+    image: jednorogSvijet,
+    description: "Magični svijet jednorozima sa duginim toboganom",
     dimensions: "5 x 5.8 x 4m"
   }, {
     id: 2,
     name: "Legoland",
-    price: "120",
+    price: "150",
     image: "/assets/legoland.png",
     description: "Avantura poput Lego svijeta",
     dimensions: "6 x 3.5 x 4.5m"

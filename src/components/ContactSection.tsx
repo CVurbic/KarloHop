@@ -4,7 +4,62 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Mail, Phone, MapPin, Clock } from "lucide-react";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
+
 const ContactSection = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: ""
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.name || !formData.email || !formData.message) {
+      toast({
+        title: "Molimo unesite sve podatke",
+        description: "Sva polja su obavezna.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      // Send email notification
+      await supabase.functions.invoke('send-contact-email', {
+        body: formData
+      });
+
+      toast({
+        title: "Poruka uspješno poslana!",
+        description: "Vaša poruka je uspješno poslana. Odgovorit ćemo vam uskoro.",
+      });
+
+      setFormData({ name: "", email: "", message: "" });
+    } catch (error) {
+      console.error('Error sending contact email:', error);
+      toast({
+        title: "Greška pri slanju poruke",
+        description: "Došlo je do greške. Molimo pokušajte ponovo ili nas nazovite direktno.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   return <section id="contact" className="py-20 bg-background">
       <div className="container mx-auto px-4">
         {/* Section Header */}
@@ -25,24 +80,55 @@ const ContactSection = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div>
-                <Label htmlFor="contact-ime">Ime</Label>
-                <Input id="contact-ime" placeholder="Vaše ime" />
-              </div>
+              <form onSubmit={handleSubmit}>
+                <div className="space-y-6">
+                  <div>
+                    <Label htmlFor="contact-ime">Ime</Label>
+                    <Input 
+                      id="contact-ime" 
+                      name="name"
+                      placeholder="Vaše ime" 
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required 
+                    />
+                  </div>
 
-              <div>
-                <Label htmlFor="contact-email">Email</Label>
-                <Input id="contact-email" type="email" placeholder="vaš@email.com" />
-              </div>
+                  <div>
+                    <Label htmlFor="contact-email">Email</Label>
+                    <Input 
+                      id="contact-email" 
+                      name="email"
+                      type="email" 
+                      placeholder="vaš@email.com" 
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      required 
+                    />
+                  </div>
 
-              <div>
-                <Label htmlFor="contact-poruka">Poruka</Label>
-                <Textarea id="contact-poruka" placeholder="Vaše pitanje ili poruka..." rows={5} />
-              </div>
+                  <div>
+                    <Label htmlFor="contact-poruka">Poruka</Label>
+                    <Textarea 
+                      id="contact-poruka" 
+                      name="message"
+                      placeholder="Vaše pitanje ili poruka..." 
+                      rows={5} 
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      required 
+                    />
+                  </div>
 
-              <Button className="w-full gradient-secondary hover:shadow-playful transition-all duration-300 text-lg py-6">
-                Pošaljite poruku
-              </Button>
+                  <Button 
+                    type="submit" 
+                    className="w-full gradient-secondary hover:shadow-playful transition-all duration-300 text-lg py-6"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Šalje se..." : "Pošaljite poruku"}
+                  </Button>
+                </div>
+              </form>
             </CardContent>
           </Card>
 
@@ -72,7 +158,7 @@ const ContactSection = () => {
                     </div>
                     <div>
                       <h4 className="font-semibold text-foreground mb-1">Email</h4>
-                      <p className="text-muted-foreground">info@hophop.hr</p>
+                      <p className="text-muted-foreground">info@hophop-napuhanci.com</p>
                       <p className="text-sm text-muted-foreground">Za detaljne upite</p>
                     </div>
                   </div>

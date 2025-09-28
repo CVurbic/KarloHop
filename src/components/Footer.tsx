@@ -73,7 +73,7 @@ const Footer = () => {
               </div>
               <div className="flex items-center">
                 <Mail className="h-4 w-4 text-primary mr-3" />
-                <span className="text-background/80">info@hophop.hr</span>
+                <span className="text-background/80">info@hophop-napuhanci.com</span>
               </div>
               <div className="flex items-start">
                 <MapPin className="h-4 w-4 text-primary mr-3 mt-1" />

@@ -37,7 +37,7 @@ const Header = () => {
               </div>
               <div className="flex items-center space-x-1 text-muted-foreground">
                 <Mail className="h-4 w-4" />
-                <span>info@hophop.hr</span>
+                <span>info@hophop-napuhanci.com</span>
               </div>
             </div>
             <Button variant="default" className="gradient-primary hover:shadow-playful transition-all duration-300">

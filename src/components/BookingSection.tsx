@@ -152,6 +152,16 @@ const BookingSection = () => {
         throw error;
       }
 
+      // Send email notification
+      try {
+        await supabase.functions.invoke('send-booking-email', {
+          body: values
+        });
+      } catch (emailError) {
+        console.error('Error sending email:', emailError);
+        // Don't block the booking if email fails
+      }
+
       toast({
         title: "Rezervacija uspješno poslana!",
         description: "Vaša rezervacija je uspješno zabilježena. Kontaktirat ćemo Vas uskoro.",
@@ -279,8 +289,8 @@ const BookingSection = () => {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="princeza">Princeza dvorac - 110€</SelectItem>
-                            <SelectItem value="legoland">Legoland - 120€</SelectItem>
+                            <SelectItem value="jednorog">Jednorog svijet - 110€</SelectItem>
+                            <SelectItem value="legoland">Legoland - 150€</SelectItem>
                             <SelectItem value="dzungla">Mala džungla - 100€</SelectItem>
                           </SelectContent>
                         </Select>
