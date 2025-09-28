@@ -61,6 +61,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_availability_safe: {
+        Args: {
+          bounce_house_name: string
+          check_end_date: string
+          check_start_date: string
+        }
+        Returns: {
+          unavailable_date: string
+        }[]
+      }
       check_bounce_house_availability: {
         Args: {
           bounce_house_name: string

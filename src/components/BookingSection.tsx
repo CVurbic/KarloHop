@@ -71,7 +71,7 @@ const BookingSection = () => {
     
     setIsCheckingAvailability(true);
     try {
-      const { data, error } = await supabase.rpc('check_bounce_house_availability', {
+      const { data, error } = await supabase.rpc('check_availability_safe', {
         bounce_house_name: bounceHouse,
         check_start_date: startDate,
         check_end_date: endDate
