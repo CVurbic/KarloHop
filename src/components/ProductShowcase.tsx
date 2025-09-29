@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import jednorogSvijet from "@/assets/jednorog-svijet.png";
-
 const ProductShowcase = () => {
   const products = [{
     id: 1,
@@ -67,16 +66,14 @@ const ProductShowcase = () => {
 
         {/* Special Offer */}
         <div className="text-center">
-          <div className="inline-block gradient-fun text-white p-6 rounded-2xl shadow-mascot">
+          <div className="inline-block gradient-fun text-white p-6 rounded-2xl shadow-mascot px-[20px] py-[20px]">
             <h3 className="text-2xl font-bold mb-2">
               Ponedjeljak do četvrtak -25%!
             </h3>
             <p className="text-lg opacity-90 mb-2">
               Najam preko tjedna je povoljniji!!
             </p>
-            <p className="text-sm opacity-75">
-              Uštedite na radnim danima!
-            </p>
+            
           </div>
         </div>
       </div>
