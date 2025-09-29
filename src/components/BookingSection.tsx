@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Calendar, Clock, Phone } from "lucide-react";
@@ -11,8 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { useState, useEffect, useCallback, useRef } from "react";
-import { debounce } from "lodash";
+import { useState } from "react";
 
 // Form validation schema
 const formSchema = z.object({
@@ -21,25 +21,16 @@ const formSchema = z.object({
   email: z.string().email("Unesite valjanu email adresu").max(255, "Email ne smije biti duži od 255 znakova"),
   phone: z.string().min(8, "Broj telefona mora imati najmanje 8 znamenki").max(20, "Broj telefona ne smije biti duži od 20 znamenki"),
   delivery_address: z.string().min(5, "Adresa mora biti duža od 5 znakova").max(255, "Adresa ne smije biti duža od 255 znakova"),
-  booking_start_date: z.string().min(1, "Molimo odaberite početni datum"),
-  booking_end_date: z.string().min(1, "Molimo odaberite završni datum"),
+  booking_start_date: z.string().min(1, "Molimo odaberite datum"),
   selected_bounce_house: z.string().min(1, "Molimo odaberite napuhanac"),
+  multiple_days: z.boolean(),
   additional_notes: z.string().max(500, "Napomene ne smiju biti duže od 500 znakova").optional(),
-}).refine((data) => {
-  if (data.booking_start_date && data.booking_end_date) {
-    return new Date(data.booking_start_date) <= new Date(data.booking_end_date);
-  }
-  return true;
-}, {
-  message: "Završni datum mora biti nakon početnog datuma",
-  path: ["booking_end_date"],
 });
 
 type FormData = z.infer<typeof formSchema>;
 
 const BookingSection = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // Removed availability checking as requested
   
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -50,13 +41,11 @@ const BookingSection = () => {
       phone: "",
       delivery_address: "",
       booking_start_date: "",
-      booking_end_date: "",
       selected_bounce_house: "",
+      multiple_days: false,
       additional_notes: "",
     },
   });
-
-  // Availability checking removed as requested
 
   const onSubmit = async (values: FormData) => {
     setIsSubmitting(true);
@@ -81,8 +70,9 @@ const BookingSection = () => {
       }
 
       toast({
-        title: "Rezervacija uspješno poslana!",
+        title: "🎉 Rezervacija uspješno poslana!",
         description: "Vaša rezervacija je uspješno zabilježena. Kontaktirat ćemo Vas uskoro.",
+        className: "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 max-w-md",
       });
 
       form.reset();
@@ -97,7 +87,9 @@ const BookingSection = () => {
       setIsSubmitting(false);
     }
   };
-  return <section id="booking" className="py-20 bg-gradient-to-br from-primary/5 to-accent/5">
+
+  return (
+    <section id="booking" className="py-20 bg-gradient-to-br from-primary/5 to-accent/5">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -216,44 +208,46 @@ const BookingSection = () => {
                     )}
                   />
 
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="booking_start_date"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Početni datum</FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="date" 
-                              {...field}
-                              min={new Date().toISOString().split('T')[0]}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="booking_end_date"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Završni datum</FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="date" 
-                              {...field}
-                              min={form.watch('booking_start_date') || new Date().toISOString().split('T')[0]}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                  <FormField
+                    control={form.control}
+                    name="booking_start_date"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Datum rezervacije</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="date" 
+                            {...field}
+                            min={new Date().toISOString().split('T')[0]}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                  {/* Availability checking removed */}
+                  <FormField
+                    control={form.control}
+                    name="multiple_days"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>
+                            Trebam više dana
+                          </FormLabel>
+                          <p className="text-sm text-muted-foreground">
+                            Označite ako vam treba napuhanac za više od jednog dana
+                          </p>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
 
                   <FormField
                     control={form.control}
@@ -321,6 +315,8 @@ const BookingSection = () => {
           </div>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default BookingSection;

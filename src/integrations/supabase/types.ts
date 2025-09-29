@@ -17,12 +17,12 @@ export type Database = {
       bookings: {
         Row: {
           additional_notes: string | null
-          booking_end_date: string
           booking_start_date: string
           created_at: string | null
           delivery_address: string | null
           email: string | null
           id: string
+          multiple_days: boolean | null
           name: string
           phone: string | null
           selected_bounce_house: string | null
@@ -30,12 +30,12 @@ export type Database = {
         }
         Insert: {
           additional_notes?: string | null
-          booking_end_date?: string
           booking_start_date?: string
           created_at?: string | null
           delivery_address?: string | null
           email?: string | null
           id?: string
+          multiple_days?: boolean | null
           name: string
           phone?: string | null
           selected_bounce_house?: string | null
@@ -43,12 +43,12 @@ export type Database = {
         }
         Update: {
           additional_notes?: string | null
-          booking_end_date?: string
           booking_start_date?: string
           created_at?: string | null
           delivery_address?: string | null
           email?: string | null
           id?: string
+          multiple_days?: boolean | null
           name?: string
           phone?: string | null
           selected_bounce_house?: string | null
