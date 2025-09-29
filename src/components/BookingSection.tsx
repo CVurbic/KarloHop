@@ -39,9 +39,7 @@ type FormData = z.infer<typeof formSchema>;
 
 const BookingSection = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [availability, setAvailability] = useState<{[key: string]: string[]}>({});
-  const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
-  const abortControllerRef = useRef<AbortController | null>(null);
+  // Removed availability checking as requested
   
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -58,89 +56,9 @@ const BookingSection = () => {
     },
   });
 
-  const checkAvailability = useCallback(async (bounceHouse: string, startDate: string, endDate: string) => {
-    if (!bounceHouse || !startDate || !endDate) return;
-    
-    // Cancel any previous request
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-    
-    // Create new abort controller for this request
-    abortControllerRef.current = new AbortController();
-    
-    setIsCheckingAvailability(true);
-    try {
-      const { data, error } = await supabase.rpc('check_availability_safe', {
-        bounce_house_name: bounceHouse,
-        check_start_date: startDate,
-        check_end_date: endDate
-      });
-
-      if (error) throw error;
-
-      const unavailableDates = data?.map((item: any) => item.unavailable_date) || [];
-      setAvailability(prev => ({
-        ...prev,
-        [bounceHouse]: unavailableDates
-      }));
-    } catch (error) {
-      if (error.name !== 'AbortError') {
-        console.error('Error checking availability:', error);
-      }
-    } finally {
-      setIsCheckingAvailability(false);
-    }
-  }, []);
-
-  // Debounced version to prevent too many API calls
-  const debouncedCheckAvailability = useCallback(
-    debounce(checkAvailability, 500),
-    [checkAvailability]
-  );
-
-  const watchedValues = form.watch(['selected_bounce_house', 'booking_start_date', 'booking_end_date']);
-
-  useEffect(() => {
-    const [bounceHouse, startDate, endDate] = watchedValues;
-    if (bounceHouse && startDate && endDate) {
-      debouncedCheckAvailability(bounceHouse, startDate, endDate);
-    } else {
-      // Clear availability if any field is empty
-      setAvailability({});
-      setIsCheckingAvailability(false);
-    }
-    
-    // Cleanup function to cancel debounced call
-    return () => {
-      debouncedCheckAvailability.cancel();
-    };
-  }, [watchedValues, debouncedCheckAvailability]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-      debouncedCheckAvailability.cancel();
-    };
-  }, [debouncedCheckAvailability]);
+  // Availability checking removed as requested
 
   const onSubmit = async (values: FormData) => {
-    // Check if dates are available before submitting
-    const bounceHouse = values.selected_bounce_house;
-    const unavailableDates = availability[bounceHouse] || [];
-    
-    if (unavailableDates.length > 0) {
-      toast({
-        title: "Napuhanac nije dostupan",
-        description: `Odabrani napuhanac nije dostupan za datume: ${unavailableDates.join(', ')}`,
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsSubmitting(true);
     
     try {
@@ -168,7 +86,6 @@ const BookingSection = () => {
       });
 
       form.reset();
-      setAvailability({});
     } catch (error) {
       console.error('Error submitting booking:', error);
       toast({
@@ -336,34 +253,7 @@ const BookingSection = () => {
                     />
                   </div>
 
-                  {/* Availability Status */}
-                  {form.watch('selected_bounce_house') && form.watch('booking_start_date') && form.watch('booking_end_date') && (
-                    <div className="p-4 rounded-lg border">
-                      {isCheckingAvailability ? (
-                        <div className="flex items-center text-muted-foreground">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
-                          Provjeravam dostupnost...
-                        </div>
-                      ) : (
-                        <div>
-                          {availability[form.watch('selected_bounce_house')]?.length > 0 ? (
-                            <div className="text-destructive">
-                              <p className="font-medium mb-2">⚠️ Napuhanac nije dostupan za sljedeće datume:</p>
-                              <ul className="list-disc list-inside text-sm">
-                                {availability[form.watch('selected_bounce_house')].map((date: string) => (
-                                  <li key={date}>{new Date(date).toLocaleDateString('hr-HR')}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          ) : (
-                            <div className="text-green-600">
-                              <p className="font-medium">✅ Napuhanac je dostupan za odabrane datume!</p>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  {/* Availability checking removed */}
 
                   <FormField
                     control={form.control}
@@ -381,7 +271,7 @@ const BookingSection = () => {
 
                   <Button 
                     type="submit" 
-                    disabled={isSubmitting || isCheckingAvailability || (form.watch('selected_bounce_house') && availability[form.watch('selected_bounce_house')]?.length > 0)}
+                    disabled={isSubmitting}
                     className="w-full gradient-primary hover:shadow-playful transition-all duration-300 text-lg py-6"
                   >
                     {isSubmitting ? "Šalje se..." : "Pošaljite rezervaciju"}
@@ -425,7 +315,7 @@ const BookingSection = () => {
                 <li>• Rezervirajte 2-3 dana unaprijed</li>
                 <li>• Provjerite vremensku prognozu</li>
                 <li>• Pripremite ravnu površinu 6x6m</li>
-                <li>• Osigurajte pristup struju u blizini</li>
+                <li>• Osigurajte pristup struji u blizini</li>
               </ul>
             </div>
           </div>

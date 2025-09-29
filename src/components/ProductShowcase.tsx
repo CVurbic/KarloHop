@@ -66,13 +66,27 @@ const ProductShowcase = () => {
         </div>
 
         {/* Special Offer */}
-        <div className="text-center">
-          <div className="inline-block gradient-fun text-white p-6 rounded-2xl shadow-mascot">
+        <div className="text-center relative">
+          {/* Floating percentage elements */}
+          <div className="absolute -left-16 top-1/2 transform -translate-y-1/2 text-4xl font-bold gradient-fun bg-clip-text text-transparent animate-pulse hidden lg:block">
+            %
+          </div>
+          <div className="absolute -right-16 top-1/2 transform -translate-y-1/2 text-4xl font-bold gradient-fun bg-clip-text text-transparent animate-pulse hidden lg:block">
+            %
+          </div>
+          <div className="absolute -left-8 top-8 text-2xl font-bold gradient-fun bg-clip-text text-transparent animate-pulse opacity-60 hidden lg:block">
+            %
+          </div>
+          <div className="absolute -right-8 bottom-8 text-2xl font-bold gradient-fun bg-clip-text text-transparent animate-pulse opacity-60 hidden lg:block">
+            %
+          </div>
+          
+          <div className="inline-block gradient-fun text-white p-6 rounded-2xl shadow-mascot relative z-10">
             <h3 className="text-2xl font-bold mb-2">
-              Posebna ponuda: 3 dana za cijenu 2
+              Ponedjeljak do četvrtak -25%!
             </h3>
             <p className="text-lg opacity-90">
-              Treći dan gratis!
+              Uštedite na radnim danima!
             </p>
           </div>
         </div>
