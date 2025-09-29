@@ -70,9 +70,7 @@ const ProductShowcase = () => {
             <h3 className="text-2xl font-bold mb-2">
               Ponedjeljak do četvrtak -25%!
             </h3>
-            <p className="text-lg opacity-90 mb-2">
-              Najam preko tjedna je povoljniji!!
-            </p>
+            <p className="text-lg opacity-90 mb-2">Najam napuhanca preko tjedna je povoljniji!!</p>
             
           </div>
         </div>
