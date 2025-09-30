@@ -17,7 +17,7 @@ const DeliverySection = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-center lg:justify-start">
                 <MapPin className="h-5 w-5 text-primary mr-3" />
-                <span className="text-lg">Besplatna dostava u Zagrebu</span>
+                <span className="text-lg">Isporuka za Zagreb po dogovoru</span>
               </div>
               <div className="flex items-center justify-center lg:justify-start">
                 <MapPin className="h-5 w-5 text-primary mr-3" />

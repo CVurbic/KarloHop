@@ -198,9 +198,9 @@ const BookingSection = () => {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="jednorog">Jednorog svijet - 110€</SelectItem>
-                            <SelectItem value="legoland">Legoland - 150€</SelectItem>
-                            <SelectItem value="dzungla">Mala džungla - 100€</SelectItem>
+                            <SelectItem value="jednorog">Jednorog svijet - 80€</SelectItem>
+                            <SelectItem value="legoland">Legoland - 100€</SelectItem>
+                            <SelectItem value="dzungla">Mala džungla - 75€</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -280,7 +280,7 @@ const BookingSection = () => {
             <Card className="shadow-card">
               <CardContent className="p-8 text-center">
                 <div className="mb-6">
-                  <img src="/assets/mascot-chill.png" alt="Hop Hop mascot relaxing" className="w-32 h-32 mx-auto object-contain mascot-hover" />
+                  <img src="/assets/rezervacije-2.png" alt="Hop Hop mascot taking reservations" className="w-32 h-32 mx-auto object-contain mascot-hover" />
                 </div>
                 <h3 className="text-2xl font-bold text-foreground mb-4">
                   Ili nas nazovite direktno!

@@ -1,18 +1,18 @@
 import { Card, CardContent } from "@/components/ui/card";
 const AdvantagesSection = () => {
   const advantages = [{
-    title: "Besplatna dostava",
-    description: "Dostavljamo napuhance besplatno u Zagrebu i okolici",
+    title: "Brza dostava",
+    description: "Dostavljamo napuhance brzo u Zagrebu i okolici",
     image: "/assets/mascot-delivery.png",
     bgColor: "from-primary/10 to-primary/5"
   }, {
-    title: "Montaža uračunata u cijenu",
-    description: "Naš tim postavlja i objašnjava sigurno korištenje",
-    image: "/assets/mascot-setup.png",
+    title: "Loše vrijeme bez naknada",
+    description: "Nema novčanih naknada kada otkažemo zbog lošeg vremena",
+    image: "/assets/nevrijeme.png",
     bgColor: "from-secondary/10 to-secondary/5"
   }, {
-    title: "Bez skrivenih troškova",
-    description: "Transparentne cijene, plaćate točno ono što vidite",
+    title: "Bez avansne uplate",
+    description: "Plaćate tek kad napuhanac stigne na vašu lokaciju",
     image: "/assets/mascot-chill.png",
     bgColor: "from-accent/10 to-accent/5"
   }];
@@ -41,6 +41,15 @@ const AdvantagesSection = () => {
                 </p>
               </CardContent>
             </Card>)}
+        </div>
+
+        {/* Booking Button */}
+        <div className="text-center mt-16">
+          <a href="#booking" className="inline-block">
+            <button className="gradient-primary hover:shadow-playful transition-all duration-300 text-white font-semibold py-4 px-8 rounded-lg text-lg hover:-translate-y-1">
+              Rezerviraj napuhanac
+            </button>
+          </a>
         </div>
       </div>
     </section>;

@@ -5,21 +5,21 @@ const ProductShowcase = () => {
   const products = [{
     id: 1,
     name: "Jednorog svijet",
-    price: "110",
+    price: "80",
     image: jednorogSvijet,
     description: "Magični svijet jednorozima sa duginim toboganom",
     dimensions: "5 x 5.8 x 4m"
   }, {
     id: 2,
     name: "Legoland",
-    price: "150",
+    price: "100",
     image: "/assets/legoland.png",
     description: "Avantura poput Lego svijeta",
     dimensions: "6 x 3.5 x 4.5m"
   }, {
     id: 3,
     name: "Mala džungla",
-    price: "100",
+    price: "75",
     image: "/assets/mala-dzungla.png",
     description: "Safari avantura u vlastitom dvorištu",
     dimensions: "5 x 4 x 3.6m"
@@ -49,8 +49,11 @@ const ProductShowcase = () => {
                 <p className="text-muted-foreground mb-2">
                   {product.description}
                 </p>
-                <p className="text-sm text-muted-foreground mb-4">
+                <p className="text-sm text-muted-foreground mb-2">
                   Dimenzije: {product.dimensions}
+                </p>
+                <p className="text-xs text-muted-foreground/70 mb-4">
+                  *Cijena se odnosi na osobno preuzimanje po dogovoru
                 </p>
                 <div className="flex items-center justify-between">
                   <div className="text-2xl font-bold text-primary">
