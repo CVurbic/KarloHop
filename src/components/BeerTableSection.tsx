@@ -26,7 +26,7 @@ const BeerTableSection = () => {
             </div>
             
             <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-              Idealno za zabave i proslave! Naši kvalitetni pivski stolovi s klupama pružaju udobno sjedenje za sve goste. Savršeno za vrtne zabave, rođendane i obiteljska okupljanja.
+              Naši kvalitetni pivski stolovi s klupama osiguravaju udobno sjedenje za sve goste. Bilo da planirate vrtne zabave, rođendane ili obiteljska okupljanja, naši stolovi i klupe pružaju praktično i stabilno rješenje. Savršeni su i za veće proslave na otvorenom, a jednostavno postavljanje i čvrsta konstrukcija čine ih najboljim izborom za svaku priliku.
             </p>
 
             <div className="space-y-4">
