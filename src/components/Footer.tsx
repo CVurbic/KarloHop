@@ -19,13 +19,13 @@ const Footer = () => {
             </div>
             <p className="text-background/80 mb-6 leading-relaxed">Hop Hop Napuhanci – najam napuhanaca za dječje rođendane, proslave i događanja. Naši sigurni i kvalitetni dvorci, tobogani i tematski napuhanci uz brzu dostavu i profesionalnu uslugu uveseljavaju djecu diljem Zagreba i okolice.</p>
             <div className="flex space-x-4">
-              <a href="#" className="bg-primary p-3 rounded-full hover:bg-primary/80 transition-colors" aria-label="Facebook">
+              <a href="https://www.facebook.com/hophopnapuhanci" target="_blank" rel="noopener noreferrer" className="bg-primary p-3 rounded-full hover:bg-primary/80 transition-colors" aria-label="Facebook">
                 <Facebook className="h-5 w-5 text-white" />
               </a>
-              <a href="#" className="bg-secondary p-3 rounded-full hover:bg-secondary/80 transition-colors" aria-label="Instagram">
+              <a href="https://www.instagram.com/hophopnapuhanci/" target="_blank" rel="noopener noreferrer" className="bg-secondary p-3 rounded-full hover:bg-secondary/80 transition-colors" aria-label="Instagram">
                 <Instagram className="h-5 w-5 text-white" />
               </a>
-              <a href="#" className="bg-accent p-3 rounded-full hover:bg-accent/80 transition-colors" aria-label="TikTok">
+              <a href="https://www.tiktok.com/@hophopnapuhanci" target="_blank" rel="noopener noreferrer" className="bg-accent p-3 rounded-full hover:bg-accent/80 transition-colors" aria-label="TikTok">
                 <TikTok className="h-5 w-5 text-white" />
               </a>
             </div>
