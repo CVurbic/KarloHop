@@ -34,7 +34,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Send email to business
     const businessEmailResponse = await resend.emails.send({
       from: "Hop Hop Napuhanci <onboarding@resend.dev>",
-      to: ["turic.karlo@gmail.com"],
+      to: ["tiktokarlo2021@gmail.com", "turic.karlo@gmail.com"],
       subject: `Nova rezervacija - ${bookingData.selected_bounce_house}`,
       html: `
         <h1>Nova rezervacija napuhanca!</h1>
