@@ -200,7 +200,7 @@ const BookingSection = () => {
                           <SelectContent>
                             <SelectItem value="jednorog">Jednorog svijet - 80€</SelectItem>
                             <SelectItem value="legoland">Legoland - 100€</SelectItem>
-                            <SelectItem value="dzungla">Mala džungla - 75€</SelectItem>
+                            <SelectItem value="dino-park">Dino park - 75€</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />

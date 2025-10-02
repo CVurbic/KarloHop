@@ -18,10 +18,10 @@ const ProductShowcase = () => {
     dimensions: "6 x 3.5 x 4.5m"
   }, {
     id: 3,
-    name: "Mala džungla",
+    name: "Dino park",
     price: "75",
-    image: "/assets/mala-dzungla.png",
-    description: "Safari avantura u vlastitom dvorištu",
+    image: "/assets/dino-park.png",
+    description: "Avantura u svijetu dinosaura",
     dimensions: "5 x 4 x 3.6m"
   }];
   return <section id="products" className="py-20 bg-background">
