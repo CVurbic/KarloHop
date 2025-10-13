@@ -7,7 +7,7 @@ const BeerTableSection = () => {
         <div className="text-center lg:text-left lg:order-2">
           <div className="flex items-center justify-center lg:justify-start mb-6">
             <h2 className="text-4xl lg:text-5xl font-bold text-foreground">
-              Najam <span className="text-primary">pivskih stolova</span>
+              Najam <span className="text-primary">stolova i klupa</span>
             </h2>
           </div>
           
