@@ -12,7 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // Form validation schema
 const formSchema = z.object({
@@ -24,6 +24,7 @@ const formSchema = z.object({
   booking_start_date: z.string().min(1, "Molimo odaberite datum"),
   selected_bounce_house: z.string().min(1, "Molimo odaberite napuhanac"),
   multiple_days: z.boolean(),
+  add_table_set: z.boolean(),
   additional_notes: z.string().max(500, "Napomene ne smiju biti duže od 500 znakova").optional(),
 });
 
@@ -31,6 +32,8 @@ type FormData = z.infer<typeof formSchema>;
 
 const BookingSection = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [availabilityStatus, setAvailabilityStatus] = useState<string>("");
+  const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
   
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -43,9 +46,47 @@ const BookingSection = () => {
       booking_start_date: "",
       selected_bounce_house: "",
       multiple_days: false,
+      add_table_set: false,
       additional_notes: "",
     },
   });
+
+  const selectedDate = form.watch("booking_start_date");
+  const selectedBounceHouse = form.watch("selected_bounce_house");
+
+  useEffect(() => {
+    const checkAvailability = async () => {
+      if (!selectedDate || !selectedBounceHouse) {
+        setAvailabilityStatus("");
+        return;
+      }
+
+      setIsCheckingAvailability(true);
+      
+      try {
+        const { data, error } = await supabase
+          .from('bookings')
+          .select('*')
+          .eq('booking_start_date', selectedDate)
+          .eq('selected_bounce_house', selectedBounceHouse);
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          setAvailabilityStatus("❌ Ovaj napuhanac je već rezerviran za odabrani datum");
+        } else {
+          setAvailabilityStatus("✅ Dostupno za rezervaciju!");
+        }
+      } catch (error) {
+        console.error('Error checking availability:', error);
+        setAvailabilityStatus("");
+      } finally {
+        setIsCheckingAvailability(false);
+      }
+    };
+
+    checkAvailability();
+  }, [selectedDate, selectedBounceHouse]);
 
   const onSubmit = async (values: FormData) => {
     setIsSubmitting(true);
@@ -221,6 +262,13 @@ const BookingSection = () => {
                             min={new Date().toISOString().split('T')[0]}
                           />
                         </FormControl>
+                        {availabilityStatus && (
+                          <p className={`text-sm mt-2 font-semibold ${
+                            availabilityStatus.includes("✅") ? "text-green-600" : "text-red-600"
+                          }`}>
+                            {isCheckingAvailability ? "Provjeravam dostupnost..." : availabilityStatus}
+                          </p>
+                        )}
                         <FormMessage />
                       </FormItem>
                     )}
@@ -243,6 +291,29 @@ const BookingSection = () => {
                           </FormLabel>
                           <p className="text-sm text-muted-foreground">
                             Označite ako vam treba napuhanac za više od jednog dana
+                          </p>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="add_table_set"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border-2 border-primary/50 bg-primary/5 p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel className="text-base font-bold flex items-center">
+                            ⭐ Dodaj set stola i klupa za samo 15€/dan
+                          </FormLabel>
+                          <p className="text-sm text-muted-foreground">
+                            <span className="font-semibold text-primary">Preporučujemo!</span> Savršeno za dodatno sjedenje na vašem događaju - 1 stol i 2 klupe
                           </p>
                         </div>
                       </FormItem>

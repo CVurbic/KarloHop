@@ -78,7 +78,7 @@ const Footer = () => {
               <div className="flex items-start">
                 <MapPin className="h-4 w-4 text-primary mr-3 mt-1" />
                 <span className="text-background/80">
-                  Zagreb i okolica<br />
+                  Siječanjska ulica 11, Zagreb<br />
                   Dostava do 30km
                 </span>
               </div>
