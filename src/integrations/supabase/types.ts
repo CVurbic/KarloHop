@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       bookings: {
         Row: {
+          add_table_set: boolean | null
           additional_notes: string | null
           booking_start_date: string
           created_at: string | null
@@ -29,6 +30,7 @@ export type Database = {
           surname: string
         }
         Insert: {
+          add_table_set?: boolean | null
           additional_notes?: string | null
           booking_start_date?: string
           created_at?: string | null
@@ -42,6 +44,7 @@ export type Database = {
           surname: string
         }
         Update: {
+          add_table_set?: boolean | null
           additional_notes?: string | null
           booking_start_date?: string
           created_at?: string | null
