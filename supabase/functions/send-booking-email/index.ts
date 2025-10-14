@@ -15,10 +15,11 @@ interface BookingEmailRequest {
   email: string;
   phone: string;
   booking_start_date: string;
-  booking_end_date: string;
   selected_bounce_house: string;
   delivery_address: string;
-  additional_notes: string;
+  multiple_days?: boolean;
+  add_table_set?: boolean;
+  additional_notes?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -43,8 +44,9 @@ const handler = async (req: Request): Promise<Response> => {
         <p><strong>Email:</strong> ${bookingData.email}</p>
         <p><strong>Telefon:</strong> ${bookingData.phone}</p>
         <p><strong>Napuhanac:</strong> ${bookingData.selected_bounce_house}</p>
-        <p><strong>Datum od:</strong> ${bookingData.booking_start_date}</p>
-        <p><strong>Datum do:</strong> ${bookingData.booking_end_date}</p>
+        <p><strong>Datum:</strong> ${bookingData.booking_start_date}</p>
+        ${bookingData.multiple_days ? '<p><strong>Napomena:</strong> Klijent treba više dana</p>' : ''}
+        ${bookingData.add_table_set ? '<p><strong>Dodatno:</strong> Set stola i klupa (+15€/dan)</p>' : ''}
         <p><strong>Adresa dostave:</strong> ${bookingData.delivery_address}</p>
         ${bookingData.additional_notes ? `<p><strong>Dodatne napomene:</strong> ${bookingData.additional_notes}</p>` : ''}
         
@@ -64,8 +66,9 @@ const handler = async (req: Request): Promise<Response> => {
         <p>Primili smo vašu rezervaciju za napuhanac <strong>${bookingData.selected_bounce_house}</strong>.</p>
         
         <h2>Detalji vaše rezervacije:</h2>
-        <p><strong>Datum od:</strong> ${bookingData.booking_start_date}</p>
-        <p><strong>Datum do:</strong> ${bookingData.booking_end_date}</p>
+        <p><strong>Datum:</strong> ${bookingData.booking_start_date}</p>
+        ${bookingData.multiple_days ? '<p>Kontaktirat ćemo vas radi dogovora oko točnog broja dana.</p>' : ''}
+        ${bookingData.add_table_set ? '<p><strong>Dodatno:</strong> Set stola i klupa (+15€/dan)</p>' : ''}
         <p><strong>Adresa dostave:</strong> ${bookingData.delivery_address}</p>
         ${bookingData.additional_notes ? `<p><strong>Vaše napomene:</strong> ${bookingData.additional_notes}</p>` : ''}
         
