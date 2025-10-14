@@ -31,7 +31,7 @@ const ProductShowcase = () => {
           <h2 className="text-4xl lg:text-5xl font-bold text-foreground mb-6">
             Naši <span className="text-primary">Napuhanci</span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Najam napuhanaca za dječje rođendane i proslave. Sigurni, kvalitetni i zabavni dvorci ili tobogani za nezaboravnu igru i osmijehe te stolovi i klupe za roditelje i goste.</p>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Najam napuhanaca za dječje rođendane i proslave. Sigurni, kvalitetni i zabavni dvorci, tobogani i avanture na napuhavanje za nezaboravnu igru i osmijehe.</p>
         </div>
 
         {/* Product Grid */}

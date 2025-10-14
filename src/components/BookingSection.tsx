@@ -313,7 +313,7 @@ const BookingSection = () => {
                             ⭐ Dodaj set stola i klupa za samo 15€/dan
                           </FormLabel>
                           <p className="text-sm text-muted-foreground">
-                            <span className="font-semibold text-primary">Preporučujemo!</span> Idealno za roditelje i goste dok djeca skaču – 1 stol + 2 klupe.
+                            <span className="font-semibold text-primary">Preporučujemo!</span> Savršeno za dodatno sjedenje na vašem događaju - 1 stol i 2 klupe
                           </p>
                         </div>
                       </FormItem>

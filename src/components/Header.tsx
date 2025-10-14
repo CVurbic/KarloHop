@@ -17,7 +17,9 @@ const Header = () => {
             <a href="#products" className="text-foreground hover:text-primary transition-colors">
               Napuhanci
             </a>
-            <a href="#advantages" className="text-foreground hover:text-primary transition-colors">Setovi stolova</a>
+            <a href="#advantages" className="text-foreground hover:text-primary transition-colors">
+              Prednosti
+            </a>
             <a href="#booking" className="text-foreground hover:text-primary transition-colors">
               Rezervacija
             </a>

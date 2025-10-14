@@ -57,10 +57,8 @@ const TableRental = () => {
         rental_type: values.tables_only ? "Samo stolovi" : values.benches_only ? "Samo klupe" : "Komplet set",
       };
 
-      const rentalDescription = `Najam stolova - ${rentalDetails.rental_type} - ${values.number_of_sets} set(ova)`;
-
-      // Insert booking into database
-      const { error: dbError } = await supabase
+      // Za sada možemo koristiti istu tablicu bookings sa posebnom oznakom
+      const { error } = await supabase
         .from('bookings')
         .insert([{
           name: values.name,
@@ -69,31 +67,11 @@ const TableRental = () => {
           phone: values.phone,
           delivery_address: values.delivery_address,
           booking_start_date: values.rental_date,
-          selected_bounce_house: rentalDescription,
+          selected_bounce_house: `Najam stolova - ${rentalDetails.rental_type} - ${values.number_of_sets} set(ova)`,
           additional_notes: values.additional_notes || "",
         }]);
 
-      if (dbError) throw dbError;
-
-      // Send confirmation email
-      try {
-        await supabase.functions.invoke('send-booking-email', {
-          body: {
-            name: values.name,
-            surname: values.surname,
-            email: values.email,
-            phone: values.phone,
-            booking_start_date: values.rental_date,
-            booking_end_date: values.rental_date,
-            selected_bounce_house: rentalDescription,
-            delivery_address: values.delivery_address,
-            additional_notes: values.additional_notes || "",
-          },
-        });
-      } catch (emailError) {
-        console.error('Error sending confirmation email:', emailError);
-        // Don't fail the whole booking if email fails
-      }
+      if (error) throw error;
 
       toast({
         title: "🎉 Rezervacija stolova uspješno poslana!",
@@ -160,9 +138,8 @@ const TableRental = () => {
                   <div className="flex items-center">
                     <Calendar className="h-6 w-6 text-primary mr-3" />
                     <div>
-                      <h3 className="font-bold text-lg">Cijena najma</h3>
+                      <h3 className="font-bold text-lg">Cijena</h3>
                       <p className="text-2xl font-bold text-primary">15€/dan po setu</p>
-                      <p className="text-sm text-muted-foreground mt-1">*Dostava se naplaćuje posebno</p>
                     </div>
                   </div>
                 </CardContent>

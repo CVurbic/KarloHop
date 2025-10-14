@@ -46,11 +46,6 @@ const Footer = () => {
                 </a>
               </li>
               <li>
-                <a href="/najam-stolova" className="text-background/80 hover:text-white transition-colors">
-                  Stolovi i klupe
-                </a>
-              </li>
-              <li>
                 <a href="#advantages" className="text-background/80 hover:text-white transition-colors">
                   Prednosti
                 </a>
