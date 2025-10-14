@@ -12,15 +12,15 @@ const MAX_REQUESTS = 5; // 5 requests per minute
 
 // Validation schema
 const bookingSchema = z.object({
-  name: z.string().trim().min(2, "Name too short").max(50, "Name too long").regex(/^[a-zA-ZčćžšđČĆŽŠĐ\s-]+$/, "Invalid name format"),
-  surname: z.string().trim().min(2, "Surname too short").max(50, "Surname too long").regex(/^[a-zA-ZčćžšđČĆŽŠĐ\s-]+$/, "Invalid surname format"),
+  name: z.string().trim().min(1, "Name required").max(100, "Name too long"),
+  surname: z.string().trim().min(1, "Surname required").max(100, "Surname too long"),
   email: z.string().trim().email("Invalid email").max(255, "Email too long"),
-  phone: z.string().trim().min(8, "Phone too short").max(20, "Phone too long").regex(/^[0-9+\s\/-]+$/, "Invalid phone format"),
+  phone: z.string().trim().min(1, "Phone required").max(50, "Phone too long"),
   booking_start_date: z.string().trim().min(1, "Start date required"),
-  booking_end_date: z.string().optional(),
-  selected_bounce_house: z.string().trim().min(1, "Bounce house selection required").max(100),
-  delivery_address: z.string().trim().min(5, "Address too short").max(200, "Address too long"),
-  additional_notes: z.string().trim().max(500, "Notes too long").optional(),
+  booking_end_date: z.string().optional().default(""),
+  selected_bounce_house: z.string().trim().min(1, "Selection required").max(200),
+  delivery_address: z.string().trim().min(1, "Address required").max(500, "Address too long"),
+  additional_notes: z.string().optional().default(""),
 });
 
 const corsHeaders = {
