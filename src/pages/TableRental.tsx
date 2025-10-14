@@ -123,7 +123,6 @@ const TableRental = () => {
                   <li>✓ Kompletni setovi (stol + 2 klupe)</li>
                   <li>✓ Samo stolovi</li>
                   <li>✓ Samo klupe</li>
-                  <li>✓ Dostava i postavljanje uključeno</li>
                 </ul>
               </div>
             </div>
