@@ -313,7 +313,7 @@ const BookingSection = () => {
                             ⭐ Dodaj set stola i klupa za samo 15€/dan
                           </FormLabel>
                           <p className="text-sm text-muted-foreground">
-                            <span className="font-semibold text-primary">Preporučujemo!</span> 1 stol + 2 klupe
+                            <span className="font-semibold text-primary">Preporučujemo!</span> Stol + 2 klupe za roditelje i goste
                           </p>
                         </div>
                       </FormItem>
