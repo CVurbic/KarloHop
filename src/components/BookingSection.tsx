@@ -130,7 +130,7 @@ const BookingSection = () => {
   };
 
   return (
-    <section id="booking" className="py-20 bg-gradient-to-br from-primary/5 to-accent/5">
+    <section id="rezervacija" className="py-20 bg-gradient-to-br from-primary/5 to-accent/5">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -313,7 +313,7 @@ const BookingSection = () => {
                             ⭐ Dodaj set stola i klupa za samo 15€/dan
                           </FormLabel>
                           <p className="text-sm text-muted-foreground">
-                            <span className="font-semibold text-primary">Preporučujemo!</span> Savršeno za dodatno sjedenje na vašem događaju - 1 stol i 2 klupe
+                            <span className="font-semibold text-primary">Preporučujemo!</span> 1 stol + 2 klupe
                           </p>
                         </div>
                       </FormItem>

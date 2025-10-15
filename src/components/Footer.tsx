@@ -36,27 +36,27 @@ const Footer = () => {
             <h3 className="text-lg font-bold mb-4 text-white">Brzi linkovi</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#home" className="text-background/80 hover:text-white transition-colors">
+                <a href="#pocetna" className="text-background/80 hover:text-white transition-colors">
                   Početna
                 </a>
               </li>
               <li>
-                <a href="#products" className="text-background/80 hover:text-white transition-colors">
+                <a href="#napuhanci" className="text-background/80 hover:text-white transition-colors">
                   Napuhanci
                 </a>
               </li>
               <li>
-                <a href="#advantages" className="text-background/80 hover:text-white transition-colors">
+                <a href="#prednosti" className="text-background/80 hover:text-white transition-colors">
                   Prednosti
                 </a>
               </li>
               <li>
-                <a href="#booking" className="text-background/80 hover:text-white transition-colors">
+                <a href="#rezervacija" className="text-background/80 hover:text-white transition-colors">
                   Rezervacija
                 </a>
               </li>
               <li>
-                <a href="#contact" className="text-background/80 hover:text-white transition-colors">
+                <a href="#kontakt" className="text-background/80 hover:text-white transition-colors">
                   Kontakt
                 </a>
               </li>
@@ -78,7 +78,7 @@ const Footer = () => {
               <div className="flex items-start">
                 <MapPin className="h-4 w-4 text-primary mr-3 mt-1" />
                 <span className="text-background/80">
-                  Siječanjska ulica 11, Zagreb<br />
+                  Lanište 26, Zagreb<br />
                   Dostava do 30km
                 </span>
               </div>

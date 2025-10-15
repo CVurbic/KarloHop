@@ -60,7 +60,7 @@ const ContactSection = () => {
       setIsSubmitting(false);
     }
   };
-  return <section id="contact" className="py-20 bg-background">
+  return <section id="kontakt" className="py-20 bg-background">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -168,9 +168,9 @@ const ContactSection = () => {
                       <MapPin className="h-6 w-6 text-accent" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-foreground mb-1">Područje dostave</h4>
-                      <p className="text-muted-foreground">Zagreb i okolica</p>
-                      <p className="text-sm text-muted-foreground">Do 30km od centra</p>
+                      <h4 className="font-semibold text-foreground mb-1">Adresa</h4>
+                      <p className="text-muted-foreground">Lanište 26, Zagreb</p>
+                      <p className="text-sm text-muted-foreground">Dostava do 30km</p>
                     </div>
                   </div>
 

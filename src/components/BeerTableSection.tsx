@@ -30,13 +30,6 @@ const BeerTableSection = () => {
               </div>
             </div>
             
-            <div className="mt-8 flex justify-center lg:justify-start">
-              <a href="/najam-stolova">
-                <button className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-4 rounded-md font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300">
-                  Rezerviraj Stolove
-                </button>
-              </a>
-            </div>
           </div>
 
         {/* Image */}

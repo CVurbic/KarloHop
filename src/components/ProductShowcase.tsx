@@ -1,14 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import jednorogSvijet from "@/assets/jednorog-svijet.png";
+
 const ProductShowcase = () => {
   const products = [{
     id: 1,
     name: "Jednorog svijet",
     price: "80",
-    image: jednorogSvijet,
+    image: "/assets/jednorog-novi.png",
     description: "Magični svijet jednorozima sa duginim toboganom",
-    dimensions: "5 x 5.8 x 4m"
+    dimensions: "5.5 x 4.5 x 4.5m"
   }, {
     id: 2,
     name: "Legoland",
@@ -20,11 +20,11 @@ const ProductShowcase = () => {
     id: 3,
     name: "Dino park",
     price: "75",
-    image: "/assets/dino-park.png",
+    image: "/assets/dino-park-novi.png",
     description: "Avantura u svijetu dinosaura",
-    dimensions: "5 x 4 x 3.6m"
+    dimensions: "5.5 x 4 x 4.5m"
   }];
-  return <section id="products" className="py-20 bg-background">
+  return <section id="napuhanci" className="py-20 bg-background">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">

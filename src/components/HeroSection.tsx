@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Star, Sparkles } from "lucide-react";
 const HeroSection = () => {
-  return <section id="home" className="relative min-h-screen flex items-center glass-blue overflow-hidden">
+  return <section id="pocetna" className="relative min-h-screen flex items-center glass-blue overflow-hidden">
       {/* Background Decorations */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-20 left-10 text-warning opacity-80">
@@ -45,7 +45,7 @@ const HeroSection = () => {
               <Button 
                 size="lg" 
                 className="bg-warning text-warning-foreground hover:bg-warning/90 shadow-playful hover:shadow-mascot transition-all duration-300 text-lg px-8 py-6 rounded-full"
-                onClick={() => document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() => document.getElementById('rezervacija')?.scrollIntoView({ behavior: 'smooth' })}
               >
                 Rezerviraj svoj napuhanac
               </Button>
@@ -53,7 +53,7 @@ const HeroSection = () => {
                 variant="outline" 
                 size="lg" 
                 className="border-white text-warning hover:bg-white hover:text-primary backdrop-blur-sm text-lg px-8 py-6 rounded-full"
-                onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() => document.getElementById('napuhanci')?.scrollIntoView({ behavior: 'smooth' })}
               >
                 Pogledaj ponudu
               </Button>

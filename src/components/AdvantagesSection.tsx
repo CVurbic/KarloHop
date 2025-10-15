@@ -16,7 +16,7 @@ const AdvantagesSection = () => {
     image: "/assets/mascot-chill.png",
     bgColor: "from-accent/10 to-accent/5"
   }];
-  return <section id="advantages" className="py-20 bg-muted/30">
+  return <section id="prednosti" className="py-20 bg-muted/30">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -45,7 +45,7 @@ const AdvantagesSection = () => {
 
         {/* Booking Button */}
         <div className="text-center mt-16">
-          <a href="#booking" className="inline-block">
+          <a href="#rezervacija" className="inline-block">
             <button className="gradient-primary hover:shadow-playful transition-all duration-300 text-white font-semibold py-4 px-8 rounded-lg text-lg hover:-translate-y-1">
               Rezerviraj napuhanac
             </button>
