@@ -64,11 +64,13 @@ const BookingSection = () => {
       setIsCheckingAvailability(true);
       
       try {
+        // Use the database function to check availability securely
         const { data, error } = await supabase
-          .from('bookings')
-          .select('*')
-          .eq('booking_start_date', selectedDate)
-          .eq('selected_bounce_house', selectedBounceHouse);
+          .rpc('check_availability_safe', {
+            bounce_house_name: selectedBounceHouse,
+            check_start_date: selectedDate,
+            check_end_date: selectedDate
+          });
 
         if (error) throw error;
 
@@ -92,6 +94,26 @@ const BookingSection = () => {
     setIsSubmitting(true);
     
     try {
+      // Double-check availability before submitting
+      const { data: availabilityData, error: availabilityError } = await supabase
+        .rpc('check_availability_safe', {
+          bounce_house_name: values.selected_bounce_house,
+          check_start_date: values.booking_start_date,
+          check_end_date: values.booking_start_date
+        });
+
+      if (availabilityError) {
+        console.error('Error checking availability:', availabilityError);
+      } else if (availabilityData && availabilityData.length > 0) {
+        toast({
+          title: "Napuhanac već rezerviran",
+          description: "Ovaj napuhanac je već rezerviran za odabrani datum. Molimo odaberite drugi datum.",
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       const { error } = await supabase
         .from('bookings')
         .insert([values]);
@@ -117,6 +139,7 @@ const BookingSection = () => {
       });
 
       form.reset();
+      setAvailabilityStatus("");
     } catch (error) {
       console.error('Error submitting booking:', error);
       toast({
