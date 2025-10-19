@@ -5,21 +5,21 @@ const ProductShowcase = () => {
   const products = [{
     id: 1,
     name: "Jednorog svijet",
-    price: "80",
+    price: "90",
     image: "/assets/jednorog-novi.png",
     description: "Magični svijet jednorozima sa duginim toboganom",
     dimensions: "5.5 x 4.5 x 4.5m"
   }, {
     id: 2,
-    name: "Legoland",
-    price: "100",
-    image: "/assets/legoland.png",
-    description: "Avantura poput Lego svijeta",
+    name: "Minecraft Party",
+    price: "90",
+    image: "/assets/minecraft-party.png",
+    description: "Avantura u Minecraft svijetu sa tobogano i prepoznatljivim likovima",
     dimensions: "6 x 3.5 x 4.5m"
   }, {
     id: 3,
     name: "Dino park",
-    price: "75",
+    price: "90",
     image: "/assets/dino-park-novi.png",
     description: "Avantura u svijetu dinosaura",
     dimensions: "5.5 x 4 x 4.5m"
@@ -71,9 +71,9 @@ const ProductShowcase = () => {
         <div className="text-center">
           <div className="inline-block gradient-fun text-white p-6 rounded-2xl shadow-mascot px-[20px] py-[20px]">
             <h3 className="text-2xl font-bold mb-2">
-              Ponedjeljak do četvrtak -25%!
+              Drugi dan 50% povoljniji!
             </h3>
-            <p className="text-lg opacity-90 mb-2">Najam napuhanca preko tjedna je povoljniji!</p>
+            <p className="text-lg opacity-90 mb-2">Produžite zabavu još jedan dan uz nevjerojatnu uštedu!</p>
             
           </div>
         </div>
