@@ -15,7 +15,7 @@ const ProductShowcase = () => {
     price: "90",
     image: "/assets/minecraft-party.png",
     description: "Avantura u Minecraft svijetu sa tobogano i prepoznatljivim likovima",
-    dimensions: "6 x 3.5 x 4.5m"
+    dimensions: "5.5 x 4.5 x 4.5m"
   }, {
     id: 3,
     name: "Dino park",
