@@ -7,21 +7,21 @@ const ProductShowcase = () => {
     name: "Jednorog svijet",
     price: "90",
     image: "/assets/jednorog-novi.png",
-    description: "Magični svijet jednorozima sa duginim toboganom",
+    description: "Napuhanac s jednorozima za male princeze",
     dimensions: "5.5 x 4.5 x 4.5m"
   }, {
     id: 2,
-    name: "Minecraft Party",
+    name: "Minecraft party",
     price: "90",
     image: "/assets/minecraft-party.png",
-    description: "Avantura u Minecraft svijetu sa tobogano i prepoznatljivim likovima",
+    description: "Minecraft avantura u napuhancu s toboganom",
     dimensions: "5.5 x 4.5 x 4.5m"
   }, {
     id: 3,
     name: "Dino park",
     price: "90",
     image: "/assets/dino-park-novi.png",
-    description: "Avantura u svijetu dinosaura",
+    description: "Zabava u Dinosaur napuhancu za male istraživače",
     dimensions: "5.5 x 4 x 4.5m"
   }];
   return <section id="napuhanci" className="py-20 bg-background">
