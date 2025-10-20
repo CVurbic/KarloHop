@@ -12,7 +12,7 @@ const DeliverySection = () => {
               </h2>
             </div>
             
-            <p className="text-xl text-muted-foreground mb-8 leading-relaxed">Naš tim brzo i sigurno dostavlja napuhance direktno na vašu lokaciju. Pokrivamo cijeli Zagreb i okolna mjesta do 30km udaljenosti. Veće udaljenosti uz dogovor i plaćanje putem poziva.</p>
+            <p className="text-xl text-muted-foreground mb-8 leading-relaxed">Naš tim brzo i sigurno dostavlja napuhance direktno na vašu lokaciju. Pokrivamo cijeli Zagreb i okolna mjesta do 30km udaljenosti. Veće udaljenosti uz dogovor i plaćanje putem poziva. Osobno preuzimanje je moguće u našoj garaži na adresi Lanište 26.</p>
 
             <div className="space-y-4">
               <div className="flex items-center justify-center lg:justify-start">
@@ -26,10 +26,6 @@ const DeliverySection = () => {
               <div className="flex items-center justify-center lg:justify-start">
                 <MapPin className="h-5 w-5 text-primary mr-3" />
                 <span className="text-lg">Dostava za samo 1€/km</span>
-              </div>
-              <div className="flex items-center justify-center lg:justify-start">
-                <MapPin className="h-5 w-5 text-primary mr-3" />
-                <span className="text-lg">Osobno preuzimanje je moguće u našoj garaži na adresi Lanište 26.</span>
               </div>
             </div>
           </div>
