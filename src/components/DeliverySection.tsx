@@ -17,7 +17,7 @@ const DeliverySection = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-center lg:justify-start">
                 <MapPin className="h-5 w-5 text-primary mr-3" />
-                <span className="text-lg">Isporuka za Zagreb po dogovoru</span>
+                <span className="text-lg">Montaža uračunata u cijenu</span>
               </div>
               <div className="flex items-center justify-center lg:justify-start">
                 <MapPin className="h-5 w-5 text-primary mr-3" />
@@ -25,7 +25,11 @@ const DeliverySection = () => {
               </div>
               <div className="flex items-center justify-center lg:justify-start">
                 <MapPin className="h-5 w-5 text-primary mr-3" />
-                <span className="text-lg">Brza dostava unutar 24 sata</span>
+                <span className="text-lg">Dostava za samo 1€/km</span>
+              </div>
+              <div className="flex items-center justify-center lg:justify-start">
+                <MapPin className="h-5 w-5 text-primary mr-3" />
+                <span className="text-lg">Osobno preuzimanje je moguće u našoj garaži na adresi Lanište 26.</span>
               </div>
             </div>
           </div>
