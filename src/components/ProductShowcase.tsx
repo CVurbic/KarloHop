@@ -53,11 +53,11 @@ const ProductShowcase = () => {
                   Dimenzije: {product.dimensions}
                 </p>
                 <p className="text-xs text-muted-foreground/70 mb-4">
-                  *Cijena se odnosi na osobno preuzimanje po dogovoru
+                  *Cijena se odnosi na osobno preuzimanje po dogovoru ili dostavu do 10km udaljenosti
                 </p>
                 <div className="flex items-center justify-between">
                   <div className="text-2xl font-bold text-primary">
-                    {product.price}€<span className="text-sm text-muted-foreground">/dan</span>
+                    100€<span className="text-sm text-muted-foreground">/dan</span>
                   </div>
                   <Button variant="default" className="gradient-secondary hover:shadow-playful transition-all duration-300">
                     Rezerviraj

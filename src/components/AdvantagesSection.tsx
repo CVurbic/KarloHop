@@ -1,8 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 const AdvantagesSection = () => {
   const advantages = [{
-    title: "Brza dostava",
-    description: "Dostavljamo napuhance brzo u Zagrebu i okolici",
+    title: "Besplatna dostava",
+    description: "Dostavljamo napuhance besplatno do 10km udaljenosti",
     image: "/assets/mascot-delivery.png",
     bgColor: "from-primary/10 to-primary/5"
   }, {
