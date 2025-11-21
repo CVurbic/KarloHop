@@ -12,7 +12,7 @@ const FAQSection = () => {
     },
     {
       question: "Na koje lokacije dostavljamo napuhance?",
-      answer: "Dostavljamo napuhance unutar Zagreba te u okolna mjesta do 30km udaljenosti (Sesvete, Velika Gorica, Zaprešić i sl.) po cijeni od 1€/km, a maksimalno 40€. Za udaljenije lokacije moguć je dodatni trošak dostave. Ako vaša lokacija zahtijeva posebne uvjete (neravan teren, daleka udaljenost), obratite nam se za besplatnu procjenu."
+      answer: "Dostavljamo napuhance besplatno unutar Zagreba i okolnih mjesta do 10km udaljenosti. Za lokacije do 30km dostava je po dogovoru. Za udaljenije lokacije moguć je dodatni trošak dostave. Ako vaša lokacija zahtijeva posebne uvjete (neravan teren, daleka udaljenost), obratite nam se za besplatnu procjenu."
     },
     {
       question: "Koliko dugo traje najam i mogu li produžiti vrijeme najma?",
