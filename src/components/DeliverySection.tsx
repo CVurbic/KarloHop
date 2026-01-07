@@ -1,20 +1,24 @@
-import { MapPin, Truck } from "lucide-react";
+import { MapPin } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
 const DeliverySection = () => {
-  return <section className="py-20 bg-background">
+  return (
+    <section className="py-20 bg-background">
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Content */}
           <div className="text-center lg:text-left">
             <div className="flex items-center justify-center lg:justify-start mb-6">
-              
               <h2 className="text-4xl lg:text-5xl font-bold text-foreground">
                 Dostavljamo u <span className="text-primary">Zagrebu</span> i okolici
               </h2>
             </div>
             
-            <p className="text-xl text-muted-foreground mb-8 leading-relaxed">Naš tim brzo i sigurno dostavlja napuhance direktno na vašu lokaciju. Nudimo besplatnu dostavu unutar 10km, a za lokacije do 30km dostava je po dogovoru. Osobno preuzimanje je moguće u našoj garaži na adresi Lanište 26.</p>
+            <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
+              Naš tim brzo i sigurno dostavlja napuhance direktno na vašu lokaciju. Nudimo besplatnu dostavu unutar 10km, a za lokacije do 30km dostava je po dogovoru. Osobno preuzimanje je moguće u našoj garaži na adresi Lanište 26.
+            </p>
 
-            <div className="space-y-4">
+            <div className="space-y-4 mb-8">
               <div className="flex items-center justify-center lg:justify-start">
                 <MapPin className="h-5 w-5 text-primary mr-3" />
                 <span className="text-lg">Montaža uračunata u cijenu</span>
@@ -28,17 +32,31 @@ const DeliverySection = () => {
                 <span className="text-lg">Dostava do 30km po dogovoru</span>
               </div>
             </div>
+
+            <div className="flex justify-center lg:justify-start">
+              <a href="#rezervacija">
+                <Button className="gradient-primary hover:shadow-playful transition-all duration-300 text-white font-semibold py-4 px-8 rounded-lg text-lg hover:-translate-y-1">
+                  Rezerviraj napuhanac
+                </Button>
+              </a>
+            </div>
           </div>
 
           {/* Mascot Image */}
           <div className="flex justify-center">
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-3xl"></div>
-              <img src="/assets/mascot-delivery.png" alt="Hop Hop mascot delivering bounce houses" className="relative w-full max-w-md h-auto float-animation" />
+              <img 
+                src="/assets/mascot-delivery.png" 
+                alt="Hop Hop mascot delivering bounce houses" 
+                className="relative w-full max-w-md h-auto float-animation" 
+              />
             </div>
           </div>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default DeliverySection;
