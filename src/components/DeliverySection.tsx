@@ -49,7 +49,8 @@ const DeliverySection = () => {
               <img 
                 src="/assets/mascot-delivery.png" 
                 alt="Hop Hop mascot delivering bounce houses" 
-                className="relative w-full max-w-md h-auto float-animation" 
+                className="relative w-full max-w-md h-auto float-animation"
+                loading="lazy"
               />
             </div>
           </div>
