@@ -24,22 +24,32 @@ const ProductShowcase = () => {
     description: "Zabava u Dinosaur napuhancu za male istraživače",
     dimensions: "5.5 x 4 x 4.5m"
   }];
-  return <section id="napuhanci" className="py-20 bg-background">
+
+  return (
+    <section id="napuhanci" className="py-20 bg-background">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-bold text-foreground mb-6">
             Naši <span className="text-primary">Napuhanci</span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Najam napuhanaca za dječje rođendane i proslave. Sigurni, kvalitetni i zabavni dvorci, tobogani i avanture na napuhavanje za nezaboravnu igru i osmijehe.</p>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Najam napuhanaca za dječje rođendane i proslave. Sigurni, kvalitetni i zabavni dvorci, tobogani i avanture na napuhavanje za nezaboravnu igru i osmijehe.
+          </p>
         </div>
 
         {/* Product Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {products.map(product => <Card key={product.id} className="overflow-hidden shadow-card hover:shadow-playful transition-all duration-300 hover:-translate-y-2 border-2 hover:border-primary/20">
+          {products.map(product => (
+            <Card key={product.id} className="overflow-hidden shadow-card hover:shadow-playful transition-all duration-300 hover:-translate-y-2 border-2 hover:border-primary/20">
               <CardHeader className="p-0">
                 <div className="relative overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10 aspect-square">
-                  <img src={product.image} alt={product.name} className="w-full h-full object-cover mascot-hover" />
+                  <img 
+                    src={product.image} 
+                    alt={product.name} 
+                    className="w-full h-full object-cover mascot-hover"
+                    loading="lazy"
+                  />
                 </div>
               </CardHeader>
               <CardContent className="p-6">
@@ -64,7 +74,8 @@ const ProductShowcase = () => {
                   </Button>
                 </div>
               </CardContent>
-            </Card>)}
+            </Card>
+          ))}
         </div>
 
         {/* Special Offer */}
@@ -77,6 +88,8 @@ const ProductShowcase = () => {
           </div>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default ProductShowcase;

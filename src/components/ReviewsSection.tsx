@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Star } from "lucide-react";
+import { useRef, useState, useEffect } from "react";
 
 const ReviewsSection = () => {
   const reviews = [
@@ -17,6 +18,54 @@ const ReviewsSection = () => {
 
   // Duplicate reviews for seamless infinite scroll
   const duplicatedReviews = [...reviews, ...reviews];
+  
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!scrollRef.current) return;
+    setIsDragging(true);
+    setIsPaused(true);
+    setStartX(e.pageX - scrollRef.current.offsetLeft);
+    setScrollLeft(scrollRef.current.scrollLeft);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+    // Resume animation after a short delay
+    setTimeout(() => setIsPaused(false), 2000);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !scrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollRef.current.offsetLeft;
+    const walk = (x - startX) * 2;
+    scrollRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!scrollRef.current) return;
+    setIsDragging(true);
+    setIsPaused(true);
+    setStartX(e.touches[0].pageX - scrollRef.current.offsetLeft);
+    setScrollLeft(scrollRef.current.scrollLeft);
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    setTimeout(() => setIsPaused(false), 2000);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || !scrollRef.current) return;
+    const x = e.touches[0].pageX - scrollRef.current.offsetLeft;
+    const walk = (x - startX) * 2;
+    scrollRef.current.scrollLeft = scrollLeft - walk;
+  };
 
   const renderStars = (rating: number) => {
     const stars = [];
@@ -52,12 +101,32 @@ const ReviewsSection = () => {
         <p className="text-muted-foreground text-center">Recenzije zadovoljnih roditelja i djece</p>
       </div>
 
-      <div className="relative">
-        <div className="flex animate-scroll-left">
+      <div 
+        className="relative cursor-grab active:cursor-grabbing select-none"
+        ref={scrollRef}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        onMouseMove={handleMouseMove}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onTouchMove={handleTouchMove}
+        style={{ 
+          overflow: 'hidden',
+          WebkitOverflowScrolling: 'touch'
+        }}
+      >
+        <div 
+          className={`flex ${isPaused ? '' : 'animate-scroll-left-fast'}`}
+          style={{ 
+            animationPlayState: isPaused ? 'paused' : 'running',
+            transform: isDragging ? 'none' : undefined
+          }}
+        >
           {duplicatedReviews.map((review, index) => (
             <Card 
               key={index} 
-              className="flex-shrink-0 w-[320px] md:w-[380px] mx-3 border-2 hover:border-primary/20 transition-colors"
+              className="flex-shrink-0 w-[320px] md:w-[380px] mx-3 border-2 hover:border-primary/20 transition-colors pointer-events-none"
             >
               <CardContent className="p-6">
                 <div className="flex gap-1 mb-3">
@@ -74,6 +143,10 @@ const ReviewsSection = () => {
           ))}
         </div>
       </div>
+      
+      <p className="text-center text-muted-foreground text-sm mt-4">
+        ← Povuci za više recenzija →
+      </p>
     </section>
   );
 };

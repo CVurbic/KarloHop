@@ -23,6 +23,10 @@ const FAQSection = () => {
       answer: "Sigurnost nam je prioritet. Naši napuhanci su redovito pregledavani, imaju EU certifikate i izrađeni su od kvalitetnih materijala. Pristup skakanju mora biti pod nadzorom odraslih te je potrebno prije korištenja potpisati izjavu o korištenju na vlastitu odgovornost. Napuhanci se postavljaju na ravnu i stabilnu površinu, osigurana je zaštita i pravilno pričvršćivanje."
     },
     {
+      question: "Kako se održava higijena napuhanaca?",
+      answer: "Higijena nam je izuzetno važna. Svaki napuhanac temeljito čistimo i dezinficiramo prije i nakon svake uporabe. Dodatno, jednom mjesečno provodimo dubinsko čišćenje svih napuhanaca kako bismo osigurali maksimalnu čistoću i sigurnost za djecu."
+    },
+    {
       question: "Što ako pada kiša ili je loše vrijeme?",
       answer: "Ako vremenske prilike onemoguće siguran rad (jaka kiša, vjetar iznad sigurnosne granice), imate mogućnost otkazivanja najma bez naknade ili promjenu termina bez dodatnih troškova. Svakako nas kontaktirajte najkasnije 12 sati prije početka najma."
     },
