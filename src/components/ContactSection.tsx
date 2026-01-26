@@ -60,14 +60,17 @@ const ContactSection = () => {
       setIsSubmitting(false);
     }
   };
-  return <section id="kontakt" className="py-20 bg-background">
+  return (
+    <section id="kontakt" className="py-20 bg-background">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-bold text-foreground mb-6">
             Kontaktirajte <span className="text-secondary">Hop Hop</span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Nazovite ili pošaljite upit! Tu smo da odgovorimo na sva vaša pitanja!</p>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Nazovite ili pošaljite upit! Tu smo da odgovorimo na sva vaša pitanja!
+          </p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-12">
@@ -205,7 +208,34 @@ const ContactSection = () => {
             </Card>
           </div>
         </div>
+
+        {/* Google Maps */}
+        <div className="mt-12">
+          <Card className="shadow-card overflow-hidden">
+            <CardHeader>
+              <CardTitle className="flex items-center text-2xl">
+                <MapPin className="h-6 w-6 text-primary mr-3" />
+                Pronađite nas
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2782.5!2d15.9!3d45.78!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4765d6f5a3d25d75%3A0x1234567890abcdef!2sLani%C5%A1te%2026%2C%2010020%2C%20Zagreb%2C%20Croatia!5e0!3m2!1sen!2shr!4v1700000000000!5m2!1sen!2shr"
+                width="100%"
+                height="400"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Hop Hop Napuhanci lokacija - Lanište 26, Zagreb"
+                className="w-full"
+              />
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default ContactSection;
