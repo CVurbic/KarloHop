@@ -220,7 +220,7 @@ const ContactSection = () => {
             </CardHeader>
             <CardContent className="p-0">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2782.5!2d15.9!3d45.78!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4765d6f5a3d25d75%3A0x1234567890abcdef!2sLani%C5%A1te%2026%2C%2010020%2C%20Zagreb%2C%20Croatia!5e0!3m2!1sen!2shr!4v1700000000000!5m2!1sen!2shr"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2783.0!2d15.8887!3d45.7747!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4765d0a3c4b4c6e7%3A0x8c2e5f3d9a1b2c4d!2sLani%C5%A1te%2026%2C%2010020%2C%20Zagreb!5e0!3m2!1shr!2shr!4v1706400000000!5m2!1shr!2shr&z=17"
                 width="100%"
                 height="400"
                 style={{ border: 0 }}

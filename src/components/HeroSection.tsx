@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Star, Sparkles, Truck, Shield, Clock } from "lucide-react";
+import { Star, Sparkles, Truck, Wallet, Clock } from "lucide-react";
 
 const HeroSection = () => {
   return (
@@ -31,19 +31,19 @@ const HeroSection = () => {
               Najam napuhanaca u <span className="text-primary">Zagrebu</span> i okolici
             </h1>
             
-            {/* Horizontal bullets */}
-            <div className="flex flex-wrap justify-center lg:justify-start gap-4 md:gap-6 mb-8">
-              <div className="flex items-center gap-2 text-foreground">
-                <Truck className="h-5 w-5 text-primary" />
-                <span className="font-medium">Dostava + montaža</span>
+            {/* Horizontal bullets - always in one row */}
+            <div className="flex justify-center lg:justify-start gap-3 md:gap-6 mb-8">
+              <div className="flex items-center gap-1.5 md:gap-2 text-foreground">
+                <Truck className="h-4 w-4 md:h-5 md:w-5 text-primary flex-shrink-0" />
+                <span className="font-medium text-sm md:text-base whitespace-nowrap">Dostava + montaža</span>
               </div>
-              <div className="flex items-center gap-2 text-foreground">
-                <Shield className="h-5 w-5 text-primary" />
-                <span className="font-medium">Sigurnosna oprema</span>
+              <div className="flex items-center gap-1.5 md:gap-2 text-foreground">
+                <Wallet className="h-4 w-4 md:h-5 md:w-5 text-primary flex-shrink-0" />
+                <span className="font-medium text-sm md:text-base whitespace-nowrap">Bez avansa</span>
               </div>
-              <div className="flex items-center gap-2 text-foreground">
-                <Clock className="h-5 w-5 text-primary" />
-                <span className="font-medium">Rezervacija u 1 minuti</span>
+              <div className="flex items-center gap-1.5 md:gap-2 text-foreground">
+                <Clock className="h-4 w-4 md:h-5 md:w-5 text-primary flex-shrink-0" />
+                <span className="font-medium text-sm md:text-base whitespace-nowrap">Rezervacija u 1 min</span>
               </div>
             </div>
 
