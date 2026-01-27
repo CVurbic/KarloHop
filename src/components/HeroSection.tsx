@@ -31,19 +31,19 @@ const HeroSection = () => {
               Najam napuhanaca u <span className="text-primary">Zagrebu</span> i okolici
             </h1>
             
-            {/* Horizontal bullets - always in one row */}
-            <div className="flex justify-center lg:justify-start gap-3 md:gap-6 mb-8">
-              <div className="flex items-center gap-1.5 md:gap-2 text-foreground">
-                <Truck className="h-4 w-4 md:h-5 md:w-5 text-primary flex-shrink-0" />
-                <span className="font-medium text-sm md:text-base whitespace-nowrap">Dostava + montaža</span>
+            {/* Horizontal bullets - 2 on mobile, 3 on desktop */}
+            <div className="flex justify-center lg:justify-start gap-4 md:gap-6 mb-8">
+              <div className="hidden md:flex items-center gap-2 text-foreground">
+                <Truck className="h-5 w-5 text-primary flex-shrink-0" />
+                <span className="font-medium whitespace-nowrap">Dostava + montaža</span>
               </div>
-              <div className="flex items-center gap-1.5 md:gap-2 text-foreground">
-                <Wallet className="h-4 w-4 md:h-5 md:w-5 text-primary flex-shrink-0" />
-                <span className="font-medium text-sm md:text-base whitespace-nowrap">Bez avansa</span>
+              <div className="flex items-center gap-2 text-foreground">
+                <Wallet className="h-5 w-5 text-primary flex-shrink-0" />
+                <span className="font-medium whitespace-nowrap">Bez avansa</span>
               </div>
-              <div className="flex items-center gap-1.5 md:gap-2 text-foreground">
-                <Clock className="h-4 w-4 md:h-5 md:w-5 text-primary flex-shrink-0" />
-                <span className="font-medium text-sm md:text-base whitespace-nowrap">Rezervacija u 1 min</span>
+              <div className="flex items-center gap-2 text-foreground">
+                <Clock className="h-5 w-5 text-primary flex-shrink-0" />
+                <span className="font-medium whitespace-nowrap">Rezervacija u 1 min</span>
               </div>
             </div>
 
