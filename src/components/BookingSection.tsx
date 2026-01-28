@@ -124,9 +124,16 @@ const BookingSection = () => {
 
       // Send email notification
       try {
-        await supabase.functions.invoke('send-booking-email', {
+        const { error: emailError } = await supabase.functions.invoke('send-booking-email', {
           body: values
         });
+        
+        if (emailError) {
+          // Check if it's a rate limit error
+          if (emailError.message?.includes('429') || emailError.message?.includes('rate')) {
+            console.warn('Rate limit reached for email notifications');
+          }
+        }
       } catch (emailError) {
         console.error('Error sending email:', emailError);
         // Don't block the booking if email fails
