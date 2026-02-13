@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Calendar, Clock, Phone } from "lucide-react";
+import { Calendar, Clock, Phone, User, Castle, StickyNote, CheckCircle, Loader2, MapPin } from "lucide-react";
+import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -30,11 +30,28 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.2 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: "easeOut" },
+  },
+};
+
 const BookingSection = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [availabilityStatus, setAvailabilityStatus] = useState<string>("");
   const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
-  
+
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -62,7 +79,7 @@ const BookingSection = () => {
       }
 
       setIsCheckingAvailability(true);
-      
+
       try {
         // Use the database function to check availability securely
         const { data, error } = await supabase
@@ -92,7 +109,7 @@ const BookingSection = () => {
 
   const onSubmit = async (values: FormData) => {
     setIsSubmitting(true);
-    
+
     try {
       // Double-check availability before submitting
       const { data: availabilityData, error: availabilityError } = await supabase
@@ -127,7 +144,7 @@ const BookingSection = () => {
         const { error: emailError } = await supabase.functions.invoke('send-booking-email', {
           body: values
         });
-        
+
         if (emailError) {
           // Check if it's a rate limit error
           if (emailError.message?.includes('429') || emailError.message?.includes('rate')) {
@@ -163,256 +180,335 @@ const BookingSection = () => {
     <section id="rezervacija" className="py-20 bg-gradient-to-br from-primary/5 to-accent/5">
       <div className="container mx-auto px-4">
         {/* Section Header */}
-        <div className="text-center mb-16">
+        <motion.div
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
           <h2 className="text-4xl lg:text-5xl font-bold text-foreground mb-6">
             Rezerviraj <span className="text-primary">Napuhanac</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Jednostavna online rezervacija u samo nekoliko koraka
           </p>
-        </div>
+        </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-start">
+        <div className="grid lg:grid-cols-3 gap-8 items-start">
           {/* Booking Form */}
-          <Card className="shadow-card hover:shadow-playful transition-all duration-300">
-            <CardHeader>
-              <CardTitle className="flex items-center text-2xl">
-                <Calendar className="h-6 w-6 text-primary mr-3" />
-                Online rezervacija
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Ime</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Vaše ime" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="surname"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Prezime</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Vaše prezime" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input type="email" placeholder="vaš@email.com" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="phone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Telefon</FormLabel>
-                          <FormControl>
-                            <Input placeholder="01/234-5678" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <FormField
-                    control={form.control}
-                    name="delivery_address"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Lokacija dostave</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Adresa za dostavu" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="selected_bounce_house"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Izbor napuhanca</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Odaberite napuhanac" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="jednorog">Jednorog svijet - 100€</SelectItem>
-                            <SelectItem value="minecraft">Minecraft party - 100€</SelectItem>
-                            <SelectItem value="dino-park">Dino park - 100€</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="booking_start_date"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Datum rezervacije</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="date" 
-                            {...field}
-                            min={new Date().toISOString().split('T')[0]}
+          <motion.div
+            className="lg:col-span-2"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            <Card className="shadow-card hover:shadow-playful transition-all duration-300">
+              <CardHeader>
+                <CardTitle className="flex items-center text-2xl">
+                  <Calendar className="h-6 w-6 text-primary mr-3" />
+                  Online rezervacija
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                    {/* Section 1: Personal Info */}
+                    <motion.div variants={itemVariants}>
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="bg-primary/10 p-2 rounded-lg">
+                          <User className="h-5 w-5 text-primary" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-foreground">Osobni podaci</h3>
+                      </div>
+                      <div className="bg-muted/30 rounded-xl p-5 space-y-4">
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name="name"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Ime</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Vaše ime" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
                           />
-                        </FormControl>
-                        {availabilityStatus && (
-                          <p className={`text-sm mt-2 font-semibold ${
-                            availabilityStatus.includes("✅") ? "text-green-600" : "text-red-600"
-                          }`}>
-                            {isCheckingAvailability ? "Provjeravam dostupnost..." : availabilityStatus}
-                          </p>
+                          <FormField
+                            control={form.control}
+                            name="surname"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Prezime</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Vaše prezime" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Email</FormLabel>
+                                <FormControl>
+                                  <Input type="email" placeholder="vaš@email.com" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="phone"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Telefon</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="01/234-5678" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        <FormField
+                          control={form.control}
+                          name="delivery_address"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="flex items-center gap-1.5">
+                                <MapPin className="h-4 w-4 text-muted-foreground" />
+                                Lokacija dostave
+                              </FormLabel>
+                              <FormControl>
+                                <Input placeholder="Adresa za dostavu" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </motion.div>
+
+                    {/* Section 2: Booking Details */}
+                    <motion.div variants={itemVariants}>
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="bg-primary/10 p-2 rounded-lg">
+                          <Castle className="h-5 w-5 text-primary" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-foreground">Detalji rezervacije</h3>
+                      </div>
+                      <div className="bg-muted/30 rounded-xl p-5 space-y-4">
+                        <FormField
+                          control={form.control}
+                          name="selected_bounce_house"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Izbor napuhanca</FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Odaberite napuhanac" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="jednorog">Jednorog svijet - 100€</SelectItem>
+                                  <SelectItem value="minecraft">Minecraft party - 100€</SelectItem>
+                                  <SelectItem value="dino-park">Dino park - 100€</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="booking_start_date"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Datum rezervacije</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="date"
+                                  {...field}
+                                  min={new Date().toISOString().split('T')[0]}
+                                />
+                              </FormControl>
+                              {availabilityStatus && (
+                                <motion.p
+                                  initial={{ opacity: 0, height: 0 }}
+                                  animate={{ opacity: 1, height: "auto" }}
+                                  className={`text-sm mt-2 font-semibold ${
+                                    availabilityStatus.includes("✅") ? "text-green-600" : "text-red-600"
+                                  }`}
+                                >
+                                  {isCheckingAvailability ? "Provjeravam dostupnost..." : availabilityStatus}
+                                </motion.p>
+                              )}
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="multiple_days"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                              <div className="space-y-1 leading-none">
+                                <FormLabel>
+                                  Trebam više dana
+                                </FormLabel>
+                                <p className="text-sm text-muted-foreground">
+                                  Označite ako vam treba napuhanac za više od jednog dana
+                                </p>
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="add_table_set"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border-2 border-primary/50 bg-primary/5 p-4">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                              <div className="space-y-1 leading-none">
+                                <FormLabel className="text-base font-bold flex items-center">
+                                  ⭐ Dodaj set stola i klupa za samo 15€/dan
+                                </FormLabel>
+                                <p className="text-sm text-muted-foreground">
+                                  <span className="font-semibold text-primary">Preporučujemo!</span> Stol + 2 klupe za roditelje i goste
+                                </p>
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </motion.div>
+
+                    {/* Section 3: Additional Info */}
+                    <motion.div variants={itemVariants}>
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="bg-primary/10 p-2 rounded-lg">
+                          <StickyNote className="h-5 w-5 text-primary" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-foreground">Dodatne informacije</h3>
+                      </div>
+                      <div className="bg-muted/30 rounded-xl p-5">
+                        <FormField
+                          control={form.control}
+                          name="additional_notes"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Dodatne napomene</FormLabel>
+                              <FormControl>
+                                <Textarea placeholder="Posebni zahtjevi ili pitanja..." rows={3} {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </motion.div>
+
+                    {/* Submit Button */}
+                    <motion.div variants={itemVariants}>
+                      <Button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full gradient-primary hover:shadow-playful transition-all duration-300 text-lg py-6"
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                            Šalje se...
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle className="mr-2 h-5 w-5" />
+                            Pošaljite rezervaciju
+                          </>
                         )}
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="multiple_days"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <div className="space-y-1 leading-none">
-                          <FormLabel>
-                            Trebam više dana
-                          </FormLabel>
-                          <p className="text-sm text-muted-foreground">
-                            Označite ako vam treba napuhanac za više od jednog dana
-                          </p>
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="add_table_set"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border-2 border-primary/50 bg-primary/5 p-4">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <div className="space-y-1 leading-none">
-                          <FormLabel className="text-base font-bold flex items-center">
-                            ⭐ Dodaj set stola i klupa za samo 15€/dan
-                          </FormLabel>
-                          <p className="text-sm text-muted-foreground">
-                            <span className="font-semibold text-primary">Preporučujemo!</span> Stol + 2 klupe za roditelje i goste
-                          </p>
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="additional_notes"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Dodatne napomene</FormLabel>
-                        <FormControl>
-                          <Textarea placeholder="Posebni zahtjevi ili pitanja..." rows={3} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <Button 
-                    type="submit" 
-                    disabled={isSubmitting}
-                    className="w-full gradient-primary hover:shadow-playful transition-all duration-300 text-lg py-6"
-                  >
-                    {isSubmitting ? "Šalje se..." : "Pošaljite rezervaciju"}
-                  </Button>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
-
-          {/* Contact Info & Mascot */}
-          <div className="space-y-8">
-            <Card className="shadow-card">
-              <CardContent className="p-8 text-center">
-                <div className="mb-6">
-                  <img src="/assets/rezervacije-2.png" alt="Hop Hop mascot taking reservations" className="w-32 h-32 mx-auto object-contain mascot-hover" loading="lazy" />
-                </div>
-                <h3 className="text-2xl font-bold text-foreground mb-4">
-                  Ili nas nazovite direktno!
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-center">
-                    <Phone className="h-5 w-5 text-primary mr-3" />
-                    <span className="text-lg font-semibold">095 865 5213</span>
-                  </div>
-                  <div className="flex items-center justify-center">
-                    <Clock className="h-5 w-5 text-primary mr-3" />
-                    <span>Svakim danom od 8:00 - 20:00</span>
-                  </div>
-                </div>
-                <Button variant="outline" className="mt-6 border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-                  Nazovite nas
-                </Button>
+                      </Button>
+                    </motion.div>
+                  </form>
+                </Form>
               </CardContent>
             </Card>
+          </motion.div>
 
-            <div className="bg-warning/10 border border-warning/20 rounded-xl p-6">
-              <h4 className="font-bold text-lg text-foreground mb-3">
-                Savjeti za rezervaciju:
-              </h4>
-              <ul className="space-y-2 text-muted-foreground">
-                <li>• Rezervirajte 2-3 dana unaprijed</li>
-                <li>• Provjerite vremensku prognozu</li>
-                <li>• Pripremite ravnu površinu 6x6m</li>
-                <li>• Osigurajte pristup struji u blizini</li>
-              </ul>
-            </div>
+          {/* Contact Info & Mascot */}
+          <div className="space-y-6">
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <Card className="shadow-card">
+                <CardContent className="p-8 text-center">
+                  <div className="mb-6">
+                    <img src="/assets/rezervacije-2.png" alt="Hop Hop mascot taking reservations" className="w-32 h-32 mx-auto object-contain mascot-hover" loading="lazy" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-foreground mb-4">
+                    Ili nas nazovite direktno!
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-center">
+                      <Phone className="h-5 w-5 text-primary mr-3" />
+                      <span className="text-lg font-semibold">095 865 5213</span>
+                    </div>
+                    <div className="flex items-center justify-center">
+                      <Clock className="h-5 w-5 text-primary mr-3" />
+                      <span>Svakim danom od 8:00 - 20:00</span>
+                    </div>
+                  </div>
+                  <Button variant="outline" className="mt-6 border-primary text-primary hover:bg-primary hover:text-primary-foreground">
+                    Nazovite nas
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+            >
+              <div className="bg-warning/10 border border-warning/20 rounded-xl p-6">
+                <h4 className="font-bold text-lg text-foreground mb-3">
+                  Savjeti za rezervaciju:
+                </h4>
+                <ul className="space-y-2 text-muted-foreground">
+                  <li>• Rezervirajte 2-3 dana unaprijed</li>
+                  <li>• Provjerite vremensku prognozu</li>
+                  <li>• Pripremite ravnu površinu 6x6m</li>
+                  <li>• Osigurajte pristup struji u blizini</li>
+                </ul>
+              </div>
+            </motion.div>
           </div>
         </div>
       </div>

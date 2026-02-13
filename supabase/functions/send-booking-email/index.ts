@@ -37,6 +37,206 @@ function escapeHtml(unsafe: string): string {
     .replace(/'/g, "&#039;");
 }
 
+interface BusinessEmailData {
+  safeName: string;
+  safeSurname: string;
+  safeEmail: string;
+  safePhone: string;
+  safeBounceHouse: string;
+  bookingStartDate: string;
+  multipleDays?: boolean;
+  addTableSet?: boolean;
+  safeAddress: string;
+  safeNotes: string;
+}
+
+function buildBusinessEmailHtml(data: BusinessEmailData): string {
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nova rezervacija</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f7fa;font-family:Arial,Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f7fa;padding:20px 0;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+
+        <!-- Header -->
+        <tr>
+          <td style="background:linear-gradient(135deg,#0ba5e8,#e83a30);padding:30px 40px;text-align:center;">
+            <h1 style="color:#ffffff;margin:0;font-size:24px;">Hop Hop Napuhanci</h1>
+            <p style="color:#ffffff;opacity:0.9;margin:8px 0 0;font-size:14px;">Nova rezervacija napuhanca</p>
+          </td>
+        </tr>
+
+        <!-- Alert banner -->
+        <tr>
+          <td style="padding:20px 40px 0;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#fff3cd;border-left:4px solid #f6a609;border-radius:4px;">
+              <tr><td style="padding:12px 16px;font-size:14px;color:#856404;">
+                Nova rezervacija zaprimljena! Molimo kontaktirajte klijenta.
+              </td></tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Booking details -->
+        <tr>
+          <td style="padding:24px 40px;">
+            <h2 style="font-size:18px;color:#1b2a4a;margin:0 0 16px;border-bottom:2px solid #0ba5e8;padding-bottom:8px;">Detalji rezervacije</h2>
+            <table width="100%" cellpadding="8" cellspacing="0" style="font-size:14px;color:#333;">
+              <tr style="background-color:#f8f9fa;">
+                <td style="font-weight:bold;width:40%;">Napuhanac:</td>
+                <td>${data.safeBounceHouse}</td>
+              </tr>
+              <tr>
+                <td style="font-weight:bold;">Datum:</td>
+                <td>${data.bookingStartDate}</td>
+              </tr>
+              ${data.multipleDays ? `<tr style="background-color:#f8f9fa;"><td style="font-weight:bold;">Trajanje:</td><td style="color:#e83a30;font-weight:bold;">Klijent treba vi\u0161e dana</td></tr>` : ''}
+              ${data.addTableSet ? `<tr style="background-color:#f8f9fa;"><td style="font-weight:bold;">Dodatno:</td><td>Set stola i klupa (+15\u20AC/dan)</td></tr>` : ''}
+              <tr>
+                <td style="font-weight:bold;">Adresa dostave:</td>
+                <td>${data.safeAddress}</td>
+              </tr>
+              ${data.safeNotes ? `<tr style="background-color:#f8f9fa;"><td style="font-weight:bold;">Napomene:</td><td>${data.safeNotes}</td></tr>` : ''}
+            </table>
+          </td>
+        </tr>
+
+        <!-- Client info -->
+        <tr>
+          <td style="padding:0 40px 24px;">
+            <h2 style="font-size:18px;color:#1b2a4a;margin:0 0 16px;border-bottom:2px solid #e83a30;padding-bottom:8px;">Podaci o klijentu</h2>
+            <table width="100%" cellpadding="8" cellspacing="0" style="font-size:14px;color:#333;">
+              <tr style="background-color:#f8f9fa;">
+                <td style="font-weight:bold;width:40%;">Ime i prezime:</td>
+                <td>${data.safeName} ${data.safeSurname}</td>
+              </tr>
+              <tr>
+                <td style="font-weight:bold;">Email:</td>
+                <td><a href="mailto:${data.safeEmail}" style="color:#0ba5e8;">${data.safeEmail}</a></td>
+              </tr>
+              <tr style="background-color:#f8f9fa;">
+                <td style="font-weight:bold;">Telefon:</td>
+                <td><a href="tel:${data.safePhone}" style="color:#0ba5e8;">${data.safePhone}</a></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td style="background-color:#f4f7fa;padding:20px 40px;text-align:center;font-size:12px;color:#888;">
+            Automatska obavijest sustava Hop Hop Napuhanci
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
+
+interface CustomerEmailData {
+  safeName: string;
+  safeBounceHouse: string;
+  bookingStartDate: string;
+  multipleDays?: boolean;
+  addTableSet?: boolean;
+  safeAddress: string;
+  safeNotes: string;
+}
+
+function buildCustomerEmailHtml(data: CustomerEmailData): string {
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Potvrda rezervacije</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f7fa;font-family:Arial,Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f7fa;padding:20px 0;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+
+        <!-- Header -->
+        <tr>
+          <td style="background:linear-gradient(135deg,#0ba5e8,#0bc0e8);padding:30px 40px;text-align:center;">
+            <h1 style="color:#ffffff;margin:0;font-size:28px;">Hop Hop Napuhanci</h1>
+            <p style="color:#ffffff;opacity:0.9;margin:8px 0 0;font-size:16px;">Hvala vam na rezervaciji!</p>
+          </td>
+        </tr>
+
+        <!-- Greeting -->
+        <tr>
+          <td style="padding:30px 40px 10px;">
+            <p style="font-size:16px;color:#1b2a4a;margin:0;">Po\u0161tovani/a <strong>${data.safeName}</strong>,</p>
+            <p style="font-size:14px;color:#555;margin:12px 0 0;line-height:1.6;">
+              Primili smo va\u0161u rezervaciju i uskoro \u0107emo vas kontaktirati radi potvrde termina i dogovora oko dostave.
+            </p>
+          </td>
+        </tr>
+
+        <!-- Booking summary card -->
+        <tr>
+          <td style="padding:20px 40px;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;">
+              <tr><td style="padding:20px;">
+                <h2 style="font-size:16px;color:#0ba5e8;margin:0 0 16px;">Va\u0161a rezervacija</h2>
+                <table width="100%" cellpadding="6" cellspacing="0" style="font-size:14px;color:#333;">
+                  <tr>
+                    <td style="font-weight:bold;width:40%;">Napuhanac:</td>
+                    <td>${data.safeBounceHouse}</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight:bold;">Datum:</td>
+                    <td>${data.bookingStartDate}</td>
+                  </tr>
+                  ${data.multipleDays ? '<tr><td colspan="2" style="color:#e83a30;font-size:13px;">Kontaktirat \u0107emo vas radi dogovora oko to\u010Dnog broja dana.</td></tr>' : ''}
+                  ${data.addTableSet ? '<tr><td style="font-weight:bold;">Dodatno:</td><td>Set stola i klupa (+15\u20AC/dan)</td></tr>' : ''}
+                  <tr>
+                    <td style="font-weight:bold;">Adresa dostave:</td>
+                    <td>${data.safeAddress}</td>
+                  </tr>
+                  ${data.safeNotes ? `<tr><td style="font-weight:bold;">Va\u0161e napomene:</td><td>${data.safeNotes}</td></tr>` : ''}
+                </table>
+              </td></tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Next steps -->
+        <tr>
+          <td style="padding:0 40px 20px;">
+            <h3 style="font-size:15px;color:#1b2a4a;margin:0 0 12px;">Sljede\u0107i koraci:</h3>
+            <table cellpadding="0" cellspacing="0" style="font-size:14px;color:#555;">
+              <tr><td style="padding:4px 0;">1. Kontaktirat \u0107emo vas telefonom radi potvrde</td></tr>
+              <tr><td style="padding:4px 0;">2. Dogovorit \u0107emo to\u010Dno vrijeme dostave</td></tr>
+              <tr><td style="padding:4px 0;">3. Dostavit \u0107emo i postaviti napuhanac na va\u0161u lokaciju</td></tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td style="background-color:#1b2a4a;padding:24px 40px;text-align:center;">
+            <p style="color:#ffffff;font-size:14px;margin:0 0 4px;font-weight:bold;">Hop Hop Napuhanci</p>
+            <p style="color:#aab4c6;font-size:13px;margin:0;">095 865 5213 | info@hophop-napuhanci.com</p>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
+
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -96,27 +296,28 @@ const handler = async (req: Request): Promise<Response> => {
     const safeBounceHouse = escapeHtml(bookingData.selected_bounce_house);
     const safeNotes = bookingData.additional_notes ? escapeHtml(bookingData.additional_notes) : '';
 
+    // NOTE: "onboarding@resend.dev" is Resend's test domain.
+    // It only delivers to the Resend account owner's email.
+    // For production: verify a custom domain in Resend dashboard
+    // and update to e.g. "Hop Hop Napuhanci <rezervacije@hophop-napuhanci.com>"
+
     // Send email to business
     const businessEmailResponse = await resend.emails.send({
       from: "Hop Hop Napuhanci <onboarding@resend.dev>",
       to: ["tiktokarlo2021@gmail.com", "turic.karlo@gmail.com"],
       subject: `Nova rezervacija - ${safeBounceHouse}`,
-      html: `
-        <h1>Nova rezervacija napuhanca!</h1>
-        <h2>Detalji rezervacije:</h2>
-        <p><strong>Ime i prezime:</strong> ${safeName} ${safeSurname}</p>
-        <p><strong>Email:</strong> ${safeEmail}</p>
-        <p><strong>Telefon:</strong> ${safePhone}</p>
-        <p><strong>Napuhanac:</strong> ${safeBounceHouse}</p>
-        <p><strong>Datum:</strong> ${bookingData.booking_start_date}</p>
-        ${bookingData.multiple_days ? '<p><strong>Napomena:</strong> Klijent treba više dana</p>' : ''}
-        ${bookingData.add_table_set ? '<p><strong>Dodatno:</strong> Set stola i klupa (+15€/dan)</p>' : ''}
-        <p><strong>Adresa dostave:</strong> ${safeAddress}</p>
-        ${safeNotes ? `<p><strong>Dodatne napomene:</strong> ${safeNotes}</p>` : ''}
-        
-        <h2>Kontakt informacije:</h2>
-        <p>Molimo kontaktirajte klijenta na ${safePhone} ili ${safeEmail}</p>
-      `,
+      html: buildBusinessEmailHtml({
+        safeName,
+        safeSurname,
+        safeEmail,
+        safePhone,
+        safeBounceHouse,
+        bookingStartDate: bookingData.booking_start_date,
+        multipleDays: bookingData.multiple_days,
+        addTableSet: bookingData.add_table_set,
+        safeAddress,
+        safeNotes,
+      }),
     });
 
     // Send confirmation email to customer
@@ -124,23 +325,15 @@ const handler = async (req: Request): Promise<Response> => {
       from: "Hop Hop Napuhanci <onboarding@resend.dev>",
       to: [bookingData.email],
       subject: `Potvrda rezervacije - ${safeBounceHouse}`,
-      html: `
-        <h1>Hvala vam na rezervaciji!</h1>
-        <p>Poštovani/a ${safeName},</p>
-        <p>Primili smo vašu rezervaciju za napuhanac <strong>${safeBounceHouse}</strong>.</p>
-        
-        <h2>Detalji vaše rezervacije:</h2>
-        <p><strong>Datum:</strong> ${bookingData.booking_start_date}</p>
-        ${bookingData.multiple_days ? '<p>Kontaktirat ćemo vas radi dogovora oko točnog broja dana.</p>' : ''}
-        ${bookingData.add_table_set ? '<p><strong>Dodatno:</strong> Set stola i klupa (+15€/dan)</p>' : ''}
-        <p><strong>Adresa dostave:</strong> ${safeAddress}</p>
-        ${safeNotes ? `<p><strong>Vaše napomene:</strong> ${safeNotes}</p>` : ''}
-        
-        <p>Kontaktirat ćemo vas uskoro radi potvrde termina i dogovora oko dostave.</p>
-        <p>Hvala vam što ste odabrali Hop Hop Napuhance!</p>
-        
-        <p>S poštovanjem,<br>Hop Hop Napuhanci tim<br>095 865 5213<br>info@hophop-napuhanci.com</p>
-      `,
+      html: buildCustomerEmailHtml({
+        safeName,
+        safeBounceHouse,
+        bookingStartDate: bookingData.booking_start_date,
+        multipleDays: bookingData.multiple_days,
+        addTableSet: bookingData.add_table_set,
+        safeAddress,
+        safeNotes,
+      }),
     });
 
     // Check for email send errors without logging response details
@@ -151,7 +344,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Booking emails sent successfully");
 
-    return new Response(JSON.stringify({ 
+    return new Response(JSON.stringify({
       success: true
     }), {
       status: 200,
