@@ -84,7 +84,7 @@ const ProductShowcase = () => {
 
         {/* Special Offer */}
         <div className="text-center">
-          <div className="inline-block gradient-fun text-white p-6 rounded-2xl shadow-mascot px-[20px] py-[20px]">
+          <div className="inline-block gradient-fun text-white p-6 rounded-2xl shadow-mascot px-[20px] py-[20px] max-w-full box-border">
             <h3 className="text-2xl font-bold mb-2">
               Drugi dan 50% povoljniji!
             </h3>
