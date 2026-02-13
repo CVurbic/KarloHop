@@ -6,7 +6,7 @@ const Header = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <img src="/assets/logo.png" alt="Hop Hop Napuhanci Logo" className="h-12 w-auto mascot-hover" />
+            <img src="/assets/logo.webp" alt="Hop Hop Napuhanci Logo" className="h-12 w-auto mascot-hover" />
           </div>
 
           {/* Navigation */}

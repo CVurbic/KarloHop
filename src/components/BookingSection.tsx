@@ -395,7 +395,7 @@ const BookingSection = () => {
               <Card className="shadow-card">
                 <CardContent className="p-8 text-center">
                   <div className="mb-6">
-                    <img src="/assets/rezervacije-2.png" alt="Hop Hop mascot taking reservations" className="w-32 h-32 mx-auto object-contain mascot-hover" loading="lazy" />
+                    <img src="/assets/rezervacije-2.webp" alt="Hop Hop mascot taking reservations" className="w-32 h-32 mx-auto object-contain mascot-hover" loading="lazy" />
                   </div>
                   <h3 className="text-2xl font-bold text-foreground mb-4">
                     Ili nas nazovite direktno!

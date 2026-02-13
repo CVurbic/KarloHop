@@ -69,7 +69,7 @@ const HeroSection = () => {
           {/* Mascot Image */}
           <div className="flex justify-center lg:justify-end">
             <img 
-              src="/assets/mascot-jumping-new.png" 
+              src="/assets/mascot-jumping-new.webp" 
               alt="Hop Hop Mascot jumping with kids on bounce house" 
               className="w-full max-w-md lg:max-w-lg xl:max-w-xl h-auto hop-bounce" 
             />

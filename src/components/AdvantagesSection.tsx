@@ -4,17 +4,17 @@ const AdvantagesSection = () => {
   const advantages = [{
     title: "Besplatna dostava",
     description: "Dostavljamo napuhance besplatno do 10km udaljenosti",
-    image: "/assets/mascot-delivery.png",
+    image: "/assets/mascot-delivery.webp",
     bgColor: "from-primary/10 to-primary/5"
   }, {
     title: "Loše vrijeme bez naknada",
     description: "Nema novčanih naknada kada otkažemo zbog lošeg vremena",
-    image: "/assets/nevrijeme.png",
+    image: "/assets/nevrijeme.webp",
     bgColor: "from-secondary/10 to-secondary/5"
   }, {
     title: "Bez avansne uplate",
     description: "Plaćate tek kad napuhanac stigne na vašu lokaciju",
-    image: "/assets/mascot-chill.png",
+    image: "/assets/mascot-chill.webp",
     bgColor: "from-accent/10 to-accent/5"
   }];
 
