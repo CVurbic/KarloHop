@@ -6,21 +6,21 @@ const ProductShowcase = () => {
     id: 1,
     name: "Jednorog svijet",
     price: "100",
-    image: "/assets/jednorog-new.png",
+    image: "/assets/jednorog-new.webp",
     description: "Napuhanac s jednorozima za male princeze",
     dimensions: "5.5 x 4.5 x 4.5m"
   }, {
     id: 2,
     name: "Minecraft party",
     price: "100",
-    image: "/assets/minecraft-new.png",
+    image: "/assets/minecraft-new.webp",
     description: "Minecraft avantura u napuhancu s toboganom",
     dimensions: "5.5 x 4.5 x 4.5m"
   }, {
     id: 3,
     name: "Dino park",
     price: "100",
-    image: "/assets/dino-new.png",
+    image: "/assets/dino-new.webp",
     description: "Zabava u Dinosaur napuhancu za male istraživače",
     dimensions: "5.5 x 4 x 4.5m"
   }];

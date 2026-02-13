@@ -20,9 +20,6 @@ const bookingSchema = z.object({
   booking_start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   selected_bounce_house: z.string().min(1).max(100),
   delivery_address: z.string().min(5).max(255),
-  multiple_days: z.boolean().optional(),
-  add_table_set: z.boolean().optional(),
-  additional_notes: z.string().max(500).optional().nullable(),
 });
 
 type BookingEmailRequest = z.infer<typeof bookingSchema>;
@@ -44,10 +41,7 @@ interface BusinessEmailData {
   safePhone: string;
   safeBounceHouse: string;
   bookingStartDate: string;
-  multipleDays?: boolean;
-  addTableSet?: boolean;
   safeAddress: string;
-  safeNotes: string;
 }
 
 function buildBusinessEmailHtml(data: BusinessEmailData): string {
@@ -95,13 +89,10 @@ function buildBusinessEmailHtml(data: BusinessEmailData): string {
                 <td style="font-weight:bold;">Datum:</td>
                 <td>${data.bookingStartDate}</td>
               </tr>
-              ${data.multipleDays ? `<tr style="background-color:#f8f9fa;"><td style="font-weight:bold;">Trajanje:</td><td style="color:#e83a30;font-weight:bold;">Klijent treba vi\u0161e dana</td></tr>` : ''}
-              ${data.addTableSet ? `<tr style="background-color:#f8f9fa;"><td style="font-weight:bold;">Dodatno:</td><td>Set stola i klupa (+15\u20AC/dan)</td></tr>` : ''}
               <tr>
                 <td style="font-weight:bold;">Adresa dostave:</td>
                 <td>${data.safeAddress}</td>
               </tr>
-              ${data.safeNotes ? `<tr style="background-color:#f8f9fa;"><td style="font-weight:bold;">Napomene:</td><td>${data.safeNotes}</td></tr>` : ''}
             </table>
           </td>
         </tr>
@@ -145,10 +136,7 @@ interface CustomerEmailData {
   safeName: string;
   safeBounceHouse: string;
   bookingStartDate: string;
-  multipleDays?: boolean;
-  addTableSet?: boolean;
   safeAddress: string;
-  safeNotes: string;
 }
 
 function buildCustomerEmailHtml(data: CustomerEmailData): string {
@@ -197,13 +185,10 @@ function buildCustomerEmailHtml(data: CustomerEmailData): string {
                     <td style="font-weight:bold;">Datum:</td>
                     <td>${data.bookingStartDate}</td>
                   </tr>
-                  ${data.multipleDays ? '<tr><td colspan="2" style="color:#e83a30;font-size:13px;">Kontaktirat \u0107emo vas radi dogovora oko to\u010Dnog broja dana.</td></tr>' : ''}
-                  ${data.addTableSet ? '<tr><td style="font-weight:bold;">Dodatno:</td><td>Set stola i klupa (+15\u20AC/dan)</td></tr>' : ''}
                   <tr>
                     <td style="font-weight:bold;">Adresa dostave:</td>
                     <td>${data.safeAddress}</td>
                   </tr>
-                  ${data.safeNotes ? `<tr><td style="font-weight:bold;">Va\u0161e napomene:</td><td>${data.safeNotes}</td></tr>` : ''}
                 </table>
               </td></tr>
             </table>
@@ -294,8 +279,6 @@ const handler = async (req: Request): Promise<Response> => {
     const safePhone = escapeHtml(bookingData.phone);
     const safeAddress = escapeHtml(bookingData.delivery_address);
     const safeBounceHouse = escapeHtml(bookingData.selected_bounce_house);
-    const safeNotes = bookingData.additional_notes ? escapeHtml(bookingData.additional_notes) : '';
-
     // Send email to business
     const businessEmailResponse = await resend.emails.send({
       from: "Hop Hop Napuhanci <info@hophop-napuhanci.com>",
@@ -308,10 +291,7 @@ const handler = async (req: Request): Promise<Response> => {
         safePhone,
         safeBounceHouse,
         bookingStartDate: bookingData.booking_start_date,
-        multipleDays: bookingData.multiple_days,
-        addTableSet: bookingData.add_table_set,
         safeAddress,
-        safeNotes,
       }),
     });
 
@@ -324,10 +304,7 @@ const handler = async (req: Request): Promise<Response> => {
         safeName,
         safeBounceHouse,
         bookingStartDate: bookingData.booking_start_date,
-        multipleDays: bookingData.multiple_days,
-        addTableSet: bookingData.add_table_set,
         safeAddress,
-        safeNotes,
       }),
     });
 

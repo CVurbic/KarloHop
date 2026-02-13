@@ -38,7 +38,7 @@ const BeerTableSection = () => {
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-3xl"></div>
               <img 
-                src="/assets/stolovi.png" 
+                src="/assets/stolovi.webp" 
                 alt="Hop Hop beer tables with benches" 
                 className="relative w-full max-w-md h-auto float-animation"
                 loading="lazy"

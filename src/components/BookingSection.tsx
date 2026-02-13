@@ -1,17 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Calendar, Clock, Phone, User, Castle, StickyNote, CheckCircle, Loader2, MapPin } from "lucide-react";
+import { Calendar, Clock, Phone, User, Castle, CheckCircle, Loader2, MapPin, Truck } from "lucide-react";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { analytics } from "@/lib/analytics";
 import { useState, useEffect } from "react";
 
 // Form validation schema
@@ -23,9 +22,6 @@ const formSchema = z.object({
   delivery_address: z.string().min(5, "Adresa mora biti duža od 5 znakova").max(255, "Adresa ne smije biti duža od 255 znakova"),
   booking_start_date: z.string().min(1, "Molimo odaberite datum"),
   selected_bounce_house: z.string().min(1, "Molimo odaberite napuhanac"),
-  multiple_days: z.boolean(),
-  add_table_set: z.boolean(),
-  additional_notes: z.string().max(500, "Napomene ne smiju biti duže od 500 znakova").optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -62,9 +58,6 @@ const BookingSection = () => {
       delivery_address: "",
       booking_start_date: "",
       selected_bounce_house: "",
-      multiple_days: false,
-      add_table_set: false,
-      additional_notes: "",
     },
   });
 
@@ -162,6 +155,7 @@ const BookingSection = () => {
         className: "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 max-w-md",
       });
 
+      analytics.trackBookingSubmission(values.selected_bounce_house, values.booking_start_date);
       form.reset();
       setAvailabilityStatus("");
     } catch (error) {
@@ -359,81 +353,11 @@ const BookingSection = () => {
                           )}
                         />
 
-                        <FormField
-                          control={form.control}
-                          name="multiple_days"
-                          render={({ field }) => (
-                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value}
-                                  onCheckedChange={field.onChange}
-                                />
-                              </FormControl>
-                              <div className="space-y-1 leading-none">
-                                <FormLabel>
-                                  Trebam više dana
-                                </FormLabel>
-                                <p className="text-sm text-muted-foreground">
-                                  Označite ako vam treba napuhanac za više od jednog dana
-                                </p>
-                              </div>
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="add_table_set"
-                          render={({ field }) => (
-                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border-2 border-primary/50 bg-primary/5 p-4">
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value}
-                                  onCheckedChange={field.onChange}
-                                />
-                              </FormControl>
-                              <div className="space-y-1 leading-none">
-                                <FormLabel className="text-base font-bold flex items-center">
-                                  ⭐ Dodaj set stola i klupa za samo 15€/dan
-                                </FormLabel>
-                                <p className="text-sm text-muted-foreground">
-                                  <span className="font-semibold text-primary">Preporučujemo!</span> Stol + 2 klupe za roditelje i goste
-                                </p>
-                              </div>
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                    </motion.div>
-
-                    {/* Section 3: Additional Info */}
-                    <motion.div variants={itemVariants}>
-                      <div className="flex items-center gap-2 mb-4">
-                        <div className="bg-primary/10 p-2 rounded-lg">
-                          <StickyNote className="h-5 w-5 text-primary" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-foreground">Dodatne informacije</h3>
-                      </div>
-                      <div className="bg-muted/30 rounded-xl p-5">
-                        <FormField
-                          control={form.control}
-                          name="additional_notes"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Dodatne napomene</FormLabel>
-                              <FormControl>
-                                <Textarea placeholder="Posebni zahtjevi ili pitanja..." rows={3} {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
                       </div>
                     </motion.div>
 
                     {/* Submit Button */}
-                    <motion.div variants={itemVariants}>
+                    <motion.div variants={itemVariants} className="space-y-3">
                       <Button
                         type="submit"
                         disabled={isSubmitting}
@@ -447,10 +371,14 @@ const BookingSection = () => {
                         ) : (
                           <>
                             <CheckCircle className="mr-2 h-5 w-5" />
-                            Pošaljite rezervaciju
+                            Rezerviraj sada — besplatna dostava!
                           </>
                         )}
                       </Button>
+                      <p className="text-center text-sm text-muted-foreground flex items-center justify-center gap-1.5">
+                        <Truck className="h-4 w-4" />
+                        Besplatna dostava i postavljanje za sve rezervacije
+                      </p>
                     </motion.div>
                   </form>
                 </Form>
@@ -469,7 +397,7 @@ const BookingSection = () => {
               <Card className="shadow-card">
                 <CardContent className="p-8 text-center">
                   <div className="mb-6">
-                    <img src="/assets/rezervacije-2.png" alt="Hop Hop mascot taking reservations" className="w-32 h-32 mx-auto object-contain mascot-hover" loading="lazy" />
+                    <img src="/assets/rezervacije-2.webp" alt="Hop Hop mascot taking reservations" className="w-32 h-32 mx-auto object-contain mascot-hover" loading="lazy" />
                   </div>
                   <h3 className="text-2xl font-bold text-foreground mb-4">
                     Ili nas nazovite direktno!

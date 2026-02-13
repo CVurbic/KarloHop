@@ -15,7 +15,7 @@ const Footer = () => {
           {/* Logo & Description */}
           <div className="lg:col-span-2">
             <div className="flex items-center mb-4">
-              <img src="/assets/logo.png" alt="Hop Hop Napuhanci Logo" className="h-16 w-auto mr-4" />
+              <img src="/assets/logo.webp" alt="Hop Hop Napuhanci Logo" className="h-16 w-auto mr-4" />
             </div>
             <p className="text-background/80 mb-6 leading-relaxed">Hop Hop Napuhanci – najam napuhanaca za dječje rođendane, proslave i događanja. Naši sigurni i kvalitetni dvorci, tobogani i tematski napuhanci uz brzu dostavu i profesionalnu uslugu uveseljavaju djecu diljem Zagreba i okolice.</p>
             <div className="flex space-x-4">

@@ -7,6 +7,7 @@ import { Mail, Phone, MapPin, Clock } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { analytics } from "@/lib/analytics";
 
 const ContactSection = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -48,6 +49,7 @@ const ContactSection = () => {
         description: "Vaša poruka je uspješno poslana. Odgovorit ćemo vam uskoro.",
       });
 
+      analytics.trackContactSubmission();
       setFormData({ name: "", email: "", message: "" });
     } catch (error) {
       console.error('Error sending contact email:', error);
@@ -194,7 +196,7 @@ const ContactSection = () => {
             {/* CTA Card */}
             <Card className="gradient-fun text-white shadow-mascot">
               <CardContent className="p-8 text-center">
-                <img src="/assets/mascot-jumping.png" alt="Hop Hop mascot" className="w-24 h-24 mx-auto mb-4 object-contain" loading="lazy" />
+                <img src="/assets/mascot-jumping.webp" alt="Hop Hop mascot" className="w-24 h-24 mx-auto mb-4 object-contain" loading="lazy" />
                 <h3 className="text-2xl font-bold mb-3">
                   Spremni za zabavu?
                 </h3>
