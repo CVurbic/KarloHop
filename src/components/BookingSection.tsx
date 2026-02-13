@@ -171,7 +171,7 @@ const BookingSection = () => {
   };
 
   return (
-    <section id="rezervacija" className="py-20 bg-gradient-to-br from-primary/5 to-accent/5">
+    <section id="rezervacija" className="py-20 bg-gradient-to-br from-primary/5 to-accent/5 overflow-hidden">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <motion.div
@@ -192,7 +192,7 @@ const BookingSection = () => {
         <div className="grid lg:grid-cols-3 gap-8 items-start">
           {/* Booking Form */}
           <motion.div
-            className="lg:col-span-2"
+            className="lg:col-span-2 min-w-0"
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
