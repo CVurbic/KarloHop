@@ -132,16 +132,19 @@ All colors MUST be HSL.
     overscroll-behavior: none;
   }
 
-  /* Prevent background shift when mobile menu/dialog opens */
-  html[data-scroll-locked] {
-    margin-right: 0 !important;
-    padding-right: 0 !important;
-  }
-
+  /* Prevent background shift when mobile menu/dialog opens.
+     react-remove-scroll adds padding/margin to compensate for scrollbar
+     removal, which causes visible layout shift on mobile. */
+  html[data-scroll-locked],
   html[data-scroll-locked] body {
     margin-right: 0 !important;
     padding-right: 0 !important;
     overflow: hidden !important;
+  }
+
+  /* Prevent elements with large blur/transforms from causing horizontal scroll */
+  html {
+    overflow-x: hidden;
   }
 
   .hop-bounce {
