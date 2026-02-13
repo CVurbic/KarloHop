@@ -7,6 +7,7 @@ import { Mail, Phone, MapPin, Clock } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { analytics } from "@/lib/analytics";
 
 const ContactSection = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -48,6 +49,7 @@ const ContactSection = () => {
         description: "Vaša poruka je uspješno poslana. Odgovorit ćemo vam uskoro.",
       });
 
+      analytics.trackContactSubmission();
       setFormData({ name: "", email: "", message: "" });
     } catch (error) {
       console.error('Error sending contact email:', error);

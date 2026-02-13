@@ -10,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { analytics } from "@/lib/analytics";
 import { useState, useEffect } from "react";
 
 // Form validation schema
@@ -154,6 +155,7 @@ const BookingSection = () => {
         className: "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 max-w-md",
       });
 
+      analytics.trackBookingSubmission(values.selected_bounce_house, values.booking_start_date);
       form.reset();
       setAvailabilityStatus("");
     } catch (error) {
