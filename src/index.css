@@ -143,8 +143,10 @@ All colors MUST be HSL.
   }
 
   /* Prevent elements with large blur/transforms from causing horizontal scroll */
-  html {
+  html,
+  body {
     overflow-x: hidden;
+    max-width: 100vw;
   }
 
   .hop-bounce {
