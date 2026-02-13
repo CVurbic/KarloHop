@@ -12,11 +12,21 @@ const navLinks = [
   { href: "#kontakt", label: "Kontakt" },
 ];
 
+const scrollToSection = (id: string) => {
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+};
+
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const handleLinkClick = () => {
+  const handleMobileLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
     setMobileMenuOpen(false);
+    // Delay scroll until sheet close animation completes
+    setTimeout(() => {
+      const targetId = href.replace('#', '');
+      scrollToSection(targetId);
+    }, 300);
   };
 
   return (
@@ -53,7 +63,11 @@ const Header = () => {
                 <span>info@hophop-napuhanci.com</span>
               </div>
             </div>
-            <Button variant="default" className="hidden md:inline-flex gradient-primary hover:shadow-playful transition-all duration-300">
+            <Button
+              variant="default"
+              className="hidden md:inline-flex gradient-primary hover:shadow-playful transition-all duration-300"
+              onClick={() => scrollToSection('rezervacija')}
+            >
               Rezerviraj
             </Button>
 
@@ -64,7 +78,7 @@ const Header = () => {
                   <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[360px]">
+              <SheetContent side="right" className="w-[300px] sm:w-[360px] overflow-y-auto">
                 <SheetHeader>
                   <SheetTitle className="text-left">Izbornik</SheetTitle>
                 </SheetHeader>
@@ -73,7 +87,7 @@ const Header = () => {
                     <a
                       key={link.href}
                       href={link.href}
-                      onClick={handleLinkClick}
+                      onClick={(e) => handleMobileLinkClick(e, link.href)}
                       className="text-foreground hover:text-primary transition-colors text-lg font-medium py-1"
                     >
                       {link.label}
@@ -85,7 +99,7 @@ const Header = () => {
                   <div className="space-y-3">
                     <a
                       href="tel:+385958655213"
-                      onClick={() => { analytics.trackPhoneClick("mobile_menu"); handleLinkClick(); }}
+                      onClick={() => { analytics.trackPhoneClick("mobile_menu"); setMobileMenuOpen(false); }}
                       className="flex items-center space-x-2 text-muted-foreground hover:text-primary transition-colors"
                     >
                       <Phone className="h-5 w-5" />
@@ -93,7 +107,7 @@ const Header = () => {
                     </a>
                     <a
                       href="mailto:info@hophop-napuhanci.com"
-                      onClick={handleLinkClick}
+                      onClick={() => setMobileMenuOpen(false)}
                       className="flex items-center space-x-2 text-muted-foreground hover:text-primary transition-colors"
                     >
                       <Mail className="h-5 w-5" />
@@ -101,11 +115,16 @@ const Header = () => {
                     </a>
                   </div>
 
-                  <a href="#rezervacija" onClick={handleLinkClick}>
-                    <Button variant="default" className="w-full gradient-primary hover:shadow-playful transition-all duration-300 mt-4">
-                      Rezerviraj
-                    </Button>
-                  </a>
+                  <Button
+                    variant="default"
+                    className="w-full gradient-primary hover:shadow-playful transition-all duration-300 mt-4"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setTimeout(() => scrollToSection('rezervacija'), 300);
+                    }}
+                  >
+                    Rezerviraj
+                  </Button>
                 </nav>
               </SheetContent>
             </Sheet>

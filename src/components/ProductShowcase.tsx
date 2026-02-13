@@ -69,7 +69,11 @@ const ProductShowcase = () => {
                   <div className="text-2xl font-bold text-primary">
                     100€<span className="text-sm text-muted-foreground">/dan</span>
                   </div>
-                  <Button variant="default" className="gradient-secondary hover:shadow-playful transition-all duration-300">
+                  <Button
+                    variant="default"
+                    className="gradient-secondary hover:shadow-playful transition-all duration-300"
+                    onClick={() => document.getElementById('rezervacija')?.scrollIntoView({ behavior: 'smooth' })}
+                  >
                     Rezerviraj
                   </Button>
                 </div>
