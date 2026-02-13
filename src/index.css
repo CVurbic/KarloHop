@@ -164,15 +164,6 @@ All colors MUST be HSL.
     }
   }
 
-  @keyframes scroll-banner {
-    0% {
-      transform: translateX(0);
-    }
-    100% {
-      transform: translateX(-50%);
-    }
-  }
-
   .animate-scroll-left {
     animation: scroll-left 30s linear infinite;
   }
@@ -181,9 +172,6 @@ All colors MUST be HSL.
     animation: scroll-left 15s linear infinite;
   }
 
-  .animate-scroll-banner {
-    animation: scroll-banner 20s linear infinite;
-  }
 
   .mascot-hover {
     transition: transform 0.3s ease;
