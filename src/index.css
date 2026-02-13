@@ -129,6 +129,19 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground font-sans;
+    overscroll-behavior: none;
+  }
+
+  /* Prevent background shift when mobile menu/dialog opens */
+  html[data-scroll-locked] {
+    margin-right: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  html[data-scroll-locked] body {
+    margin-right: 0 !important;
+    padding-right: 0 !important;
+    overflow: hidden !important;
   }
 
   .hop-bounce {
