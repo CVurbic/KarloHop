@@ -296,14 +296,9 @@ const handler = async (req: Request): Promise<Response> => {
     const safeBounceHouse = escapeHtml(bookingData.selected_bounce_house);
     const safeNotes = bookingData.additional_notes ? escapeHtml(bookingData.additional_notes) : '';
 
-    // NOTE: "onboarding@resend.dev" is Resend's test domain.
-    // It only delivers to the Resend account owner's email.
-    // For production: verify a custom domain in Resend dashboard
-    // and update to e.g. "Hop Hop Napuhanci <rezervacije@hophop-napuhanci.com>"
-
     // Send email to business
     const businessEmailResponse = await resend.emails.send({
-      from: "Hop Hop Napuhanci <onboarding@resend.dev>",
+      from: "Hop Hop Napuhanci <info@hophop-napuhanci.com>",
       to: ["tiktokarlo2021@gmail.com", "turic.karlo@gmail.com"],
       subject: `Nova rezervacija - ${safeBounceHouse}`,
       html: buildBusinessEmailHtml({
@@ -322,7 +317,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send confirmation email to customer
     const customerEmailResponse = await resend.emails.send({
-      from: "Hop Hop Napuhanci <onboarding@resend.dev>",
+      from: "Hop Hop Napuhanci <info@hophop-napuhanci.com>",
       to: [bookingData.email],
       subject: `Potvrda rezervacije - ${safeBounceHouse}`,
       html: buildCustomerEmailHtml({
