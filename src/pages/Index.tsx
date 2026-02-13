@@ -9,13 +9,11 @@ import BookingSection from "@/components/BookingSection";
 import FAQSection from "@/components/FAQSection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
-import PromoBanner from "@/components/PromoBanner";
 import WhatsAppButton from "@/components/WhatsAppButton";
 
 const Index = () => {
   return (
     <div className="min-h-screen overflow-x-hidden">
-      <PromoBanner />
       <Header />
       <HeroSection />
       <ProductShowcase />
