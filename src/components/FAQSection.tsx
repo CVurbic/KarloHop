@@ -47,10 +47,6 @@ const FAQSection = () => {
       answer: "Plaćanje se može izvršiti bankovnim prijenosom, gotovinom ili putem kartice (ovisno o dogovoru). Plaćanje se odvija prije istovara napuhanca na lokaciji ili prilikom preuzimanja u našoj garaži na adresi Lanište 26."
     },
     {
-      question: "Koje dodatne usluge nudimo uz najam napuhanaca?",
-      answer: "Uz najam napuhanca nudimo i stolove i klupe za goste. Sve možete uključiti u paket i time kreirate kompletan događaj bez dodatnih briga."
-    },
-    {
       question: "Mogu li vidjeti više o napuhancima i rezervacijama?",
       answer: "Da, na našoj web-stranici i društvenim mrežama možete pogledati galeriju slika i kratke videozapise s prošlih događanja. To je odličan način da vidite kako napuhanci izgledaju u akciji i kako izgleda priprema događaja."
     }

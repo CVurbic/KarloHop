@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Calendar, Clock, Phone, User, Castle, CheckCircle, Loader2, MapPin, Truck } from "lucide-react";
+import { Calendar, Clock, Phone, User, Castle, CheckCircle, Loader2, MapPin } from "lucide-react";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -371,14 +371,10 @@ const BookingSection = () => {
                         ) : (
                           <>
                             <CheckCircle className="mr-2 h-5 w-5" />
-                            Rezerviraj sada — besplatna dostava!
+                            Rezerviraj sada
                           </>
                         )}
                       </Button>
-                      <p className="text-center text-sm text-muted-foreground flex items-center justify-center gap-1.5">
-                        <Truck className="h-4 w-4" />
-                        Besplatna dostava i postavljanje za sve rezervacije
-                      </p>
                     </motion.div>
                   </form>
                 </Form>
