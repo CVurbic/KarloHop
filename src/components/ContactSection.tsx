@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Mail, Phone, MapPin, Clock } from "lucide-react";
+import { Mail, Phone, MapPin, Clock, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -125,12 +125,19 @@ const ContactSection = () => {
                     />
                   </div>
 
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     className="w-full gradient-secondary hover:shadow-playful transition-all duration-300 text-lg py-6"
                     disabled={isSubmitting}
                   >
-                    {isSubmitting ? "Šalje se..." : "Pošaljite poruku"}
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Šalje se...
+                      </>
+                    ) : (
+                      "Pošaljite poruku"
+                    )}
                   </Button>
                 </div>
               </form>
