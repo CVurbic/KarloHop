@@ -82,6 +82,14 @@ const ProductShowcase = () => {
           ))}
         </div>
 
+        {/* Kako rezervirati */}
+        <div className="mt-12 px-4">
+          <img
+            src="/assets/kako-rezervirati.webp"
+            alt="Kako rezervirati napuhanac u 4 koraka"
+            className="w-full max-w-4xl mx-auto rounded-2xl shadow-lg"
+          />
+        </div>
       </div>
     </section>
   );
