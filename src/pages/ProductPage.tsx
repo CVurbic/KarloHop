@@ -1,6 +1,6 @@
 import { useParams, Link, Navigate } from "react-router-dom";
 import { napuhanci } from "@/data/products";
-import { ArrowLeft, Ruler, Users, Baby, CheckCircle, Phone, Clock } from "lucide-react";
+import { ArrowLeft, Ruler, Users, Baby, CheckCircle, Phone, Clock, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import BookingSection from "@/components/BookingSection";
@@ -110,7 +110,7 @@ const ProductPage = () => {
             <h2 className="text-3xl lg:text-4xl font-bold text-foreground text-center mb-12">
               Detalji <span className="text-primary">proizvoda</span>
             </h2>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl mx-auto">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 max-w-5xl mx-auto">
               <Card className="text-center shadow-card hover:shadow-playful transition-all duration-300 hover:-translate-y-1">
                 <CardContent className="p-6">
                   <div className="bg-primary/10 p-3 rounded-full w-14 h-14 flex items-center justify-center mx-auto mb-4">
@@ -160,6 +160,19 @@ const ProductPage = () => {
                   </CardTitle>
                   <p className="font-bold text-foreground text-lg">
                     8 sati / dan
+                  </p>
+                </CardContent>
+              </Card>
+              <Card className="text-center shadow-card hover:shadow-playful transition-all duration-300 hover:-translate-y-1 col-span-2 sm:col-span-1">
+                <CardContent className="p-6">
+                  <div className="bg-accent/10 p-3 rounded-full w-14 h-14 flex items-center justify-center mx-auto mb-4">
+                    <Truck className="h-7 w-7 text-accent" />
+                  </div>
+                  <CardTitle className="text-sm text-muted-foreground mb-1">
+                    Dostava
+                  </CardTitle>
+                  <p className="font-bold text-foreground text-lg">
+                    Besplatno do 10km
                   </p>
                 </CardContent>
               </Card>

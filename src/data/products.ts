@@ -42,7 +42,7 @@ export const napuhanci: Product[] = [
     ages: "3–12 godina",
     included: [
       "Najam napuhanca za cijeli dan (8h)",
-      "Besplatna dostava i postavljanje (do 10km)",
+      "Besplatna dostava, postavljanje i odvoz (do 10km od Zagreba)",
       "Puhalo (uključeno u cijenu)",
       "Upute za sigurnu upotrebu",
     ],
@@ -76,7 +76,7 @@ export const napuhanci: Product[] = [
     ages: "3–12 godina",
     included: [
       "Najam napuhanca za cijeli dan (8h)",
-      "Besplatna dostava i postavljanje (do 10km)",
+      "Besplatna dostava, postavljanje i odvoz (do 10km od Zagreba)",
       "Puhalo (uključeno u cijenu)",
       "Upute za sigurnu upotrebu",
     ],
@@ -110,7 +110,7 @@ export const napuhanci: Product[] = [
     ages: "3–12 godina",
     included: [
       "Najam napuhanca za cijeli dan (8h)",
-      "Besplatna dostava i postavljanje (do 10km)",
+      "Besplatna dostava, postavljanje i odvoz (do 10km od Zagreba)",
       "Puhalo (uključeno u cijenu)",
       "Upute za sigurnu upotrebu",
     ],
