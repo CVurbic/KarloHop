@@ -27,8 +27,7 @@ export const napuhanci: Product[] = [
     coverImage: "/assets/unicorn-cover.png",
     image: "/assets/jednorog-new.webp",
     gallery: [
-      "/assets/jednorog-new.webp",
-      "/assets/uni-product.webp",
+      "/assets/unicorn-cover.png",
       "/assets/unicorn-1.webp",
       "/assets/unicorn-2.webp",
       "/assets/unicorn-3.webp",
@@ -60,8 +59,7 @@ export const napuhanci: Product[] = [
     coverImage: "/assets/minecraft-cover.png",
     image: "/assets/minecraft-new.webp",
     gallery: [
-      "/assets/minecraft-new.webp",
-      "/assets/mcp-product.webp",
+      "/assets/minecraft-cover.png",
       "/assets/minecraft-1.webp",
       "/assets/minecraft-2.webp",
       "/assets/minecraft-3.webp",
@@ -93,8 +91,7 @@ export const napuhanci: Product[] = [
     coverImage: "/assets/dino-cover.png",
     image: "/assets/dino-product-main.webp",
     gallery: [
-      "/assets/dino-product-main.webp",
-      "/assets/dino-product.webp",
+      "/assets/dino-cover.png",
       "/assets/dino-1.webp",
       "/assets/dino-2.webp",
       "/assets/dino-3.webp",
