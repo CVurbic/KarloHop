@@ -42,9 +42,8 @@ export const napuhanci: Product[] = [
     ages: "3–12 godina",
     included: [
       "Najam napuhanca za cijeli dan (8h)",
-      "Besplatna dostava, postavljanje i odvoz (do 10km od Zagreba)",
-      "Puhalo (uključeno u cijenu)",
-      "Upute za sigurnu upotrebu",
+      "Besplatna dostava do 10km od Zagreba",
+      "Montaža i demontaža na lokaciji",
     ],
     price: "100",
     seo: {
@@ -76,9 +75,8 @@ export const napuhanci: Product[] = [
     ages: "3–12 godina",
     included: [
       "Najam napuhanca za cijeli dan (8h)",
-      "Besplatna dostava, postavljanje i odvoz (do 10km od Zagreba)",
-      "Puhalo (uključeno u cijenu)",
-      "Upute za sigurnu upotrebu",
+      "Besplatna dostava do 10km od Zagreba",
+      "Montaža i demontaža na lokaciji",
     ],
     price: "100",
     seo: {
@@ -110,9 +108,8 @@ export const napuhanci: Product[] = [
     ages: "3–12 godina",
     included: [
       "Najam napuhanca za cijeli dan (8h)",
-      "Besplatna dostava, postavljanje i odvoz (do 10km od Zagreba)",
-      "Puhalo (uključeno u cijenu)",
-      "Upute za sigurnu upotrebu",
+      "Besplatna dostava do 10km od Zagreba",
+      "Montaža i demontaža na lokaciji",
     ],
     price: "100",
     seo: {
