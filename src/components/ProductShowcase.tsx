@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -12,57 +13,9 @@ import {
 } from "@/components/ui/carousel";
 import { X } from "lucide-react";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { napuhanci } from "@/data/products";
 
-const products = [
-  {
-    id: 1,
-    name: "Jednorog svijet",
-    price: "100",
-    image: "/assets/jednorog-new.webp",
-    gallery: [
-      "/assets/jednorog-new.webp",
-      "/assets/uni-product.webp",
-      "/assets/unicorn-1.webp",
-      "/assets/unicorn-2.webp",
-      "/assets/unicorn-3.webp",
-      "/assets/unicorn-4.webp",
-    ],
-    description: "Napuhanac s jednorozima za male princeze",
-    dimensions: "5.5 x 4.5 x 4.5m",
-  },
-  {
-    id: 2,
-    name: "Minecraft party",
-    price: "100",
-    image: "/assets/minecraft-new.webp",
-    gallery: [
-      "/assets/minecraft-new.webp",
-      "/assets/mcp-product.webp",
-      "/assets/minecraft-1.webp",
-      "/assets/minecraft-2.webp",
-      "/assets/minecraft-3.webp",
-      "/assets/minecraft-4.webp",
-    ],
-    description: "Minecraft avantura u napuhancu s toboganom",
-    dimensions: "5.5 x 4.5 x 4.5m",
-  },
-  {
-    id: 3,
-    name: "Dino park",
-    price: "100",
-    image: "/assets/dino-product-main.webp",
-    gallery: [
-      "/assets/dino-product-main.webp",
-      "/assets/dino-product.webp",
-      "/assets/dino-1.webp",
-      "/assets/dino-2.webp",
-      "/assets/dino-3.webp",
-      "/assets/dino-4.webp",
-    ],
-    description: "Zabava u Dinosaur napuhancu za male istraživače",
-    dimensions: "5.5 x 4 x 4.5m",
-  },
-];
+const products = napuhanci;
 
 const ProductShowcase = () => {
   const [lightbox, setLightbox] = useState<number | null>(null);
@@ -137,7 +90,7 @@ const ProductShowcase = () => {
               </CardHeader>
               <CardContent className="p-6">
                 <CardTitle className="text-xl mb-2 text-foreground">{product.name}</CardTitle>
-                <p className="text-muted-foreground mb-2">{product.description}</p>
+                <p className="text-muted-foreground mb-2">{product.shortDesc}</p>
                 <p className="text-sm text-muted-foreground mb-2">
                   Dimenzije: {product.dimensions}
                 </p>
@@ -147,19 +100,14 @@ const ProductShowcase = () => {
                 </p>
                 <div className="flex items-center justify-between">
                   <div className="text-2xl font-bold text-primary">
-                    100€<span className="text-sm text-muted-foreground">/dan</span>
+                    {product.price}€<span className="text-sm text-muted-foreground">/dan</span>
                   </div>
-                  <Button
-                    variant="default"
-                    className="gradient-secondary hover:shadow-playful transition-all duration-300"
-                    onClick={() =>
-                      document
-                        .getElementById("rezervacija")
-                        ?.scrollIntoView({ behavior: "smooth" })
-                    }
+                  <Link
+                    to={`/${product.slug}`}
+                    className="inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 gradient-secondary text-white hover:shadow-playful transition-all duration-300"
                   >
-                    Rezerviraj
-                  </Button>
+                    Saznaj više
+                  </Link>
                 </div>
               </CardContent>
             </Card>
