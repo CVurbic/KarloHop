@@ -2,6 +2,27 @@
   command = "npm run build"
   publish = "dist"
 
+[build.environment]
+  # Netlify build image has Chromium installed — tell puppeteer to use it
+  PUPPETEER_EXECUTABLE_PATH = "/usr/bin/chromium-browser"
+  PUPPETEER_SKIP_CHROMIUM_DOWNLOAD = "true"
+
+# Serve pre-rendered HTML files first, then fallback to SPA
+[[redirects]]
+  from = "/jednorog-napuhanac"
+  to = "/jednorog-napuhanac/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/minecraft-napuhanac"
+  to = "/minecraft-napuhanac/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/dinosaur-napuhanac"
+  to = "/dinosaur-napuhanac/index.html"
+  status = 200
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
