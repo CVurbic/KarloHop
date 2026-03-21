@@ -1,7 +1,7 @@
 /**
  * Setup script for Hop Hop Napuhanci blog dashboard.
  *
- * Creates the blog_posts table and blog-images storage bucket in Supabase.
+ * Creates the blog_posts table, blog-images storage bucket, and admin user.
  *
  * Usage:
  *   1. Add SUPABASE_SERVICE_ROLE_KEY to your .env file
@@ -13,10 +13,11 @@ import { readFileSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import { createClient } from "@supabase/supabase-js";
+import { createInterface } from "readline";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// Load .env manually (no extra dependency needed)
+// ---- .env loader ----
 function loadEnv() {
   try {
     const envPath = resolve(__dirname, "..", ".env");
@@ -28,7 +29,6 @@ function loadEnv() {
       if (eqIndex === -1) continue;
       const key = trimmed.slice(0, eqIndex).trim();
       let value = trimmed.slice(eqIndex + 1).trim();
-      // Remove surrounding quotes
       if (
         (value.startsWith('"') && value.endsWith('"')) ||
         (value.startsWith("'") && value.endsWith("'"))
@@ -40,7 +40,7 @@ function loadEnv() {
       }
     }
   } catch {
-    // .env file not found — rely on existing env vars
+    // .env not found
   }
 }
 
@@ -64,7 +64,7 @@ if (!serviceRoleKey) {
       "  1. Idi na https://supabase.com/dashboard\n" +
       "  2. Otvori svoj projekt\n" +
       "  3. Settings -> API -> Project API keys\n" +
-      "  4. Kopiraj 'service_role' key (NE anon key!)\n" +
+      '  4. Kopiraj \'service_role\' key (NE anon key!)\n' +
       "  5. Dodaj u .env: SUPABASE_SERVICE_ROLE_KEY=tvoj-key\n"
   );
   process.exit(1);
@@ -74,116 +74,79 @@ const supabase = createClient(supabaseUrl, serviceRoleKey, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
 
-async function runMigration() {
-  console.log("\n=== Hop Hop Napuhanci — Setup baze ===\n");
-
-  // Step 1: Run SQL migration
-  console.log("[1/3] Kreiram blog_posts tablicu...");
-  const sqlPath = resolve(
-    __dirname,
-    "..",
-    "supabase",
-    "migrations",
-    "20260321_add_blog_tables.sql"
+function ask(question) {
+  const rl = createInterface({ input: process.stdin, output: process.stdout });
+  return new Promise((resolve) =>
+    rl.question(question, (answer) => {
+      rl.close();
+      resolve(answer.trim());
+    })
   );
-  const sql = readFileSync(sqlPath, "utf-8");
+}
 
-  const { error: sqlError } = await supabase.rpc("", undefined).then(
-    () => ({ error: null }),
-    () => ({ error: null })
-  );
+async function runSetup() {
+  console.log("\n╔══════════════════════════════════════════════╗");
+  console.log("║  Hop Hop Napuhanci — Blog Dashboard Setup   ║");
+  console.log("╚══════════════════════════════════════════════╝\n");
 
-  // Use the Supabase REST API to execute raw SQL via the pg_query endpoint
-  // The service role key gives us access to execute SQL
-  const response = await fetch(`${supabaseUrl}/rest/v1/rpc/`, {
-    method: "POST",
-    headers: {
-      apikey: serviceRoleKey,
-      Authorization: `Bearer ${serviceRoleKey}`,
-      "Content-Type": "application/json",
-    },
-  }).catch(() => null);
+  // ---- Step 1: Check if blog_posts table exists ----
+  console.log("[1/4] Provjeravam blog_posts tablicu...");
+  const { error: tableCheck } = await supabase
+    .from("blog_posts")
+    .select("id")
+    .limit(1);
 
-  // Alternative approach: use the SQL endpoint directly
-  const sqlResponse = await fetch(`${supabaseUrl}/pg`, {
-    method: "POST",
-    headers: {
-      apikey: serviceRoleKey,
-      Authorization: `Bearer ${serviceRoleKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ query: sql }),
-  }).catch(() => null);
+  if (!tableCheck) {
+    console.log("  ✓ blog_posts tablica već postoji!");
+  } else {
+    console.log("  ✗ blog_posts tablica ne postoji.");
+    console.log("");
+    console.log("  Za kreiranje tablice otvori Supabase SQL Editor:");
+    console.log("  https://supabase.com/dashboard/project/egwtrsfcobwybcnbqsok/sql/new");
+    console.log("");
+    console.log("  Zalijepi sljedeći SQL i klikni 'Run':");
+    console.log("  ─────────────────────────────────────────────");
 
-  // If direct SQL doesn't work, try the management API
-  if (!sqlResponse || !sqlResponse.ok) {
-    // Try using supabase-js to check if table already exists
-    const { error: checkError } = await supabase
+    const sqlPath = resolve(
+      __dirname,
+      "..",
+      "supabase",
+      "migrations",
+      "20260321_add_blog_tables.sql"
+    );
+    const sql = readFileSync(sqlPath, "utf-8");
+    console.log(sql);
+    console.log("  ─────────────────────────────────────────────");
+
+    const answer = await ask(
+      "\n  Jesi li pokrenuo SQL u Supabase dashboardu? (da/ne): "
+    );
+    if (answer.toLowerCase() !== "da") {
+      console.log("  OK — pokreni skripta ponovo kad budes spreman.\n");
+      process.exit(0);
+    }
+
+    // Verify
+    const { error: recheck } = await supabase
       .from("blog_posts")
       .select("id")
       .limit(1);
-
-    if (!checkError) {
-      console.log("  -> blog_posts tablica vec postoji! Preskačem...");
-    } else if (
-      checkError.message?.includes("does not exist") ||
-      checkError.code === "42P01"
-    ) {
-      // Table doesn't exist — need to create it via Supabase Management API
-      const projectRef = supabaseUrl.match(
-        /https:\/\/([^.]+)\.supabase\.co/
-      )?.[1];
-      if (projectRef) {
-        console.log(
-          "  -> Pokušavam kreirati tablicu preko Management API..."
-        );
-        const mgmtResponse = await fetch(
-          `https://api.supabase.com/v1/projects/${projectRef}/database/query`,
-          {
-            method: "POST",
-            headers: {
-              apikey: serviceRoleKey,
-              Authorization: `Bearer ${serviceRoleKey}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ query: sql }),
-          }
-        ).catch(() => null);
-
-        if (mgmtResponse && mgmtResponse.ok) {
-          console.log("  -> blog_posts tablica kreirana!");
-        } else {
-          console.log(
-            "\n  -> Automatsko kreiranje tablice nije uspjelo."
-          );
-          console.log("     Molim te koristi jednu od ovih opcija:\n");
-          console.log("     Opcija A: Supabase CLI");
-          console.log(
-            `     npx supabase link --project-ref ${projectRef}`
-          );
-          console.log("     npx supabase db push\n");
-          console.log("     Opcija B: Supabase SQL Editor");
-          console.log(
-            "     1. Otvori supabase.com/dashboard -> SQL Editor"
-          );
-          console.log(`     2. Kopiraj sadržaj iz: ${sqlPath}`);
-          console.log("     3. Klikni Run\n");
-        }
-      }
-    } else {
-      console.log("  -> Greška:", checkError.message);
+    if (recheck) {
+      console.log(
+        "  ✗ Tablica još ne postoji. Provjeri jesi li pokrenuo SQL ispravno."
+      );
+      process.exit(1);
     }
-  } else {
-    console.log("  -> blog_posts tablica kreirana!");
+    console.log("  ✓ blog_posts tablica kreirana!");
   }
 
-  // Step 2: Create storage bucket
-  console.log("[2/3] Kreiram blog-images storage bucket...");
+  // ---- Step 2: Create storage bucket ----
+  console.log("\n[2/4] Kreiram blog-images storage bucket...");
   const { error: bucketError } = await supabase.storage.createBucket(
     "blog-images",
     {
       public: true,
-      fileSizeLimit: 5 * 1024 * 1024, // 5MB max
+      fileSizeLimit: 5 * 1024 * 1024, // 5MB
       allowedMimeTypes: [
         "image/jpeg",
         "image/png",
@@ -195,47 +158,103 @@ async function runMigration() {
 
   if (bucketError) {
     if (bucketError.message?.includes("already exists")) {
-      console.log("  -> blog-images bucket vec postoji! Preskačem...");
+      console.log("  ✓ blog-images bucket već postoji!");
     } else {
-      console.log("  -> Greška pri kreiranju bucketa:", bucketError.message);
+      console.log("  ✗ Greška:", bucketError.message);
     }
   } else {
-    console.log("  -> blog-images bucket kreiran!");
+    console.log("  ✓ blog-images bucket kreiran! (public, max 5MB)");
   }
 
-  // Step 3: Verify
-  console.log("[3/3] Verificiram setup...");
-  const { data: buckets } = await supabase.storage.listBuckets();
-  const hasBucket = buckets?.some((b) => b.name === "blog-images");
+  // ---- Step 3: Create admin user ----
+  console.log("\n[3/4] Postavljam admin korisnika...");
+  const createAdmin = await ask(
+    "  Želiš li kreirati admin korisnika? (da/ne): "
+  );
 
-  const { error: tableCheck } = await supabase
+  if (createAdmin.toLowerCase() === "da") {
+    const email = await ask("  Email: ");
+    const password = await ask("  Lozinka (min 6 znakova): ");
+
+    if (!email || password.length < 6) {
+      console.log("  ✗ Email ili lozinka nisu ispravni.");
+    } else {
+      // Create user with admin API (service role key)
+      const { data: userData, error: userError } =
+        await supabase.auth.admin.createUser({
+          email,
+          password,
+          email_confirm: true, // Skip email verification
+        });
+
+      if (userError) {
+        if (userError.message?.includes("already been registered")) {
+          console.log("  → Korisnik s tim emailom već postoji.");
+
+          // Try to find the user and assign admin role
+          const { data: users } = await supabase.auth.admin.listUsers();
+          const existingUser = users?.users?.find((u) => u.email === email);
+          if (existingUser) {
+            const { error: roleError } = await supabase
+              .from("user_roles")
+              .upsert(
+                { user_id: existingUser.id, role: "admin" },
+                { onConflict: "user_id,role" }
+              );
+            if (!roleError) {
+              console.log("  ✓ Admin rola dodijeljena!");
+            } else {
+              console.log("  ✗ Greška pri dodavanju role:", roleError.message);
+            }
+          }
+        } else {
+          console.log("  ✗ Greška:", userError.message);
+        }
+      } else if (userData?.user) {
+        console.log(`  ✓ Korisnik kreiran (${userData.user.id})`);
+
+        // Assign admin role
+        const { error: roleError } = await supabase
+          .from("user_roles")
+          .insert({ user_id: userData.user.id, role: "admin" });
+
+        if (roleError) {
+          console.log("  ✗ Greška pri dodavanju admin role:", roleError.message);
+        } else {
+          console.log("  ✓ Admin rola dodijeljena!");
+        }
+      }
+    }
+  } else {
+    console.log("  → Preskočeno.");
+  }
+
+  // ---- Step 4: Final verification ----
+  console.log("\n[4/4] Završna provjera...");
+
+  const { error: finalTableCheck } = await supabase
     .from("blog_posts")
     .select("id")
     .limit(1);
+  const { data: buckets } = await supabase.storage.listBuckets();
+  const hasBucket = buckets?.some((b) => b.name === "blog-images");
 
-  console.log(
-    `  -> blog_posts tablica: ${!tableCheck ? "OK" : "NEDOSTAJE"}`
-  );
-  console.log(`  -> blog-images bucket: ${hasBucket ? "OK" : "NEDOSTAJE"}`);
+  const tableOk = !finalTableCheck;
+  console.log(`  blog_posts tablica: ${tableOk ? "✓ OK" : "✗ NEDOSTAJE"}`);
+  console.log(`  blog-images bucket: ${hasBucket ? "✓ OK" : "✗ NEDOSTAJE"}`);
 
-  if (!tableCheck && hasBucket) {
-    console.log("\n=== Setup uspješno završen! ===");
-    console.log(
-      "\nSljedeći korak: kreiraj admin korisnika u Supabase dashboardu:"
-    );
-    console.log("  1. Authentication -> Users -> Add user");
-    console.log(
-      "  2. SQL Editor -> pokreni: INSERT INTO user_roles (user_id, role) VALUES ('tvoj-user-uuid', 'admin');"
-    );
-    console.log("\nNakon toga pristupi dashboardu na: /hop-upravljanje\n");
+  if (tableOk && hasBucket) {
+    console.log("\n╔══════════════════════════════════════════════╗");
+    console.log("║        Setup uspješno završen!               ║");
+    console.log("╚══════════════════════════════════════════════╝");
+    console.log("\nPristupi dashboardu na: /hop-upravljanje");
+    console.log("Blog stranica je na: /savjeti\n");
   } else {
-    console.log(
-      "\n=== Setup djelomično završen — provjeri gore navedene greške ===\n"
-    );
+    console.log("\n⚠  Setup djelomično završen — riješi greške iznad.\n");
   }
 }
 
-runMigration().catch((err) => {
+runSetup().catch((err) => {
   console.error("Neočekivana greška:", err);
   process.exit(1);
 });
