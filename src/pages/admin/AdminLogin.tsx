@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAdmin } from "@/hooks/useAdmin";
 import { Button } from "@/components/ui/button";
@@ -10,15 +10,16 @@ const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const { signIn, isAdmin, loading } = useAdmin();
+  const { signIn, isAdmin, loading, user } = useAdmin();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // If already logged in as admin, redirect
-  if (!loading && isAdmin) {
-    navigate("/hop-upravljanje/clanci", { replace: true });
-    return null;
-  }
+  // Redirect once admin status is confirmed (works for both fresh login and already logged in)
+  useEffect(() => {
+    if (!loading && isAdmin) {
+      navigate("/hop-upravljanje/clanci", { replace: true });
+    }
+  }, [loading, isAdmin, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,11 +37,8 @@ const AdminLogin = () => {
       return;
     }
 
-    // Wait a moment for auth state to update, then check admin role
-    setTimeout(() => {
-      navigate("/hop-upravljanje/clanci");
-      setSubmitting(false);
-    }, 500);
+    // Navigation happens via the useEffect above once isAdmin becomes true
+    // Keep submitting state active until redirect
   };
 
   if (loading) {
