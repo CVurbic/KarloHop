@@ -2,9 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Phone, Mail, Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useState } from "react";
+import { useLocation, Link } from "react-router-dom";
 import { analytics } from "@/lib/analytics";
 
-const navLinks = [
+const hashLinks = [
   { href: "#pocetna", label: "Početna" },
   { href: "#napuhanci", label: "Napuhanci" },
   { href: "#prednosti", label: "Prednosti" },
@@ -40,11 +41,14 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            {navLinks.map((link) => (
+            {hashLinks.map((link) => (
               <a key={link.href} href={link.href} className="text-foreground hover:text-primary transition-colors">
                 {link.label}
               </a>
             ))}
+            <Link to="/savjeti" className="text-foreground hover:text-primary transition-colors">
+              Savjeti i ideje
+            </Link>
           </nav>
 
           {/* Contact Info & CTA */}
@@ -83,7 +87,7 @@ const Header = () => {
                   <SheetTitle className="text-left">Izbornik</SheetTitle>
                 </SheetHeader>
                 <nav className="flex flex-col space-y-4 mt-8">
-                  {navLinks.map((link) => (
+                  {hashLinks.map((link) => (
                     <a
                       key={link.href}
                       href={link.href}
@@ -93,6 +97,13 @@ const Header = () => {
                       {link.label}
                     </a>
                   ))}
+                  <Link
+                    to="/savjeti"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-foreground hover:text-primary transition-colors text-lg font-medium py-1"
+                  >
+                    Savjeti i ideje
+                  </Link>
 
                   <div className="border-t border-border pt-4 mt-4" />
 

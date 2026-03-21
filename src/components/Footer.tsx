@@ -1,4 +1,5 @@
 import { Facebook, Instagram, Mail, Phone, MapPin } from "lucide-react";
+import { Link } from "react-router-dom";
 
 // TikTok icon component
 const TikTok = ({
@@ -59,6 +60,11 @@ const Footer = () => {
                 <a href="#kontakt" className="text-background/80 hover:text-white transition-colors">
                   Kontakt
                 </a>
+              </li>
+              <li>
+                <Link to="/savjeti" className="text-background/80 hover:text-white transition-colors">
+                  Savjeti i ideje
+                </Link>
               </li>
             </ul>
           </div>

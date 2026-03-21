@@ -34,6 +34,17 @@
   to = "/dinosaur-napuhanac/index.html"
   status = 200
 
+# Blog and admin routes — SPA fallback
+[[redirects]]
+  from = "/savjeti/*"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/hop-upravljanje/*"
+  to = "/index.html"
+  status = 200
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
