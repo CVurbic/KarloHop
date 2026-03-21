@@ -116,12 +116,13 @@ const ProductShowcase = () => {
           ))}
         </div>
 
-        {/* Kako rezervirati - hidden on mobile */}
-        <div className="mt-12 px-4 hidden md:block">
+        {/* Načini plaćanja - visible on all screens */}
+        <div className="mt-12 px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-6">Načini plaćanja</h2>
           <img
-            src="/assets/kako-rezervirati.webp"
-            alt="Kako rezervirati napuhanac u 4 koraka"
-            className="w-full max-w-4xl mx-auto rounded-2xl shadow-lg"
+            src="/assets/nacini-placanja.png"
+            alt="Načini plaćanja - Visa, Mastercard, Google Pay, Apple Pay, gotovina"
+            className="w-full max-w-3xl mx-auto"
           />
         </div>
       </div>
