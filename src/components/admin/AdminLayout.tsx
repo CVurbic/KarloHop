@@ -1,9 +1,14 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { FileText, LogOut } from "lucide-react";
+import { FileText, LogOut, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAdmin } from "@/hooks/useAdmin";
 
 const navItems = [
+  {
+    to: "/hop-upravljanje/proizvodi",
+    label: "Proizvodi",
+    icon: Package,
+  },
   {
     to: "/hop-upravljanje/clanci",
     label: "Članci",

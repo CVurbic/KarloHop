@@ -7,11 +7,71 @@ import BookingSection from "@/components/BookingSection";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { useEffect } from "react";
+import { useProductBySlug, usePublishedProducts } from "@/hooks/useProducts";
 
 const ProductPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const location = useLocation();
-  const product = napuhanci.find((p) => p.slug === slug);
+
+  // Try Supabase first, fall back to static data
+  const { data: dbProduct, isLoading } = useProductBySlug(slug || "");
+  const { data: dbProducts } = usePublishedProducts();
+  const staticProduct = napuhanci.find((p) => p.slug === slug);
+
+  // Map DB product to the shape used in the template
+  const product = dbProduct
+    ? {
+        id: dbProduct.id,
+        name: dbProduct.name,
+        slug: dbProduct.slug,
+        coverImage: dbProduct.cover_image || "",
+        image: dbProduct.image || "",
+        gallery: dbProduct.gallery || [],
+        shortDesc: dbProduct.short_desc || "",
+        longDesc: dbProduct.long_desc || "",
+        dimensions: dbProduct.dimensions || "",
+        capacity: dbProduct.capacity || "",
+        ages: dbProduct.ages || "",
+        included: dbProduct.included || [],
+        price: dbProduct.price,
+        discountPrice: dbProduct.discount_price,
+        discountLabel: dbProduct.discount_label,
+        seo: {
+          title: dbProduct.seo_title || dbProduct.name,
+          description: dbProduct.seo_description || dbProduct.short_desc || "",
+          ogImage: dbProduct.seo_og_image || dbProduct.cover_image || "",
+        },
+      }
+    : staticProduct
+      ? { ...staticProduct, discountPrice: null as string | null, discountLabel: null as string | null }
+      : null;
+
+  // Other products from DB or static
+  const otherProducts = dbProducts
+    ? dbProducts
+        .filter((p) => p.slug !== slug)
+        .map((p) => ({
+          id: p.id,
+          name: p.name,
+          slug: p.slug,
+          coverImage: p.cover_image || "",
+          shortDesc: p.short_desc || "",
+          price: p.price,
+          discountPrice: p.discount_price,
+          discountLabel: p.discount_label,
+        }))
+    : napuhanci
+        .filter((p) => p.slug !== slug)
+        .map((p) => ({
+          id: p.id,
+          name: p.name,
+          slug: p.slug,
+          coverImage: p.coverImage,
+          shortDesc: p.shortDesc,
+          price: p.price,
+          discountPrice: null as string | null,
+          discountLabel: null as string | null,
+        }));
 
   useEffect(() => {
     if (location.hash === "#rezervacija") {
@@ -23,11 +83,17 @@ const ProductPage = () => {
     }
   }, [slug, location.hash]);
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-r-transparent" />
+      </div>
+    );
+  }
+
   if (!product) {
     return <Navigate to="/" replace />;
   }
-
-  const otherProducts = napuhanci.filter((p) => p.slug !== slug);
 
   return (
     <>
@@ -83,9 +149,25 @@ const ProductPage = () => {
                     Rezerviraj ovaj napuhanac
                   </Button>
                   <div className="flex items-center justify-center lg:justify-start gap-2">
-                    <span className="text-3xl font-bold text-primary">
-                      {product.price}€
-                    </span>
+                    {product.discountPrice ? (
+                      <>
+                        <span className="text-xl line-through text-muted-foreground">
+                          {product.price}€
+                        </span>
+                        <span className="text-3xl font-bold text-primary">
+                          {product.discountPrice}€
+                        </span>
+                        {product.discountLabel && (
+                          <span className="bg-warning text-warning-foreground text-xs font-bold px-2 py-1 rounded-full">
+                            {product.discountLabel}
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      <span className="text-3xl font-bold text-primary">
+                        {product.price}€
+                      </span>
+                    )}
                     <span className="text-muted-foreground">/dan</span>
                   </div>
                 </div>
@@ -251,7 +333,16 @@ const ProductPage = () => {
                       </p>
                       <div className="flex items-center justify-between">
                         <div className="text-2xl font-bold text-primary">
-                          {p.price}€
+                          {p.discountPrice ? (
+                            <>
+                              <span className="text-base line-through text-muted-foreground font-normal">
+                                {p.price}€
+                              </span>{" "}
+                              {p.discountPrice}€
+                            </>
+                          ) : (
+                            <>{p.price}€</>
+                          )}
                           <span className="text-sm text-muted-foreground">
                             /dan
                           </span>
@@ -295,7 +386,7 @@ const ProductPage = () => {
 };
 
 /** Sets document head meta tags for SEO */
-function MetaTags({ product }: { product: (typeof napuhanci)[number] }) {
+function MetaTags({ product }: { product: { slug: string; seo: { title: string; description: string; ogImage: string } } }) {
   useEffect(() => {
     document.title = product.seo.title;
 

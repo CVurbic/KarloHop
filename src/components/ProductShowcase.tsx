@@ -1,10 +1,36 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { napuhanci } from "@/data/products";
-
-const products = napuhanci;
+import { usePublishedProducts } from "@/hooks/useProducts";
 
 const ProductShowcase = () => {
+  const { data: dbProducts } = usePublishedProducts();
+
+  // Use DB products if available, otherwise fall back to static
+  const products = dbProducts
+    ? dbProducts.map((p) => ({
+        id: p.id,
+        name: p.name,
+        slug: p.slug,
+        coverImage: p.cover_image || "",
+        shortDesc: p.short_desc || "",
+        dimensions: p.dimensions || "",
+        price: p.price,
+        discountPrice: p.discount_price,
+        discountLabel: p.discount_label,
+      }))
+    : napuhanci.map((p) => ({
+        id: p.id,
+        name: p.name,
+        slug: p.slug,
+        coverImage: p.coverImage,
+        shortDesc: p.shortDesc,
+        dimensions: p.dimensions,
+        price: p.price,
+        discountPrice: null as string | null,
+        discountLabel: null as string | null,
+      }));
+
   return (
     <section id="napuhanci" className="py-20 bg-background">
       <div className="container mx-auto px-4">
@@ -53,7 +79,22 @@ const ProductShowcase = () => {
                 </p>
                 <div className="flex items-center justify-between mb-3">
                   <div className="text-2xl font-bold text-primary">
-                    {product.price}€<span className="text-sm text-muted-foreground">/dan</span>
+                    {product.discountPrice ? (
+                      <>
+                        <span className="text-base line-through text-muted-foreground font-normal">
+                          {product.price}€
+                        </span>{" "}
+                        {product.discountPrice}€
+                        {product.discountLabel && (
+                          <span className="ml-2 text-xs bg-warning text-warning-foreground px-2 py-0.5 rounded-full font-bold">
+                            {product.discountLabel}
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      <>{product.price}€</>
+                    )}
+                    <span className="text-sm text-muted-foreground">/dan</span>
                   </div>
                 </div>
                 <div className="flex gap-3">
