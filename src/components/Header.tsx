@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Phone, Mail, Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useState } from "react";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import { analytics } from "@/lib/analytics";
 
 const hashLinks = [
@@ -19,15 +19,23 @@ const scrollToSection = (id: string) => {
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isHomepage = location.pathname === "/";
+
+  const getHashHref = (hash: string) => isHomepage ? hash : `/${hash}`;
 
   const handleMobileLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
     setMobileMenuOpen(false);
-    // Delay scroll until sheet close animation completes
-    setTimeout(() => {
-      const targetId = href.replace('#', '');
-      scrollToSection(targetId);
-    }, 300);
+    if (isHomepage) {
+      setTimeout(() => {
+        const targetId = href.replace('#', '');
+        scrollToSection(targetId);
+      }, 300);
+    } else {
+      navigate(`/${href}`);
+    }
   };
 
   return (
@@ -35,14 +43,14 @@ const Header = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center">
+          <Link to="/" className="flex items-center">
             <img src="/assets/logo.webp" alt="Hop Hop Napuhanci Logo" className="h-12 w-auto mascot-hover" />
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             {hashLinks.map((link) => (
-              <a key={link.href} href={link.href} className="text-foreground hover:text-primary transition-colors">
+              <a key={link.href} href={getHashHref(link.href)} className="text-foreground hover:text-primary transition-colors">
                 {link.label}
               </a>
             ))}
@@ -70,7 +78,7 @@ const Header = () => {
             <Button
               variant="default"
               className="hidden md:inline-flex gradient-primary hover:shadow-playful transition-all duration-300"
-              onClick={() => scrollToSection('rezervacija')}
+              onClick={() => isHomepage ? scrollToSection('rezervacija') : navigate('/#rezervacija')}
             >
               Rezerviraj
             </Button>
@@ -131,7 +139,11 @@ const Header = () => {
                     className="w-full gradient-primary hover:shadow-playful transition-all duration-300 mt-4"
                     onClick={() => {
                       setMobileMenuOpen(false);
-                      setTimeout(() => scrollToSection('rezervacija'), 300);
+                      if (isHomepage) {
+                        setTimeout(() => scrollToSection('rezervacija'), 300);
+                      } else {
+                        navigate('/#rezervacija');
+                      }
                     }}
                   >
                     Rezerviraj
