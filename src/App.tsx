@@ -15,6 +15,8 @@ const BlogPostPage = lazy(() => import("./pages/BlogPostPage"));
 const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
 const BlogManager = lazy(() => import("./components/admin/BlogManager"));
 const BlogEditorPage = lazy(() => import("./components/admin/BlogEditor"));
+const ProductManager = lazy(() => import("./components/admin/ProductManager"));
+const ProductEditorPage = lazy(() => import("./components/admin/ProductEditor"));
 
 const queryClient = new QueryClient();
 
@@ -47,6 +49,9 @@ const App = () => (
                 <Route path="clanci" element={<Suspense fallback={<PageLoader />}><BlogManager /></Suspense>} />
                 <Route path="clanci/novi" element={<Suspense fallback={<PageLoader />}><BlogEditorPage /></Suspense>} />
                 <Route path="clanci/:id" element={<Suspense fallback={<PageLoader />}><BlogEditorPage /></Suspense>} />
+                <Route path="proizvodi" element={<Suspense fallback={<PageLoader />}><ProductManager /></Suspense>} />
+                <Route path="proizvodi/novi" element={<Suspense fallback={<PageLoader />}><ProductEditorPage /></Suspense>} />
+                <Route path="proizvodi/:id" element={<Suspense fallback={<PageLoader />}><ProductEditorPage /></Suspense>} />
               </Route>
             </Route>
             <Route path="/:slug" element={<ProductPage />} />
