@@ -2,8 +2,9 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import {
   Bold,
   Italic,
@@ -27,6 +28,8 @@ interface TiptapEditorProps {
 
 const TiptapEditor = ({ content, onChange, postId }: TiptapEditorProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const { toast } = useToast();
 
   const editor = useEditor({
     extensions: [
@@ -46,13 +49,28 @@ const TiptapEditor = ({ content, onChange, postId }: TiptapEditorProps) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const url = await uploadBlogImage(file, postId);
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run();
+    setUploading(true);
+    try {
+      const url = await uploadBlogImage(file, postId);
+      if (url) {
+        editor.chain().focus().setImage({ src: url }).run();
+        toast({ title: "Slika uploadana." });
+      } else {
+        toast({
+          title: "Greška pri uploadu slike",
+          description: "Provjeri da je bucket 'blog-images' kreiran i da imaš admin prava.",
+          variant: "destructive",
+        });
+      }
+    } catch {
+      toast({
+        title: "Greška pri uploadu slike",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
-
-    // Reset input
-    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const addLink = () => {
@@ -155,8 +173,13 @@ const TiptapEditor = ({ content, onChange, postId }: TiptapEditorProps) => {
           size="icon"
           className="h-8 w-8"
           onClick={() => fileInputRef.current?.click()}
+          disabled={uploading}
         >
-          <ImageIcon className="h-4 w-4" />
+          {uploading ? (
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent" />
+          ) : (
+            <ImageIcon className="h-4 w-4" />
+          )}
         </Button>
         <Button
           type="button"
