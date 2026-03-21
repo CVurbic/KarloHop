@@ -2,7 +2,7 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -42,6 +42,27 @@ const TiptapEditor = ({ content, onChange, postId }: TiptapEditorProps) => {
       onChange(editor.getJSON() as Record<string, unknown>);
     },
   });
+
+  // When content prop changes externally (e.g. existing post loaded from DB),
+  // update the editor. Compare by checking if content has actual nodes
+  // beyond the default empty paragraph.
+  useEffect(() => {
+    if (!editor) return;
+    const contentNodes = (content as { content?: unknown[] })?.content;
+    const hasRealContent =
+      contentNodes &&
+      contentNodes.length > 0 &&
+      !(contentNodes.length === 1 && (contentNodes[0] as { type?: string })?.type === "paragraph" && !((contentNodes[0] as { content?: unknown[] })?.content));
+
+    if (hasRealContent) {
+      // Only update if editor content is different (avoid cursor jump during typing)
+      const currentJSON = JSON.stringify(editor.getJSON());
+      const newJSON = JSON.stringify(content);
+      if (currentJSON !== newJSON) {
+        editor.commands.setContent(content);
+      }
+    }
+  }, [editor, content]);
 
   if (!editor) return null;
 
