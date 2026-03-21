@@ -1,27 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://hophop-napuhanci.com/</loc>
-    <lastmod>2026-03-09</lastmod>
+    <lastmod>2026-03-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://storage.googleapis.com/gpt-engineer-file-uploads/emgZnbpr3Vb55CZpsX0UjYkB0cr2/social-images/social-1758691598447-LOGO.png</image:loc>
+      <image:title>Hop Hop Napuhanci - Najam napuhanaca Zagreb</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://hophop-napuhanci.com/jednorog-napuhanac</loc>
-    <lastmod>2026-03-09</lastmod>
+    <lastmod>2026-03-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://hophop-napuhanci.com/assets/unicorn-cover.png</image:loc>
+      <image:title>Jednorog svijet napuhanac za najam Zagreb</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://hophop-napuhanci.com/minecraft-napuhanac</loc>
-    <lastmod>2026-03-09</lastmod>
+    <lastmod>2026-03-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://hophop-napuhanci.com/assets/minecraft-cover.png</image:loc>
+      <image:title>Minecraft party napuhanac za najam Zagreb</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://hophop-napuhanci.com/dinosaur-napuhanac</loc>
-    <lastmod>2026-03-09</lastmod>
+    <lastmod>2026-03-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://hophop-napuhanci.com/assets/dino-cover.png</image:loc>
+      <image:title>Dino park napuhanac za najam Zagreb</image:title>
+    </image:image>
   </url>
 </urlset>
