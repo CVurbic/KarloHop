@@ -12,23 +12,62 @@ export interface BlogPost {
   seo_description: string | null;
   status: string;
   published_at: string | null;
+  scheduled_at: string | null;
   created_at: string | null;
   updated_at: string | null;
 }
 
-// Fetch all published posts (public)
+// Fetch all published posts (public) - includes scheduled posts whose time has passed
 export function usePublishedPosts() {
   return useQuery({
     queryKey: ["blog-posts", "published"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const now = new Date().toISOString();
+
+      // Fetch published posts
+      const { data: published, error: err1 } = await supabase
         .from("blog_posts" as string)
         .select("*")
         .eq("status", "published")
         .order("published_at", { ascending: false });
 
-      if (error) throw error;
-      return data as BlogPost[];
+      if (err1) throw err1;
+
+      // Fetch scheduled posts whose time has come
+      const { data: scheduled, error: err2 } = await supabase
+        .from("blog_posts" as string)
+        .select("*")
+        .eq("status", "scheduled")
+        .lte("scheduled_at", now);
+
+      if (err2) throw err2;
+
+      // Auto-publish scheduled posts that are due
+      const scheduledPosts = (scheduled as BlogPost[]) || [];
+      for (const post of scheduledPosts) {
+        await supabase
+          .from("blog_posts" as string)
+          .update({
+            status: "published",
+            published_at: post.scheduled_at,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", post.id);
+      }
+
+      const allPosts = [
+        ...((published as BlogPost[]) || []),
+        ...scheduledPosts.map((p) => ({ ...p, status: "published", published_at: p.scheduled_at })),
+      ];
+
+      // Sort by published_at descending
+      allPosts.sort((a, b) => {
+        const da = a.published_at ? new Date(a.published_at).getTime() : 0;
+        const db = b.published_at ? new Date(b.published_at).getTime() : 0;
+        return db - da;
+      });
+
+      return allPosts;
     },
   });
 }

@@ -102,16 +102,27 @@ const BlogManager = () => {
                       variant={
                         post.status === "published" ? "default" : "secondary"
                       }
+                      className={
+                        post.status === "scheduled"
+                          ? "bg-blue-100 text-blue-800 hover:bg-blue-100"
+                          : ""
+                      }
                     >
-                      {post.status === "published" ? "Objavljeno" : "Skica"}
+                      {post.status === "published"
+                        ? "Objavljeno"
+                        : post.status === "scheduled"
+                        ? "Zakazano"
+                        : "Skica"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-gray-500">
-                    {formatDate(post.published_at || post.created_at)}
+                    {post.status === "scheduled" && post.scheduled_at
+                      ? formatDate(post.scheduled_at)
+                      : formatDate(post.published_at || post.created_at)}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
-                      {post.status === "published" && (
+                      {(post.status === "published" || post.status === "scheduled") && (
                         <a
                           href={`/savjeti/${post.slug}`}
                           target="_blank"
