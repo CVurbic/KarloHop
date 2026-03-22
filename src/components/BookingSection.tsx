@@ -314,9 +314,9 @@ const BookingSection = () => {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem value="jednorog">Jednorog svijet - 100€</SelectItem>
-                                  <SelectItem value="minecraft">Minecraft party - 100€</SelectItem>
-                                  <SelectItem value="dino-park">Dino park - 100€</SelectItem>
+                                  <SelectItem value="Jednorog">Jednorog svijet - 100€</SelectItem>
+                                  <SelectItem value="Minecraft Party">Minecraft party - 100€</SelectItem>
+                                  <SelectItem value="Dino Park">Dino park - 100€</SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />
