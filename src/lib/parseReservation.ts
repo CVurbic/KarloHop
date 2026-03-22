@@ -71,5 +71,17 @@ export function parseReservation(text: string): ParsedReservation {
     }
   }
 
+  // Normalize bouncer name to match known names
+  if (result.bouncer) {
+    const b = result.bouncer.toLowerCase();
+    if (b.includes("dino")) {
+      result.bouncer = "Dino Park";
+    } else if (b.includes("minecraft")) {
+      result.bouncer = "Minecraft Party";
+    } else if (b.includes("jednorog") || b.includes("unicorn")) {
+      result.bouncer = "Jednorog";
+    }
+  }
+
   return result;
 }

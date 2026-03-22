@@ -73,7 +73,7 @@ const EMPTY_FORM = {
   booking_start_date: "",
   selected_bounce_house: "",
   price: "100",
-  status: "pending",
+  status: "confirmed",
   additional_notes: "",
 };
 
@@ -158,7 +158,7 @@ const BookingManager = () => {
       booking_start_date: parsed.date,
       selected_bounce_house: parsed.bouncer,
       price: parsed.price.replace(/[^\d.]/g, ""),
-      status: "pending",
+      status: "confirmed",
       additional_notes: "",
     });
     setShowPaste(false);
