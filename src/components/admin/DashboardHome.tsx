@@ -4,8 +4,23 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CalendarDays, DollarSign, TrendingUp, Users, Pencil, Check } from "lucide-react";
-import { format } from "date-fns";
+import { format, subMonths, startOfMonth } from "date-fns";
 import { hr } from "date-fns/locale";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+  LineChart,
+  Line,
+} from "recharts";
 import { useAllBookings, useUpcomingBookings, useBookingsRealtime } from "@/hooks/useBookings";
 import { useAllExpenses } from "@/hooks/useExpenses";
 import { useSetting, useUpdateSetting } from "@/hooks/useSettings";
@@ -15,6 +30,14 @@ const BOUNCER_COLORS: Record<string, string> = {
   "Dino Park": "bg-teal-100 text-teal-800",
   "Jednorog": "bg-pink-100 text-pink-800",
 };
+
+const BOUNCER_CHART_COLORS: Record<string, string> = {
+  "Minecraft Party": "#3b82f6",
+  "Dino Park": "#14b8a6",
+  "Jednorog": "#ec4899",
+};
+
+const PIE_COLORS = ["#3b82f6", "#14b8a6", "#ec4899", "#a855f7"];
 
 const statusBadge = (status: string) => {
   const map: Record<string, string> = {
@@ -80,6 +103,72 @@ const DashboardHome = () => {
       investment,
     };
   }, [allBookings, allExpenses, investmentValue]);
+
+  // Chart: Reservations per month (last 6 months)
+  const bookingsPerMonth = useMemo(() => {
+    const now = new Date();
+    const months: { label: string; count: number; revenue: number }[] = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = subMonths(now, i);
+      const monthStart_ = startOfMonth(d);
+      const m = monthStart_.getMonth();
+      const y = monthStart_.getFullYear();
+      const monthBookings = allBookings.filter((b) => {
+        if (b.status === "cancelled") return false;
+        const bd = new Date(b.booking_start_date);
+        return bd.getMonth() === m && bd.getFullYear() === y;
+      });
+      months.push({
+        label: format(monthStart_, "LLL yy", { locale: hr }),
+        count: monthBookings.length,
+        revenue: monthBookings.reduce((s, b) => s + (b.price || 0), 0),
+      });
+    }
+    return months;
+  }, [allBookings]);
+
+  // Chart: Bouncer popularity (pie chart)
+  const bouncerPopularity = useMemo(() => {
+    const counts: Record<string, number> = {};
+    allBookings
+      .filter((b) => b.status !== "cancelled" && b.selected_bounce_house)
+      .forEach((b) => {
+        const name = b.selected_bounce_house!;
+        counts[name] = (counts[name] || 0) + 1;
+      });
+    return Object.entries(counts).map(([name, value]) => ({ name, value }));
+  }, [allBookings]);
+
+  // Chart: Revenue trend (line chart, last 6 months)
+  const revenueTrend = useMemo(() => {
+    const now = new Date();
+    const months: { label: string; prihod: number; troskovi: number }[] = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = subMonths(now, i);
+      const monthStart_ = startOfMonth(d);
+      const m = monthStart_.getMonth();
+      const y = monthStart_.getFullYear();
+      const revenue = allBookings
+        .filter((b) => {
+          if (b.status === "cancelled") return false;
+          const bd = new Date(b.booking_start_date);
+          return bd.getMonth() === m && bd.getFullYear() === y;
+        })
+        .reduce((s, b) => s + (b.price || 0), 0);
+      const exp = allExpenses
+        .filter((e) => {
+          const ed = new Date(e.expense_date);
+          return ed.getMonth() === m && ed.getFullYear() === y;
+        })
+        .reduce((s, e) => s + Number(e.amount), 0);
+      months.push({
+        label: format(monthStart_, "LLL yy", { locale: hr }),
+        prihod: revenue,
+        troskovi: exp,
+      });
+    }
+    return months;
+  }, [allBookings, allExpenses]);
 
   const handleSaveInvestment = () => {
     updateSetting.mutate({ key: "investment", value: investmentInput });
@@ -162,6 +251,112 @@ const DashboardHome = () => {
                 </button>
               )}
             </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Bookings per month - bar chart */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-500">Rezervacije po mjesecima</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={bookingsPerMonth}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="label" tick={{ fontSize: 11 }} />
+                <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
+                <Tooltip
+                  formatter={(value: number) => [value, "Rezervacija"]}
+                  contentStyle={{ fontSize: 12 }}
+                />
+                <Bar dataKey="count" name="Rezervacije" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Bouncer popularity - pie chart */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-500">Popularnost napuhanaca</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {bouncerPopularity.length === 0 ? (
+              <div className="flex items-center justify-center h-[200px] text-sm text-gray-400">
+                Nema podataka
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height={200}>
+                <PieChart>
+                  <Pie
+                    data={bouncerPopularity}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={45}
+                    outerRadius={70}
+                    paddingAngle={4}
+                    dataKey="value"
+                    nameKey="name"
+                  >
+                    {bouncerPopularity.map((entry) => (
+                      <Cell
+                        key={entry.name}
+                        fill={BOUNCER_CHART_COLORS[entry.name] || PIE_COLORS[3]}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    formatter={(value: number) => [value, "Rezervacija"]}
+                    contentStyle={{ fontSize: 12 }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: 11 }} />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Revenue trend - line chart */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-500">Trend prihoda i troškova</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={200}>
+              <LineChart data={revenueTrend}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="label" tick={{ fontSize: 11 }} />
+                <YAxis tick={{ fontSize: 11 }} />
+                <Tooltip
+                  formatter={(value: number, name: string) => [
+                    `${value.toFixed(2)} €`,
+                    name === "prihod" ? "Prihod" : "Troškovi",
+                  ]}
+                  contentStyle={{ fontSize: 12 }}
+                />
+                <Legend
+                  wrapperStyle={{ fontSize: 11 }}
+                  formatter={(value: string) => (value === "prihod" ? "Prihod" : "Troškovi")}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="prihod"
+                  stroke="#22c55e"
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="troskovi"
+                  stroke="#ef4444"
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>
