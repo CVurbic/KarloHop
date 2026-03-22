@@ -1,9 +1,32 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { FileText, LogOut, Package } from "lucide-react";
+import { FileText, LogOut, Package, LayoutDashboard, CalendarDays, TrendingUp, Receipt } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAdmin } from "@/hooks/useAdmin";
 
-const navItems = [
+const businessItems = [
+  {
+    to: "/hop-upravljanje/pregled",
+    label: "Pregled",
+    icon: LayoutDashboard,
+  },
+  {
+    to: "/hop-upravljanje/rezervacije",
+    label: "Rezervacije",
+    icon: CalendarDays,
+  },
+  {
+    to: "/hop-upravljanje/prihodi",
+    label: "Prihodi",
+    icon: TrendingUp,
+  },
+  {
+    to: "/hop-upravljanje/troskovi",
+    label: "Troškovi",
+    icon: Receipt,
+  },
+];
+
+const contentItems = [
   {
     to: "/hop-upravljanje/proizvodi",
     label: "Proizvodi",
@@ -38,23 +61,49 @@ const AdminLayout = () => {
           <p className="text-xs text-gray-500 mt-2">Upravljanje sadržajem</p>
         </div>
 
-        <nav className="flex-1 p-4 space-y-1">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive
-                    ? "bg-primary/10 text-primary"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`
-              }
-            >
-              <item.icon className="h-4 w-4" />
-              {item.label}
-            </NavLink>
-          ))}
+        <nav className="flex-1 p-4 space-y-4">
+          <div>
+            <p className="px-3 mb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">Poslovanje</p>
+            <div className="space-y-1">
+              {businessItems.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      isActive
+                        ? "bg-primary/10 text-primary"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`
+                  }
+                >
+                  <item.icon className="h-4 w-4" />
+                  {item.label}
+                </NavLink>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="px-3 mb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">Sadržaj</p>
+            <div className="space-y-1">
+              {contentItems.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      isActive
+                        ? "bg-primary/10 text-primary"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`
+                  }
+                >
+                  <item.icon className="h-4 w-4" />
+                  {item.label}
+                </NavLink>
+              ))}
+            </div>
+          </div>
         </nav>
 
         <div className="p-4 border-t border-gray-200">

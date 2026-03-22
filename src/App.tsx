@@ -13,6 +13,10 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const SavjetiPage = lazy(() => import("./pages/SavjetiPage"));
 const BlogPostPage = lazy(() => import("./pages/BlogPostPage"));
 const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
+const DashboardHome = lazy(() => import("./components/admin/DashboardHome"));
+const BookingManager = lazy(() => import("./components/admin/BookingManager"));
+const RevenueView = lazy(() => import("./components/admin/RevenueView"));
+const ExpenseManager = lazy(() => import("./components/admin/ExpenseManager"));
 const BlogManager = lazy(() => import("./components/admin/BlogManager"));
 const BlogEditorPage = lazy(() => import("./components/admin/BlogEditor"));
 const ProductManager = lazy(() => import("./components/admin/ProductManager"));
@@ -46,6 +50,10 @@ const App = () => (
                   </ProtectedRoute>
                 }
               >
+                <Route path="pregled" element={<Suspense fallback={<PageLoader />}><DashboardHome /></Suspense>} />
+                <Route path="rezervacije" element={<Suspense fallback={<PageLoader />}><BookingManager /></Suspense>} />
+                <Route path="prihodi" element={<Suspense fallback={<PageLoader />}><RevenueView /></Suspense>} />
+                <Route path="troskovi" element={<Suspense fallback={<PageLoader />}><ExpenseManager /></Suspense>} />
                 <Route path="clanci" element={<Suspense fallback={<PageLoader />}><BlogManager /></Suspense>} />
                 <Route path="clanci/novi" element={<Suspense fallback={<PageLoader />}><BlogEditorPage /></Suspense>} />
                 <Route path="clanci/:id" element={<Suspense fallback={<PageLoader />}><BlogEditorPage /></Suspense>} />
