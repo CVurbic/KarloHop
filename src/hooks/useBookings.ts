@@ -25,7 +25,7 @@ export function useAllBookings() {
     queryKey: ["bookings", "all"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("bookings" as string)
+        .from("bookings")
         .select("*")
         .order("booking_start_date", { ascending: false });
 
@@ -41,7 +41,7 @@ export function useUpcomingBookings(limit = 5) {
     queryKey: ["bookings", "upcoming", limit],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("bookings" as string)
+        .from("bookings")
         .select("*")
         .gte("booking_start_date", today)
         .neq("status", "cancelled")
@@ -62,7 +62,7 @@ export function useCreateBooking() {
       booking: Omit<Booking, "id" | "created_at">
     ) => {
       const { data, error } = await supabase
-        .from("bookings" as string)
+        .from("bookings")
         .insert(booking)
         .select()
         .single();
@@ -85,7 +85,7 @@ export function useUpdateBooking() {
       ...updates
     }: Partial<Booking> & { id: string }) => {
       const { data, error } = await supabase
-        .from("bookings" as string)
+        .from("bookings")
         .update(updates)
         .eq("id", id)
         .select()
@@ -106,7 +106,7 @@ export function useDeleteBooking() {
   return useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
-        .from("bookings" as string)
+        .from("bookings")
         .delete()
         .eq("id", id);
 

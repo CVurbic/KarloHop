@@ -15,7 +15,7 @@ export function useAllExpenses() {
     queryKey: ["expenses", "all"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("expenses" as string)
+        .from("expenses")
         .select("*")
         .order("expense_date", { ascending: false });
 
@@ -33,7 +33,7 @@ export function useCreateExpense() {
       expense: Omit<Expense, "id" | "created_at">
     ) => {
       const { data, error } = await supabase
-        .from("expenses" as string)
+        .from("expenses")
         .insert(expense)
         .select()
         .single();
@@ -53,7 +53,7 @@ export function useDeleteExpense() {
   return useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
-        .from("expenses" as string)
+        .from("expenses")
         .delete()
         .eq("id", id);
 

@@ -72,7 +72,7 @@ const EMPTY_FORM = {
   delivery_address: "",
   booking_start_date: "",
   selected_bounce_house: "",
-  price: "",
+  price: "100",
   status: "pending",
   additional_notes: "",
 };

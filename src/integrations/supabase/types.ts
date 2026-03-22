@@ -42,6 +42,7 @@ export type Database = {
         Row: {
           add_table_set: boolean | null
           additional_notes: string | null
+          booking_end_date: string | null
           booking_start_date: string
           created_at: string | null
           delivery_address: string | null
@@ -50,12 +51,15 @@ export type Database = {
           multiple_days: boolean | null
           name: string
           phone: string | null
+          price: number | null
           selected_bounce_house: string | null
+          status: string
           surname: string
         }
         Insert: {
           add_table_set?: boolean | null
           additional_notes?: string | null
+          booking_end_date?: string | null
           booking_start_date?: string
           created_at?: string | null
           delivery_address?: string | null
@@ -64,12 +68,15 @@ export type Database = {
           multiple_days?: boolean | null
           name: string
           phone?: string | null
+          price?: number | null
           selected_bounce_house?: string | null
+          status?: string
           surname: string
         }
         Update: {
           add_table_set?: boolean | null
           additional_notes?: string | null
+          booking_end_date?: string | null
           booking_start_date?: string
           created_at?: string | null
           delivery_address?: string | null
@@ -78,8 +85,55 @@ export type Database = {
           multiple_days?: boolean | null
           name?: string
           phone?: string | null
+          price?: number | null
           selected_bounce_house?: string | null
+          status?: string
           surname?: string
+        }
+        Relationships: []
+      }
+      expenses: {
+        Row: {
+          id: string
+          category: string
+          amount: number
+          description: string | null
+          expense_date: string
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          category: string
+          amount: number
+          description?: string | null
+          expense_date?: string
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          category?: string
+          amount?: number
+          description?: string | null
+          expense_date?: string
+          created_at?: string | null
+        }
+        Relationships: []
+      }
+      settings: {
+        Row: {
+          key: string
+          value: string
+          updated_at: string | null
+        }
+        Insert: {
+          key: string
+          value: string
+          updated_at?: string | null
+        }
+        Update: {
+          key?: string
+          value?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
