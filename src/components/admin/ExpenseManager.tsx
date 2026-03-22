@@ -95,7 +95,7 @@ const ExpenseManager = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Troškovi</h1>
           <p className="text-gray-500 text-sm mt-1">Praćenje troškova po kategorijama</p>
@@ -106,7 +106,7 @@ const ExpenseManager = () => {
       </div>
 
       {/* Category Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
         {categoryStats.map((cat) => {
           const Icon = cat.icon;
           return (
@@ -154,17 +154,17 @@ const ExpenseManager = () => {
                 return (
                   <div
                     key={expense.id}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-gray-50 rounded-lg"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg ${cat?.color || "bg-gray-100"}`}>
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className={`p-2 rounded-lg shrink-0 ${cat?.color || "bg-gray-100"}`}>
                         <Icon className="h-4 w-4" />
                       </div>
-                      <div>
-                        <div className="flex items-center gap-2">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-1 sm:gap-2">
                           <span className="text-sm font-medium">{cat?.label || expense.category}</span>
                           {expense.description && (
-                            <span className="text-xs text-gray-500">— {expense.description}</span>
+                            <span className="text-xs text-gray-500 truncate">— {expense.description}</span>
                           )}
                         </div>
                         <span className="text-xs text-gray-400">
@@ -172,7 +172,7 @@ const ExpenseManager = () => {
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
                       <span className="text-sm font-bold">{Number(expense.amount).toFixed(2)} €</span>
                       <Button size="icon" variant="ghost" onClick={() => handleDelete(expense.id)}>
                         <Trash2 className="h-4 w-4 text-red-500" />

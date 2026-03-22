@@ -86,7 +86,7 @@ const RevenueView = () => {
       </div>
 
       {/* ROI Summary */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         <Card>
           <CardContent className="pt-6">
             <p className="text-sm text-gray-500">Investicija</p>

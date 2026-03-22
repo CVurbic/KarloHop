@@ -52,7 +52,7 @@ const BlogManager = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 sm:mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Članci</h1>
           <p className="text-gray-500 text-sm mt-1">
@@ -83,7 +83,7 @@ const BlogManager = () => {
           </Link>
         </div>
       ) : (
-        <div className="bg-white rounded-lg border">
+        <div className="bg-white rounded-lg border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>

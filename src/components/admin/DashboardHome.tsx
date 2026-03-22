@@ -374,23 +374,23 @@ const DashboardHome = () => {
               {upcomingBookings.map((booking) => (
                 <div
                   key={booking.id}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-gray-50 rounded-lg"
                 >
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span className="font-medium text-sm">
                         {booking.name} {booking.surname}
                       </span>
                       {statusBadge(booking.status)}
                     </div>
-                    <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1 text-xs text-gray-500">
                       <span>
                         {format(new Date(booking.booking_start_date), "d. MMMM yyyy.", { locale: hr })}
                       </span>
                       {booking.phone && <span>{booking.phone}</span>}
                     </div>
                   </div>
-                  <div className="text-right">
+                  <div className="flex items-center gap-2 sm:block sm:text-right shrink-0">
                     {booking.selected_bounce_house && (
                       <Badge
                         variant="secondary"
@@ -400,7 +400,7 @@ const DashboardHome = () => {
                       </Badge>
                     )}
                     {booking.price != null && (
-                      <p className="text-sm font-medium mt-1">{Number(booking.price).toFixed(2)} €</p>
+                      <p className="text-sm font-medium sm:mt-1">{Number(booking.price).toFixed(2)} €</p>
                     )}
                   </div>
                 </div>

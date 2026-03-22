@@ -201,7 +201,7 @@ const BookingManager = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Rezervacije</h1>
           <p className="text-gray-500 text-sm mt-1">Upravljanje rezervacijama napuhanaca</p>
@@ -210,7 +210,8 @@ const BookingManager = () => {
           <Dialog open={showPaste} onOpenChange={setShowPaste}>
             <DialogTrigger asChild>
               <Button variant="outline" size="sm">
-                <ClipboardPaste className="h-4 w-4 mr-2" /> Zalijepi tekst
+                <ClipboardPaste className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Zalijepi tekst</span>
               </Button>
             </DialogTrigger>
             <DialogContent>
@@ -236,15 +237,16 @@ const BookingManager = () => {
               setShowForm(true);
             }}
           >
-            <Plus className="h-4 w-4 mr-2" /> Nova rezervacija
+            <Plus className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Nova rezervacija</span>
           </Button>
         </div>
       </div>
 
       {/* Legend */}
-      <div className="flex gap-4">
+      <div className="flex flex-wrap gap-3 sm:gap-4">
         {BOUNCERS.map((b) => (
-          <div key={b.name} className="flex items-center gap-2 text-sm">
+          <div key={b.name} className="flex items-center gap-1.5 text-xs sm:text-sm">
             <div className={`h-3 w-3 rounded-full ${b.dotColor}`} />
             {b.name}
           </div>
@@ -272,7 +274,7 @@ const BookingManager = () => {
           ) : (
             <div className="grid grid-cols-7 gap-1">
               {dayNames.map((d) => (
-                <div key={d} className="text-center text-xs font-medium text-gray-500 py-2">
+                <div key={d} className="text-center text-[10px] sm:text-xs font-medium text-gray-500 py-1 sm:py-2">
                   {d}
                 </div>
               ))}
@@ -289,7 +291,7 @@ const BookingManager = () => {
                   <button
                     key={dateKey}
                     onClick={() => setSelectedDate(day)}
-                    className={`relative p-2 min-h-[60px] rounded-lg text-left transition-colors ${
+                    className={`relative p-1 sm:p-2 min-h-[44px] sm:min-h-[60px] rounded-lg text-left transition-colors ${
                       !isSameMonth(day, currentMonth)
                         ? "text-gray-300"
                         : isSelected
@@ -342,10 +344,10 @@ const BookingManager = () => {
                   return (
                     <div
                       key={booking.id}
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                      className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-gray-50 rounded-lg"
                     >
-                      <div>
-                        <div className="flex items-center gap-2">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
                           <span className="font-medium text-sm">
                             {booking.name} {booking.surname}
                           </span>
@@ -360,7 +362,7 @@ const BookingManager = () => {
                           {booking.delivery_address && <span>{booking.delivery_address}</span>}
                         </div>
                       </div>
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 shrink-0">
                         {booking.price != null && (
                           <span className="text-sm font-medium mr-2">{Number(booking.price).toFixed(2)} €</span>
                         )}
