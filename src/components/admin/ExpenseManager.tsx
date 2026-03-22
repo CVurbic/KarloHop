@@ -23,11 +23,11 @@ import { useAllExpenses, useCreateExpense, useDeleteExpense } from "@/hooks/useE
 import { toast } from "sonner";
 
 const CATEGORIES = [
-  { value: "fuel", label: "Gorivo", icon: Fuel, color: "bg-orange-100 text-orange-800" },
-  { value: "marketing", label: "Marketing", icon: Megaphone, color: "bg-blue-100 text-blue-800" },
-  { value: "depreciation", label: "Amortizacija", icon: Wrench, color: "bg-purple-100 text-purple-800" },
-  { value: "garage", label: "Garaža", icon: Warehouse, color: "bg-green-100 text-green-800" },
-  { value: "other", label: "Ostalo", icon: Wrench, color: "bg-gray-100 text-gray-800" },
+  { value: "fuel", label: "Gorivo", icon: Fuel, color: "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300" },
+  { value: "marketing", label: "Marketing", icon: Megaphone, color: "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300" },
+  { value: "depreciation", label: "Amortizacija", icon: Wrench, color: "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300" },
+  { value: "garage", label: "Garaža", icon: Warehouse, color: "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300" },
+  { value: "other", label: "Ostalo", icon: Wrench, color: "bg-muted text-foreground" },
 ];
 
 const EMPTY_FORM = {
@@ -95,10 +95,10 @@ const ExpenseManager = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Troškovi</h1>
-          <p className="text-gray-500 text-sm mt-1">Praćenje troškova po kategorijama</p>
+          <h1 className="text-2xl font-bold text-foreground">Troškovi</h1>
+          <p className="text-muted-foreground text-sm mt-1">Praćenje troškova po kategorijama</p>
         </div>
         <Button size="sm" onClick={() => setShowForm(true)}>
           <Plus className="h-4 w-4 mr-2" /> Novi trošak
@@ -106,7 +106,7 @@ const ExpenseManager = () => {
       </div>
 
       {/* Category Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
         {categoryStats.map((cat) => {
           const Icon = cat.icon;
           return (
@@ -119,7 +119,7 @@ const ExpenseManager = () => {
                   <span className="text-sm font-medium">{cat.label}</span>
                 </div>
                 <p className="text-xl font-bold">{cat.total.toFixed(2)} €</p>
-                <p className="text-xs text-gray-500">{cat.percentage}% ukupnog</p>
+                <p className="text-xs text-muted-foreground">{cat.percentage}% ukupnog</p>
               </CardContent>
             </Card>
           );
@@ -145,7 +145,7 @@ const ExpenseManager = () => {
               <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent" />
             </div>
           ) : expenses.length === 0 ? (
-            <p className="text-sm text-gray-500">Nema unesenih troškova.</p>
+            <p className="text-sm text-muted-foreground">Nema unesenih troškova.</p>
           ) : (
             <div className="space-y-2">
               {expenses.map((expense) => {
@@ -154,25 +154,25 @@ const ExpenseManager = () => {
                 return (
                   <div
                     key={expense.id}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-muted/50 rounded-lg"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg ${cat?.color || "bg-gray-100"}`}>
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className={`p-2 rounded-lg shrink-0 ${cat?.color || "bg-muted"}`}>
                         <Icon className="h-4 w-4" />
                       </div>
-                      <div>
-                        <div className="flex items-center gap-2">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-1 sm:gap-2">
                           <span className="text-sm font-medium">{cat?.label || expense.category}</span>
                           {expense.description && (
-                            <span className="text-xs text-gray-500">— {expense.description}</span>
+                            <span className="text-xs text-muted-foreground truncate">— {expense.description}</span>
                           )}
                         </div>
-                        <span className="text-xs text-gray-400">
+                        <span className="text-xs text-muted-foreground/70">
                           {format(new Date(expense.expense_date), "d. MMMM yyyy.", { locale: hr })}
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
                       <span className="text-sm font-bold">{Number(expense.amount).toFixed(2)} €</span>
                       <Button size="icon" variant="ghost" onClick={() => handleDelete(expense.id)}>
                         <Trash2 className="h-4 w-4 text-red-500" />
