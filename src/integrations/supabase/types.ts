@@ -47,6 +47,7 @@ export type Database = {
           created_at: string | null
           delivery_address: string | null
           email: string | null
+          google_calendar_event_id: string | null
           id: string
           multiple_days: boolean | null
           name: string
@@ -64,6 +65,7 @@ export type Database = {
           created_at?: string | null
           delivery_address?: string | null
           email?: string | null
+          google_calendar_event_id?: string | null
           id?: string
           multiple_days?: boolean | null
           name: string
@@ -81,6 +83,7 @@ export type Database = {
           created_at?: string | null
           delivery_address?: string | null
           email?: string | null
+          google_calendar_event_id?: string | null
           id?: string
           multiple_days?: boolean | null
           name?: string

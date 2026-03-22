@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { CalendarDays, DollarSign, TrendingUp, Users, Pencil, Check } from "lucide-react";
+import { CalendarDays, DollarSign, TrendingUp, Users, Pencil, Check, Calendar, ExternalLink, Unlink } from "lucide-react";
 import { format, subMonths, startOfMonth } from "date-fns";
 import { hr } from "date-fns/locale";
 import {
@@ -24,6 +24,7 @@ import {
 import { useAllBookings, useUpcomingBookings, useBookingsRealtime } from "@/hooks/useBookings";
 import { useAllExpenses } from "@/hooks/useExpenses";
 import { useSetting, useUpdateSetting } from "@/hooks/useSettings";
+import { supabase } from "@/integrations/supabase/client";
 
 const BOUNCER_COLORS: Record<string, string> = {
   "Minecraft Party": "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
@@ -66,7 +67,9 @@ const DashboardHome = () => {
   const { data: upcomingBookings = [] } = useUpcomingBookings(5);
   const { data: allExpenses = [] } = useAllExpenses();
   const { data: investmentValue = "0" } = useSetting("investment");
+  const { data: googleRefreshToken } = useSetting("google_refresh_token");
   const updateSetting = useUpdateSetting();
+  const isCalendarConnected = !!googleRefreshToken;
 
   const [editingInvestment, setEditingInvestment] = useState(false);
   const [investmentInput, setInvestmentInput] = useState("");
@@ -175,12 +178,54 @@ const DashboardHome = () => {
     setEditingInvestment(false);
   };
 
+  const handleConnectCalendar = () => {
+    const supabaseUrl = "https://egwtrsfcobwybcnbqsok.supabase.co";
+    window.open(`${supabaseUrl}/functions/v1/google-oauth-callback`, "_blank");
+  };
+
+  const handleDisconnectCalendar = () => {
+    if (!window.confirm("Odspojiti Google Calendar? Nove rezervacije se više neće automatski dodavati.")) return;
+    updateSetting.mutate({ key: "google_refresh_token", value: "" });
+    updateSetting.mutate({ key: "google_access_token", value: "" });
+    updateSetting.mutate({ key: "google_token_expires", value: "" });
+  };
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Pregled</h1>
         <p className="text-muted-foreground text-sm mt-1">Poslovni pregled i statistike</p>
       </div>
+
+      {/* Google Calendar Status */}
+      <Card>
+        <CardContent className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-6">
+          <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-lg ${isCalendarConnected ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300" : "bg-muted text-muted-foreground"}`}>
+              <Calendar className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-sm font-medium">Google Calendar</p>
+              <p className="text-xs text-muted-foreground">
+                {isCalendarConnected
+                  ? "Povezano — nove rezervacije se automatski dodaju u kalendar"
+                  : "Nije povezano — povežite da se rezervacije automatski dodaju"}
+              </p>
+            </div>
+          </div>
+          {isCalendarConnected ? (
+            <Button variant="outline" size="sm" onClick={handleDisconnectCalendar} className="shrink-0">
+              <Unlink className="h-4 w-4 mr-2" />
+              Odspoji
+            </Button>
+          ) : (
+            <Button size="sm" onClick={handleConnectCalendar} className="shrink-0">
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Poveži Calendar
+            </Button>
+          )}
+        </CardContent>
+      </Card>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

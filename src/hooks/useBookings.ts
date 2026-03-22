@@ -17,6 +17,7 @@ export interface Booking {
   multiple_days: boolean | null;
   status: string;
   price: number | null;
+  google_calendar_event_id: string | null;
   created_at: string | null;
 }
 
