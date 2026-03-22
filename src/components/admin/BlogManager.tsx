@@ -54,8 +54,8 @@ const BlogManager = () => {
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Članci</h1>
-          <p className="text-gray-500 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-foreground">Članci</h1>
+          <p className="text-muted-foreground text-sm mt-1">
             Upravljajte blog člancima za "Savjeti i ideje"
           </p>
         </div>
@@ -72,8 +72,8 @@ const BlogManager = () => {
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent" />
         </div>
       ) : !posts?.length ? (
-        <div className="text-center py-12 text-gray-500">
-          <FileTextIcon className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+        <div className="text-center py-12 text-muted-foreground">
+          <FileTextIcon className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
           <p>Još nema članaka.</p>
           <Link to="/hop-upravljanje/clanci/novi">
             <Button variant="outline" className="mt-4 gap-2">
@@ -83,7 +83,7 @@ const BlogManager = () => {
           </Link>
         </div>
       ) : (
-        <div className="bg-white rounded-lg border overflow-x-auto">
+        <div className="bg-card rounded-lg border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -115,7 +115,7 @@ const BlogManager = () => {
                         : "Skica"}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-gray-500">
+                  <TableCell className="text-muted-foreground">
                     {post.status === "scheduled" && post.scheduled_at
                       ? formatDate(post.scheduled_at)
                       : formatDate(post.published_at || post.created_at)}

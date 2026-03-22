@@ -45,8 +45,8 @@ const ProductManager = () => {
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Proizvodi</h1>
-          <p className="text-gray-500 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-foreground">Proizvodi</h1>
+          <p className="text-muted-foreground text-sm mt-1">
             Upravljajte napuhancima — cijena, slike, opisi, popusti
           </p>
         </div>
@@ -63,8 +63,8 @@ const ProductManager = () => {
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent" />
         </div>
       ) : !products?.length ? (
-        <div className="text-center py-12 text-gray-500">
-          <BoxIcon className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+        <div className="text-center py-12 text-muted-foreground">
+          <BoxIcon className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
           <p>Još nema proizvoda.</p>
           <Link to="/hop-upravljanje/proizvodi/novi">
             <Button variant="outline" className="mt-4 gap-2">
@@ -74,7 +74,7 @@ const ProductManager = () => {
           </Link>
         </div>
       ) : (
-        <div className="bg-white rounded-lg border overflow-x-auto">
+        <div className="bg-card rounded-lg border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -90,7 +90,7 @@ const ProductManager = () => {
               {products.map((product) => (
                 <TableRow key={product.id}>
                   <TableCell>
-                    <GripVertical className="h-4 w-4 text-gray-300" />
+                    <GripVertical className="h-4 w-4 text-muted-foreground/50" />
                   </TableCell>
                   <TableCell>
                     {product.cover_image ? (
@@ -100,7 +100,7 @@ const ProductManager = () => {
                         className="w-12 h-12 object-cover rounded-lg"
                       />
                     ) : (
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg" />
+                      <div className="w-12 h-12 bg-muted rounded-lg" />
                     )}
                   </TableCell>
                   <TableCell className="font-medium">{product.name}</TableCell>
@@ -108,7 +108,7 @@ const ProductManager = () => {
                     <div>
                       {product.discount_price ? (
                         <>
-                          <span className="line-through text-gray-400 text-sm">
+                          <span className="line-through text-muted-foreground/70 text-sm">
                             {product.price}€
                           </span>{" "}
                           <span className="font-bold text-green-600">

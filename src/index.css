@@ -66,6 +66,10 @@ All colors MUST be HSL.
     --glass-blue-bg: rgba(173, 216, 230, 0.2);
     --glass-blue-border: rgba(173, 216, 230, 0.3);
 
+    --chart-tooltip-bg: #fff;
+    --chart-tooltip-border: #e5e7eb;
+    --chart-tooltip-text: #111;
+
     --sidebar-background: 0 0% 98%;
 
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -111,6 +115,10 @@ All colors MUST be HSL.
     --border: 221 39% 25%;
     --input: 221 39% 25%;
     --ring: 196 91% 58%;
+    --chart-tooltip-bg: #1e293b;
+    --chart-tooltip-border: #334155;
+    --chart-tooltip-text: #f1f5f9;
+
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;

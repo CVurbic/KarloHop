@@ -81,27 +81,27 @@ const RevenueView = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Prihodi</h1>
-        <p className="text-gray-500 text-sm mt-1">Analiza prihoda po napuhancu i mjesecu</p>
+        <h1 className="text-2xl font-bold text-foreground">Prihodi</h1>
+        <p className="text-muted-foreground text-sm mt-1">Analiza prihoda po napuhancu i mjesecu</p>
       </div>
 
       {/* ROI Summary */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         <Card>
           <CardContent className="pt-6">
-            <p className="text-sm text-gray-500">Investicija</p>
+            <p className="text-sm text-muted-foreground">Investicija</p>
             <p className="text-2xl font-bold">{investment.toFixed(2)} €</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <p className="text-sm text-gray-500">Ukupni prihod</p>
+            <p className="text-sm text-muted-foreground">Ukupni prihod</p>
             <p className="text-2xl font-bold text-green-600">{totalRevenue.toFixed(2)} €</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <p className="text-sm text-gray-500">Neto profit</p>
+            <p className="text-sm text-muted-foreground">Neto profit</p>
             <p className={`text-2xl font-bold ${netProfit >= 0 ? "text-green-600" : "text-red-600"}`}>
               {netProfit.toFixed(2)} €
             </p>
@@ -109,7 +109,7 @@ const RevenueView = () => {
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <p className="text-sm text-gray-500">ROI</p>
+            <p className="text-sm text-muted-foreground">ROI</p>
             <p className="text-2xl font-bold text-purple-600">{roi}%</p>
           </CardContent>
         </Card>
@@ -132,9 +132,9 @@ const RevenueView = () => {
                     <div className="h-3 w-3 rounded-full" style={{ backgroundColor: bouncer.color }} />
                     <span className="font-medium">{bouncer.name}</span>
                   </div>
-                  <span className="text-gray-600">{revenue.toFixed(2)} € ({percentage.toFixed(0)}%)</span>
+                  <span className="text-muted-foreground">{revenue.toFixed(2)} € ({percentage.toFixed(0)}%)</span>
                 </div>
-                <div className="w-full bg-gray-100 rounded-full h-3">
+                <div className="w-full bg-muted rounded-full h-3">
                   <div
                     className="h-3 rounded-full transition-all duration-500"
                     style={{
@@ -150,7 +150,7 @@ const RevenueView = () => {
             <div>
               <div className="flex justify-between text-sm mb-1">
                 <span className="font-medium">Ostalo</span>
-                <span className="text-gray-600">{revenueByBouncer["Ostalo"].toFixed(2)} €</span>
+                <span className="text-muted-foreground">{revenueByBouncer["Ostalo"].toFixed(2)} €</span>
               </div>
             </div>
           )}
@@ -179,7 +179,7 @@ const RevenueView = () => {
               <YAxis tick={{ fontSize: 12 }} />
               <Tooltip
                 formatter={(value: number) => `${value.toFixed(2)} €`}
-                contentStyle={{ fontSize: 12 }}
+                contentStyle={{ fontSize: 12, backgroundColor: "var(--chart-tooltip-bg, #fff)", border: "1px solid var(--chart-tooltip-border, #e5e7eb)", color: "var(--chart-tooltip-text, #111)" }}
               />
               <Legend wrapperStyle={{ fontSize: 12 }} />
               {BOUNCERS.map((bouncer) => (

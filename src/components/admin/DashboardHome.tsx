@@ -26,9 +26,9 @@ import { useAllExpenses } from "@/hooks/useExpenses";
 import { useSetting, useUpdateSetting } from "@/hooks/useSettings";
 
 const BOUNCER_COLORS: Record<string, string> = {
-  "Minecraft Party": "bg-blue-100 text-blue-800",
-  "Dino Park": "bg-teal-100 text-teal-800",
-  "Jednorog": "bg-pink-100 text-pink-800",
+  "Minecraft Party": "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
+  "Dino Park": "bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-300",
+  "Jednorog": "bg-pink-100 text-pink-800 dark:bg-pink-900/40 dark:text-pink-300",
 };
 
 const BOUNCER_CHART_COLORS: Record<string, string> = {
@@ -41,10 +41,10 @@ const PIE_COLORS = ["#3b82f6", "#14b8a6", "#ec4899", "#a855f7"];
 
 const statusBadge = (status: string) => {
   const map: Record<string, string> = {
-    pending: "bg-yellow-100 text-yellow-800",
-    confirmed: "bg-green-100 text-green-800",
-    cancelled: "bg-red-100 text-red-800",
-    completed: "bg-gray-100 text-gray-800",
+    pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300",
+    confirmed: "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300",
+    cancelled: "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300",
+    completed: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300",
   };
   const labels: Record<string, string> = {
     pending: "Na čekanju",
@@ -178,48 +178,48 @@ const DashboardHome = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Pregled</h1>
-        <p className="text-gray-500 text-sm mt-1">Poslovni pregled i statistike</p>
+        <h1 className="text-2xl font-bold text-foreground">Pregled</h1>
+        <p className="text-muted-foreground text-sm mt-1">Poslovni pregled i statistike</p>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Ukupni prihod</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Ukupni prihod</CardTitle>
             <DollarSign className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalRevenue.toFixed(2)} €</div>
-            <p className="text-xs text-gray-500 mt-1">{stats.reservationCount} rezervacija</p>
+            <p className="text-xs text-muted-foreground mt-1">{stats.reservationCount} rezervacija</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Ukupni troškovi</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Ukupni troškovi</CardTitle>
             <TrendingUp className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalExpenses.toFixed(2)} €</div>
-            <p className="text-xs text-gray-500 mt-1">Neto profit: {stats.netProfit.toFixed(2)} €</p>
+            <p className="text-xs text-muted-foreground mt-1">Neto profit: {stats.netProfit.toFixed(2)} €</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Mjesečni prihod</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Mjesečni prihod</CardTitle>
             <CalendarDays className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.monthlyRevenue.toFixed(2)} €</div>
-            <p className="text-xs text-gray-500 mt-1">{stats.monthlyCount} rezervacija ovaj mjesec</p>
+            <p className="text-xs text-muted-foreground mt-1">{stats.monthlyCount} rezervacija ovaj mjesec</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">ROI</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">ROI</CardTitle>
             <Users className="h-4 w-4 text-purple-500" />
           </CardHeader>
           <CardContent>
@@ -240,7 +240,7 @@ const DashboardHome = () => {
                 </div>
               ) : (
                 <button
-                  className="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1"
+                  className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
                   onClick={() => {
                     setInvestmentInput(investmentValue || "0");
                     setEditingInvestment(true);
@@ -260,7 +260,7 @@ const DashboardHome = () => {
         {/* Bookings per month - bar chart */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Rezervacije po mjesecima</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Rezervacije po mjesecima</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={200}>
@@ -270,7 +270,7 @@ const DashboardHome = () => {
                 <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
                 <Tooltip
                   formatter={(value: number) => [value, "Rezervacija"]}
-                  contentStyle={{ fontSize: 12 }}
+                  contentStyle={{ fontSize: 12, backgroundColor: "var(--chart-tooltip-bg, #fff)", border: "1px solid var(--chart-tooltip-border, #e5e7eb)", color: "var(--chart-tooltip-text, #111)" }}
                 />
                 <Bar dataKey="count" name="Rezervacije" fill="#3b82f6" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -281,11 +281,11 @@ const DashboardHome = () => {
         {/* Bouncer popularity - pie chart */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Popularnost napuhanaca</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Popularnost napuhanaca</CardTitle>
           </CardHeader>
           <CardContent>
             {bouncerPopularity.length === 0 ? (
-              <div className="flex items-center justify-center h-[200px] text-sm text-gray-400">
+              <div className="flex items-center justify-center h-[200px] text-sm text-muted-foreground">
                 Nema podataka
               </div>
             ) : (
@@ -310,7 +310,7 @@ const DashboardHome = () => {
                   </Pie>
                   <Tooltip
                     formatter={(value: number) => [value, "Rezervacija"]}
-                    contentStyle={{ fontSize: 12 }}
+                    contentStyle={{ fontSize: 12, backgroundColor: "var(--chart-tooltip-bg, #fff)", border: "1px solid var(--chart-tooltip-border, #e5e7eb)", color: "var(--chart-tooltip-text, #111)" }}
                   />
                   <Legend wrapperStyle={{ fontSize: 11 }} />
                 </PieChart>
@@ -322,7 +322,7 @@ const DashboardHome = () => {
         {/* Revenue trend - line chart */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Trend prihoda i troškova</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Trend prihoda i troškova</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={200}>
@@ -335,7 +335,7 @@ const DashboardHome = () => {
                     `${value.toFixed(2)} €`,
                     name === "prihod" ? "Prihod" : "Troškovi",
                   ]}
-                  contentStyle={{ fontSize: 12 }}
+                  contentStyle={{ fontSize: 12, backgroundColor: "var(--chart-tooltip-bg, #fff)", border: "1px solid var(--chart-tooltip-border, #e5e7eb)", color: "var(--chart-tooltip-text, #111)" }}
                 />
                 <Legend
                   wrapperStyle={{ fontSize: 11 }}
@@ -368,13 +368,13 @@ const DashboardHome = () => {
         </CardHeader>
         <CardContent>
           {upcomingBookings.length === 0 ? (
-            <p className="text-sm text-gray-500">Nema nadolazećih rezervacija.</p>
+            <p className="text-sm text-muted-foreground">Nema nadolazećih rezervacija.</p>
           ) : (
             <div className="space-y-3">
               {upcomingBookings.map((booking) => (
                 <div
                   key={booking.id}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-gray-50 rounded-lg"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-muted/50 rounded-lg"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
@@ -383,7 +383,7 @@ const DashboardHome = () => {
                       </span>
                       {statusBadge(booking.status)}
                     </div>
-                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1 text-xs text-gray-500">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1 text-xs text-muted-foreground">
                       <span>
                         {format(new Date(booking.booking_start_date), "d. MMMM yyyy.", { locale: hr })}
                       </span>

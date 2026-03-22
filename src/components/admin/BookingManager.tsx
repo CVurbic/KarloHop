@@ -52,9 +52,9 @@ import { parseReservation } from "@/lib/parseReservation";
 import { toast } from "sonner";
 
 const BOUNCERS = [
-  { name: "Minecraft Party", color: "bg-blue-500", lightColor: "bg-blue-100 text-blue-800", dotColor: "bg-blue-400" },
-  { name: "Dino Park", color: "bg-teal-500", lightColor: "bg-teal-100 text-teal-800", dotColor: "bg-teal-400" },
-  { name: "Jednorog", color: "bg-pink-500", lightColor: "bg-pink-100 text-pink-800", dotColor: "bg-pink-400" },
+  { name: "Minecraft Party", color: "bg-blue-500", lightColor: "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300", dotColor: "bg-blue-400" },
+  { name: "Dino Park", color: "bg-teal-500", lightColor: "bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-300", dotColor: "bg-teal-400" },
+  { name: "Jednorog", color: "bg-pink-500", lightColor: "bg-pink-100 text-pink-800 dark:bg-pink-900/40 dark:text-pink-300", dotColor: "bg-pink-400" },
 ];
 
 const STATUS_OPTIONS = [
@@ -203,8 +203,8 @@ const BookingManager = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Rezervacije</h1>
-          <p className="text-gray-500 text-sm mt-1">Upravljanje rezervacijama napuhanaca</p>
+          <h1 className="text-2xl font-bold text-foreground">Rezervacije</h1>
+          <p className="text-muted-foreground text-sm mt-1">Upravljanje rezervacijama napuhanaca</p>
         </div>
         <div className="flex gap-2">
           <Dialog open={showPaste} onOpenChange={setShowPaste}>
@@ -274,7 +274,7 @@ const BookingManager = () => {
           ) : (
             <div className="grid grid-cols-7 gap-1">
               {dayNames.map((d) => (
-                <div key={d} className="text-center text-[10px] sm:text-xs font-medium text-gray-500 py-1 sm:py-2">
+                <div key={d} className="text-center text-[10px] sm:text-xs font-medium text-muted-foreground py-1 sm:py-2">
                   {d}
                 </div>
               ))}
@@ -293,12 +293,12 @@ const BookingManager = () => {
                     onClick={() => setSelectedDate(day)}
                     className={`relative p-1 sm:p-2 min-h-[44px] sm:min-h-[60px] rounded-lg text-left transition-colors ${
                       !isSameMonth(day, currentMonth)
-                        ? "text-gray-300"
+                        ? "text-muted-foreground/40"
                         : isSelected
                         ? "bg-primary/10 ring-2 ring-primary"
                         : isToday
-                        ? "bg-yellow-50"
-                        : "hover:bg-gray-50"
+                        ? "bg-yellow-50 dark:bg-yellow-900/20"
+                        : "hover:bg-muted/50"
                     }`}
                   >
                     <span className={`text-xs ${isToday ? "font-bold text-primary" : ""}`}>
@@ -311,7 +311,7 @@ const BookingManager = () => {
                           return (
                             <div
                               key={b.id}
-                              className={`h-2 w-2 rounded-full ${bouncer?.dotColor || "bg-gray-400"}`}
+                              className={`h-2 w-2 rounded-full ${bouncer?.dotColor || "bg-muted-foreground"}`}
                               title={`${b.name} ${b.surname} - ${b.selected_bounce_house}`}
                             />
                           );
@@ -336,7 +336,7 @@ const BookingManager = () => {
           </CardHeader>
           <CardContent>
             {selectedDateBookings.length === 0 ? (
-              <p className="text-sm text-gray-500">Nema rezervacija za ovaj datum.</p>
+              <p className="text-sm text-muted-foreground">Nema rezervacija za ovaj datum.</p>
             ) : (
               <div className="space-y-3">
                 {selectedDateBookings.map((booking) => {
@@ -344,7 +344,7 @@ const BookingManager = () => {
                   return (
                     <div
                       key={booking.id}
-                      className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-gray-50 rounded-lg"
+                      className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-muted/50 rounded-lg"
                     >
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
@@ -357,7 +357,7 @@ const BookingManager = () => {
                             </Badge>
                           )}
                         </div>
-                        <div className="text-xs text-gray-500 mt-1">
+                        <div className="text-xs text-muted-foreground mt-1">
                           {booking.phone && <span className="mr-3">{booking.phone}</span>}
                           {booking.delivery_address && <span>{booking.delivery_address}</span>}
                         </div>
@@ -394,17 +394,17 @@ const BookingManager = () => {
           {viewBooking && (
             <div className="space-y-3 text-sm">
               <div className="grid grid-cols-2 gap-3">
-                <div><span className="text-gray-500">Ime:</span> {viewBooking.name} {viewBooking.surname}</div>
-                <div><span className="text-gray-500">Email:</span> {viewBooking.email || "-"}</div>
-                <div><span className="text-gray-500">Telefon:</span> {viewBooking.phone || "-"}</div>
-                <div><span className="text-gray-500">Adresa:</span> {viewBooking.delivery_address || "-"}</div>
-                <div><span className="text-gray-500">Napuhanac:</span> {viewBooking.selected_bounce_house || "-"}</div>
-                <div><span className="text-gray-500">Datum:</span> {format(new Date(viewBooking.booking_start_date), "d. MMMM yyyy.", { locale: hr })}</div>
-                <div><span className="text-gray-500">Cijena:</span> {viewBooking.price != null ? `${Number(viewBooking.price).toFixed(2)} €` : "-"}</div>
-                <div><span className="text-gray-500">Status:</span> {STATUS_OPTIONS.find(s => s.value === viewBooking.status)?.label || viewBooking.status}</div>
+                <div><span className="text-muted-foreground">Ime:</span> {viewBooking.name} {viewBooking.surname}</div>
+                <div><span className="text-muted-foreground">Email:</span> {viewBooking.email || "-"}</div>
+                <div><span className="text-muted-foreground">Telefon:</span> {viewBooking.phone || "-"}</div>
+                <div><span className="text-muted-foreground">Adresa:</span> {viewBooking.delivery_address || "-"}</div>
+                <div><span className="text-muted-foreground">Napuhanac:</span> {viewBooking.selected_bounce_house || "-"}</div>
+                <div><span className="text-muted-foreground">Datum:</span> {format(new Date(viewBooking.booking_start_date), "d. MMMM yyyy.", { locale: hr })}</div>
+                <div><span className="text-muted-foreground">Cijena:</span> {viewBooking.price != null ? `${Number(viewBooking.price).toFixed(2)} €` : "-"}</div>
+                <div><span className="text-muted-foreground">Status:</span> {STATUS_OPTIONS.find(s => s.value === viewBooking.status)?.label || viewBooking.status}</div>
               </div>
               {viewBooking.additional_notes && (
-                <div><span className="text-gray-500">Napomene:</span> {viewBooking.additional_notes}</div>
+                <div><span className="text-muted-foreground">Napomene:</span> {viewBooking.additional_notes}</div>
               )}
             </div>
           )}
