@@ -7,10 +7,10 @@
   PUPPETEER_EXECUTABLE_PATH = "/usr/bin/chromium-browser"
   PUPPETEER_SKIP_CHROMIUM_DOWNLOAD = "true"
 
-# Serve sitemap and robots directly (bypass SPA fallback)
+# Dynamic sitemap via Netlify Function (queries blog posts from Supabase)
 [[redirects]]
   from = "/sitemap.xml"
-  to = "/sitemap.xml"
+  to = "/.netlify/functions/sitemap"
   status = 200
 
 [[redirects]]
