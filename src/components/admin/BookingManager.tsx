@@ -49,6 +49,7 @@ import {
   type Booking,
 } from "@/hooks/useBookings";
 import { parseReservation } from "@/lib/parseReservation";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const BOUNCERS = [
@@ -134,8 +135,17 @@ const BookingManager = () => {
         await updateBooking.mutateAsync({ id: editingId, ...payload });
         toast.success("Rezervacija ažurirana");
       } else {
-        await createBooking.mutateAsync(payload);
+        const created = await createBooking.mutateAsync(payload);
         toast.success("Rezervacija kreirana");
+
+        // Sync to Google Calendar
+        try {
+          await supabase.functions.invoke("sync-google-calendar", {
+            body: created,
+          });
+        } catch (calendarError) {
+          console.error("Calendar sync error:", calendarError);
+        }
       }
 
       setFormData(EMPTY_FORM);

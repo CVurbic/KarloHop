@@ -124,9 +124,11 @@ const BookingSection = () => {
         return;
       }
 
-      const { error } = await supabase
+      const { data: insertedBooking, error } = await supabase
         .from('bookings')
-        .insert([values]);
+        .insert([values])
+        .select()
+        .single();
 
       if (error) {
         throw error;
@@ -147,6 +149,18 @@ const BookingSection = () => {
       } catch (emailError) {
         console.error('Error sending email:', emailError);
         // Don't block the booking if email fails
+      }
+
+      // Sync to Google Calendar
+      try {
+        if (insertedBooking) {
+          await supabase.functions.invoke('sync-google-calendar', {
+            body: insertedBooking
+          });
+        }
+      } catch (calendarError) {
+        console.error('Error syncing to calendar:', calendarError);
+        // Don't block the booking if calendar sync fails
       }
 
       toast({
