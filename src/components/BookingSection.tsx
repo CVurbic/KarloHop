@@ -125,10 +125,18 @@ const BookingSection = () => {
       }
 
       const { data: insertedBooking, error } = await supabase
-        .from('bookings')
-        .insert([values])
-        .select()
-        .single();
+        .rpc('create_public_booking', {
+          p_name: values.name,
+          p_surname: values.surname,
+          p_email: values.email || null,
+          p_phone: values.phone || null,
+          p_delivery_address: values.delivery_address || null,
+          p_booking_start_date: values.booking_start_date,
+          p_selected_bounce_house: values.selected_bounce_house || null,
+          p_additional_notes: values.additional_notes || null,
+          p_add_table_set: values.add_table_set || false,
+          p_multiple_days: values.multiple_days || false,
+        });
 
       if (error) {
         throw error;
