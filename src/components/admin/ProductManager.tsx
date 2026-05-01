@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Plus, Edit, Trash2, Eye, GripVertical } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, ArrowUp, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -21,13 +21,39 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useAllProducts, useDeleteProduct } from "@/hooks/useProducts";
+import {
+  useAllProducts,
+  useDeleteProduct,
+  useReorderProducts,
+} from "@/hooks/useProducts";
 import { useToast } from "@/hooks/use-toast";
 
 const ProductManager = () => {
   const { data: products, isLoading } = useAllProducts();
   const deleteProduct = useDeleteProduct();
+  const reorderProducts = useReorderProducts();
   const { toast } = useToast();
+
+  const handleMove = async (index: number, direction: -1 | 1) => {
+    if (!products) return;
+    const target = index + direction;
+    if (target < 0 || target >= products.length) return;
+
+    const a = products[index];
+    const b = products[target];
+    // Swap sort_order between the two adjacent rows so the displayed order matches.
+    const aOrder = a.sort_order ?? index;
+    const bOrder = b.sort_order ?? target;
+
+    try {
+      await reorderProducts.mutateAsync([
+        { id: a.id, sort_order: bOrder },
+        { id: b.id, sort_order: aOrder },
+      ]);
+    } catch {
+      toast({ title: "Greška pri promjeni redoslijeda", variant: "destructive" });
+    }
+  };
 
   const handleDelete = async (id: string) => {
     try {
@@ -47,7 +73,7 @@ const ProductManager = () => {
         <div>
           <h1 className="text-2xl font-bold text-foreground">Proizvodi</h1>
           <p className="text-muted-foreground text-sm mt-1">
-            Upravljajte napuhancima — cijena, slike, opisi, popusti
+            Upravljajte napuhancima — cijena, slike, opisi, popusti, redoslijed
           </p>
         </div>
         <Link to="/hop-upravljanje/proizvodi/novi">
@@ -78,7 +104,7 @@ const ProductManager = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-10"></TableHead>
+                <TableHead className="w-20">Redoslijed</TableHead>
                 <TableHead className="w-16">Slika</TableHead>
                 <TableHead>Naziv</TableHead>
                 <TableHead>Cijena</TableHead>
@@ -87,10 +113,33 @@ const ProductManager = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {products.map((product) => (
+              {products.map((product, index) => (
                 <TableRow key={product.id}>
                   <TableCell>
-                    <GripVertical className="h-4 w-4 text-muted-foreground/50" />
+                    <div className="flex flex-col gap-0.5">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={() => handleMove(index, -1)}
+                        disabled={index === 0 || reorderProducts.isPending}
+                        title="Pomakni gore"
+                      >
+                        <ArrowUp className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={() => handleMove(index, 1)}
+                        disabled={
+                          index === products.length - 1 || reorderProducts.isPending
+                        }
+                        title="Pomakni dolje"
+                      >
+                        <ArrowDown className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
                   </TableCell>
                   <TableCell>
                     {product.cover_image ? (

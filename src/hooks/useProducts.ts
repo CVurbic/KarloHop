@@ -17,6 +17,8 @@ export interface Product {
   price: string;
   discount_price: string | null;
   discount_label: string | null;
+  sticker_text: string | null;
+  sticker_color: string | null;
   seo_title: string | null;
   seo_description: string | null;
   seo_og_image: string | null;
@@ -136,6 +138,28 @@ export function useUpdateProduct() {
 
       if (error) throw error;
       return data as Product;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+  });
+}
+
+// Reorder products: pass an array of { id, sort_order } and they get persisted in parallel.
+export function useReorderProducts() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (items: { id: string; sort_order: number }[]) => {
+      const now = new Date().toISOString();
+      await Promise.all(
+        items.map((item) =>
+          supabase
+            .from("products" as string)
+            .update({ sort_order: item.sort_order, updated_at: now })
+            .eq("id", item.id)
+        )
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
