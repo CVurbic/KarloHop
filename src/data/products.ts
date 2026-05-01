@@ -116,4 +116,32 @@ export const napuhanci: Product[] = [
       ogImage: "/assets/dino-cover.png",
     },
   },
+  {
+    id: 4,
+    name: "Paw Patrol avantura",
+    slug: "paw-patrol-napuhanac",
+    coverImage: "/assets/paw-patrol.png",
+    image: "/assets/paw-patrol.png",
+    gallery: [
+      "/assets/paw-patrol.png",
+    ],
+    shortDesc: "Paw Patrol napuhanac s toboganom za male spasioce",
+    longDesc:
+      "Pridruži se Chaseu, Marshallu i cijeloj Paw Patrol ekipi! Ovaj šareni napuhanac s toboganom donosi pravu spasilačku avanturu u tvoje dvorište. Djeca obožavaju skakati uz svoje omiljene junake i spuštati se toboganom — savršen izbor za rođendane, vrtne zabave i sve male obožavatelje Paw Patrola.",
+    dimensions: "5 x 5 x 4m",
+    capacity: "Do 6 djece istovremeno",
+    ages: "3–12 godina",
+    included: [
+      "Najam napuhanca za cijeli dan (8h)",
+      "Besplatna dostava do 10km od Zagreba",
+      "Montaža i demontaža na lokaciji",
+    ],
+    price: "100",
+    seo: {
+      title: "Paw Patrol napuhanac za najam | Hop Hop Napuhanci Zagreb",
+      description:
+        "Paw Patrol napuhanac s toboganom za najam u Zagrebu! Dimenzije 5x5x4m, do 6 djece, uzrast 3-12 god. Dostava i montaža uključeni — samo 100€/dan.",
+      ogImage: "/assets/paw-patrol.png",
+    },
+  },
 ];

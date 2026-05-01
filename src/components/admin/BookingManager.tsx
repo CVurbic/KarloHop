@@ -56,6 +56,7 @@ const BOUNCERS = [
   { name: "Minecraft Party", color: "bg-blue-500", lightColor: "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300", dotColor: "bg-blue-400" },
   { name: "Dino Park", color: "bg-teal-500", lightColor: "bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-300", dotColor: "bg-teal-400" },
   { name: "Jednorog", color: "bg-pink-500", lightColor: "bg-pink-100 text-pink-800 dark:bg-pink-900/40 dark:text-pink-300", dotColor: "bg-pink-400" },
+  { name: "Paw Patrol", color: "bg-yellow-500", lightColor: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300", dotColor: "bg-yellow-400" },
 ];
 
 const STATUS_OPTIONS = [
