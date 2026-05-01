@@ -13,6 +13,10 @@ import {
   useUpdateProduct,
 } from "@/hooks/useProducts";
 import { uploadProductImage } from "@/lib/uploadImage";
+import ProductSticker, {
+  STICKER_COLOR_PRESETS,
+  DEFAULT_STICKER_COLOR,
+} from "@/components/ProductSticker";
 
 function slugify(text: string): string {
   return text
@@ -54,6 +58,8 @@ const ProductEditor = () => {
   const [price, setPrice] = useState("");
   const [discountPrice, setDiscountPrice] = useState("");
   const [discountLabel, setDiscountLabel] = useState("");
+  const [stickerText, setStickerText] = useState("");
+  const [stickerColor, setStickerColor] = useState("");
   const [seoTitle, setSeoTitle] = useState("");
   const [seoDescription, setSeoDescription] = useState("");
   const [seoOgImage, setSeoOgImage] = useState("");
@@ -85,6 +91,8 @@ const ProductEditor = () => {
       setPrice(existingProduct.price);
       setDiscountPrice(existingProduct.discount_price || "");
       setDiscountLabel(existingProduct.discount_label || "");
+      setStickerText(existingProduct.sticker_text || "");
+      setStickerColor(existingProduct.sticker_color || "");
       setSeoTitle(existingProduct.seo_title || "");
       setSeoDescription(existingProduct.seo_description || "");
       setSeoOgImage(existingProduct.seo_og_image || "");
@@ -197,6 +205,8 @@ const ProductEditor = () => {
         price: price.trim(),
         discount_price: discountPrice.trim() || null,
         discount_label: discountLabel.trim() || null,
+        sticker_text: stickerText.trim() || null,
+        sticker_color: stickerText.trim() ? stickerColor || STICKER_COLOR_PRESETS[0].value : null,
         seo_title: seoTitle.trim() || null,
         seo_description: seoDescription.trim() || null,
         seo_og_image: seoOgImage || null,
@@ -534,6 +544,84 @@ const ProductEditor = () => {
                     )}
                   </p>
                 </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Sticker (independent of price) */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm">Sticker / oznaka</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-xs text-muted-foreground">
+                Istakni proizvod kružnom oznakom (npr. "Novo", "Akcija").
+                Prikazuje se neovisno o cijeni.
+              </p>
+              <div>
+                <Label htmlFor="stickerText" className="text-xs">
+                  Tekst stickera
+                </Label>
+                <Input
+                  id="stickerText"
+                  value={stickerText}
+                  onChange={(e) => setStickerText(e.target.value)}
+                  placeholder='Npr. "Novo", "Akcija", "Hit"'
+                  maxLength={20}
+                  className="mt-1"
+                />
+              </div>
+
+              {stickerText.trim() && (
+                <>
+                  <div>
+                    <Label className="text-xs">Boja stickera</Label>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {STICKER_COLOR_PRESETS.map((preset) => {
+                        const active =
+                          (stickerColor || DEFAULT_STICKER_COLOR) === preset.value;
+                        return (
+                          <button
+                            key={preset.value}
+                            type="button"
+                            onClick={() => setStickerColor(preset.value)}
+                            title={preset.name}
+                            aria-label={preset.name}
+                            className={
+                              "h-9 w-9 rounded-full border-2 transition-all " +
+                              (active
+                                ? "border-foreground ring-2 ring-foreground/20 scale-110"
+                                : "border-border hover:scale-105")
+                            }
+                            style={{ backgroundColor: preset.value }}
+                          />
+                        );
+                      })}
+                      <label
+                        className="h-9 w-9 rounded-full border-2 border-dashed border-border cursor-pointer flex items-center justify-center text-xs text-muted-foreground hover:border-primary/50"
+                        title="Prilagođena boja"
+                      >
+                        +
+                        <input
+                          type="color"
+                          className="sr-only"
+                          onChange={(e) => setStickerColor(e.target.value)}
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="bg-muted/50 border border-border rounded-lg p-3 flex items-center justify-between gap-3">
+                    <span className="text-xs text-muted-foreground">
+                      Pregled:
+                    </span>
+                    <ProductSticker
+                      text={stickerText}
+                      color={stickerColor || DEFAULT_STICKER_COLOR}
+                      className="h-16 w-16 text-xs"
+                    />
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>

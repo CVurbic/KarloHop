@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { useEffect } from "react";
 import { useProductBySlug, usePublishedProducts } from "@/hooks/useProducts";
+import ProductSticker from "@/components/ProductSticker";
 
 const ProductPage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -36,6 +37,8 @@ const ProductPage = () => {
         price: dbProduct.price,
         discountPrice: dbProduct.discount_price,
         discountLabel: dbProduct.discount_label,
+        stickerText: dbProduct.sticker_text,
+        stickerColor: dbProduct.sticker_color,
         seo: {
           title: dbProduct.seo_title || dbProduct.name,
           description: dbProduct.seo_description || dbProduct.short_desc || "",
@@ -43,7 +46,13 @@ const ProductPage = () => {
         },
       }
     : staticProduct
-      ? { ...staticProduct, discountPrice: null as string | null, discountLabel: null as string | null }
+      ? {
+          ...staticProduct,
+          discountPrice: null as string | null,
+          discountLabel: null as string | null,
+          stickerText: null as string | null,
+          stickerColor: null as string | null,
+        }
       : null;
 
   // Other products from DB or static
@@ -59,6 +68,8 @@ const ProductPage = () => {
           price: p.price,
           discountPrice: p.discount_price,
           discountLabel: p.discount_label,
+          stickerText: p.sticker_text,
+          stickerColor: p.sticker_color,
         }))
     : napuhanci
         .filter((p) => p.slug !== slug)
@@ -71,6 +82,8 @@ const ProductPage = () => {
           price: p.price,
           discountPrice: null as string | null,
           discountLabel: null as string | null,
+          stickerText: null as string | null,
+          stickerColor: null as string | null,
         }));
 
   useEffect(() => {
@@ -173,11 +186,20 @@ const ProductPage = () => {
                 </div>
               </div>
               <div className="flex justify-center order-1 lg:order-2">
-                <img
-                  src={product.coverImage}
-                  alt={`${product.name} napuhanac`}
-                  className="w-full max-w-md lg:max-w-lg xl:max-w-xl h-auto rounded-2xl shadow-lg"
-                />
+                <div className="relative w-full max-w-md lg:max-w-lg xl:max-w-xl">
+                  <img
+                    src={product.coverImage}
+                    alt={`${product.name} napuhanac`}
+                    className="w-full h-auto rounded-2xl shadow-lg"
+                  />
+                  {product.stickerText && (
+                    <ProductSticker
+                      text={product.stickerText}
+                      color={product.stickerColor}
+                      className="absolute top-4 right-4 h-20 w-20 sm:h-24 sm:w-24 text-sm"
+                    />
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -323,6 +345,13 @@ const ProductPage = () => {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         loading="lazy"
                       />
+                      {p.stickerText && (
+                        <ProductSticker
+                          text={p.stickerText}
+                          color={p.stickerColor}
+                          className="absolute top-3 right-3 h-14 w-14 text-[10px] z-10"
+                        />
+                      )}
                     </div>
                     <CardContent className="p-6">
                       <CardTitle className="text-xl mb-2 text-foreground">

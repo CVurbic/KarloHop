@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { napuhanci } from "@/data/products";
 import { usePublishedProducts } from "@/hooks/useProducts";
+import ProductSticker from "@/components/ProductSticker";
 
 const ProductShowcase = () => {
   const { data: dbProducts } = usePublishedProducts();
@@ -18,6 +19,8 @@ const ProductShowcase = () => {
         price: p.price,
         discountPrice: p.discount_price,
         discountLabel: p.discount_label,
+        stickerText: p.sticker_text,
+        stickerColor: p.sticker_color,
       }))
     : napuhanci.map((p) => ({
         id: p.id,
@@ -29,6 +32,8 @@ const ProductShowcase = () => {
         price: p.price,
         discountPrice: null as string | null,
         discountLabel: null as string | null,
+        stickerText: null as string | null,
+        stickerColor: null as string | null,
       }));
 
   return (
@@ -64,6 +69,13 @@ const ProductShowcase = () => {
                       loading="lazy"
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+                    {product.stickerText && (
+                      <ProductSticker
+                        text={product.stickerText}
+                        color={product.stickerColor}
+                        className="absolute top-3 right-3 h-16 w-16 text-xs z-10"
+                      />
+                    )}
                   </div>
                 </Link>
               </CardHeader>
