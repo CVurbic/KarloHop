@@ -80,6 +80,8 @@ export function parseReservation(text: string): ParsedReservation {
       result.bouncer = "Minecraft Party";
     } else if (b.includes("jednorog") || b.includes("unicorn")) {
       result.bouncer = "Jednorog";
+    } else if (b.includes("paw") || b.includes("patrol")) {
+      result.bouncer = "Paw Patrol";
     }
   }
 

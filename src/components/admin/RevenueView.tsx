@@ -20,6 +20,7 @@ const BOUNCERS = [
   { name: "Minecraft Party", color: "#3b82f6", key: "minecraft" },
   { name: "Dino Park", color: "#14b8a6", key: "dino" },
   { name: "Jednorog", color: "#ec4899", key: "jednorog" },
+  { name: "Paw Patrol", color: "#eab308", key: "paw" },
 ];
 
 const MONTH_NAMES = [

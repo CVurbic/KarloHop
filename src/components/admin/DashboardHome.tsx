@@ -30,15 +30,17 @@ const BOUNCER_COLORS: Record<string, string> = {
   "Minecraft Party": "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
   "Dino Park": "bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-300",
   "Jednorog": "bg-pink-100 text-pink-800 dark:bg-pink-900/40 dark:text-pink-300",
+  "Paw Patrol": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300",
 };
 
 const BOUNCER_CHART_COLORS: Record<string, string> = {
   "Minecraft Party": "#3b82f6",
   "Dino Park": "#14b8a6",
   "Jednorog": "#ec4899",
+  "Paw Patrol": "#eab308",
 };
 
-const PIE_COLORS = ["#3b82f6", "#14b8a6", "#ec4899", "#a855f7"];
+const PIE_COLORS = ["#3b82f6", "#14b8a6", "#ec4899", "#eab308", "#a855f7"];
 
 const statusBadge = (status: string) => {
   const map: Record<string, string> = {
