@@ -98,7 +98,8 @@
       "/",
       "/jednorog-napuhanac",
       "/minecraft-napuhanac",
-      "/dinosaur-napuhanac"
+      "/dinosaur-napuhanac",
+      "/paw-patrol-napuhanac"
     ],
     "minifyHtml": {
       "collapseWhitespace": true,
