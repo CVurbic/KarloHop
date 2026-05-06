@@ -19,7 +19,7 @@ interface BlogPost {
 const staticPages = [
   {
     loc: "/",
-    lastmod: "2026-03-20",
+    lastmod: "2026-05-06",
     changefreq: "weekly",
     priority: "1.0",
     image: {
@@ -29,7 +29,7 @@ const staticPages = [
   },
   {
     loc: "/jednorog-napuhanac",
-    lastmod: "2026-03-20",
+    lastmod: "2026-05-06",
     changefreq: "monthly",
     priority: "0.8",
     image: {
@@ -39,7 +39,7 @@ const staticPages = [
   },
   {
     loc: "/minecraft-napuhanac",
-    lastmod: "2026-03-20",
+    lastmod: "2026-05-06",
     changefreq: "monthly",
     priority: "0.8",
     image: {
@@ -49,12 +49,22 @@ const staticPages = [
   },
   {
     loc: "/dinosaur-napuhanac",
-    lastmod: "2026-03-20",
+    lastmod: "2026-05-06",
     changefreq: "monthly",
     priority: "0.8",
     image: {
       loc: `${SITE_URL}/assets/dino-cover.png`,
       title: "Dino park napuhanac za najam Zagreb",
+    },
+  },
+  {
+    loc: "/paw-patrol-napuhanac",
+    lastmod: "2026-05-06",
+    changefreq: "monthly",
+    priority: "0.8",
+    image: {
+      loc: `${SITE_URL}/assets/paw-patrol.png`,
+      title: "Paw Patrol napuhanac za najam Zagreb",
     },
   },
   {

@@ -2,11 +2,6 @@
   command = "npm run build"
   publish = "dist"
 
-[build.environment]
-  # Netlify build image has Chromium installed — tell puppeteer to use it
-  PUPPETEER_EXECUTABLE_PATH = "/usr/bin/chromium-browser"
-  PUPPETEER_SKIP_CHROMIUM_DOWNLOAD = "true"
-
 # Dynamic sitemap via Netlify Function (queries blog posts from Supabase)
 [[redirects]]
   from = "/sitemap.xml"
