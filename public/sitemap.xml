@@ -3,7 +3,7 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://hophop-napuhanci.com/</loc>
-    <lastmod>2026-03-20</lastmod>
+    <lastmod>2026-05-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <image:image>
@@ -13,7 +13,7 @@
   </url>
   <url>
     <loc>https://hophop-napuhanci.com/jednorog-napuhanac</loc>
-    <lastmod>2026-03-20</lastmod>
+    <lastmod>2026-05-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <image:image>
@@ -23,7 +23,7 @@
   </url>
   <url>
     <loc>https://hophop-napuhanci.com/minecraft-napuhanac</loc>
-    <lastmod>2026-03-20</lastmod>
+    <lastmod>2026-05-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <image:image>
@@ -33,12 +33,28 @@
   </url>
   <url>
     <loc>https://hophop-napuhanci.com/dinosaur-napuhanac</loc>
-    <lastmod>2026-03-20</lastmod>
+    <lastmod>2026-05-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://hophop-napuhanci.com/assets/dino-cover.png</image:loc>
       <image:title>Dino park napuhanac za najam Zagreb</image:title>
     </image:image>
+  </url>
+  <url>
+    <loc>https://hophop-napuhanci.com/paw-patrol-napuhanac</loc>
+    <lastmod>2026-05-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://hophop-napuhanci.com/assets/paw-patrol.png</image:loc>
+      <image:title>Paw Patrol napuhanac za najam Zagreb</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://hophop-napuhanci.com/savjeti</loc>
+    <lastmod>2026-05-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>
