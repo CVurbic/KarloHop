@@ -340,6 +340,7 @@ const BookingSection = () => {
                                   <SelectItem value="Minecraft Party">Minecraft party - 100€</SelectItem>
                                   <SelectItem value="Dino Park">Dino park - 100€</SelectItem>
                                   <SelectItem value="Paw Patrol">Paw Patrol avantura - 100€</SelectItem>
+                                  <SelectItem value="Super Mario">Super Mario Tobogan - 150€</SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />

@@ -68,6 +68,16 @@ const staticPages = [
     },
   },
   {
+    loc: "/super-mario-tobogan",
+    lastmod: "2026-05-09",
+    changefreq: "monthly",
+    priority: "0.8",
+    image: {
+      loc: `${SITE_URL}/placeholder.svg`,
+      title: "Super Mario tobogan napuhanac za najam Zagreb",
+    },
+  },
+  {
     loc: "/savjeti",
     lastmod: new Date().toISOString().split("T")[0],
     changefreq: "weekly",

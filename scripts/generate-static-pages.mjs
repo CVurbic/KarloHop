@@ -73,6 +73,20 @@ const products = [
     ages: "3–12 godina",
     price: "100",
   },
+  {
+    slug: "super-mario-tobogan",
+    name: "Super Mario Tobogan",
+    title: "Super Mario tobogan napuhanac za najam | Hop Hop Napuhanci Zagreb",
+    description:
+      "Super Mario tobogan napuhanac za najam u Zagrebu! Dimenzije 7x4.2x6m, veliki tobogan, do 6 djece, uzrast 3-12 god. Dostava i montaža uključeni — 150€/dan.",
+    image: "/placeholder.svg",
+    longDesc:
+      "Skoči u svijet Super Marija! Veliki tobogan napuhanac, visok 6 metara, donosi pravu Mario avanturu u tvoje dvorište — savršen za rođendane i sve male obožavatelje kultne igre.",
+    dimensions: "7 x 4.2 x 6m",
+    capacity: "Do 6 djece istovremeno",
+    ages: "3–12 godina",
+    price: "150",
+  },
 ];
 
 function escapeHtml(s) {
