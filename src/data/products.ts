@@ -144,4 +144,32 @@ export const napuhanci: Product[] = [
       ogImage: "/assets/paw-patrol.png",
     },
   },
+  {
+    id: 5,
+    name: "Super Mario Tobogan",
+    slug: "super-mario-tobogan",
+    coverImage: "/placeholder.svg",
+    image: "/placeholder.svg",
+    gallery: [
+      "/placeholder.svg",
+    ],
+    shortDesc: "Veliki Super Mario tobogan za prave avanture",
+    longDesc:
+      "Skoči u svijet Super Marija! Ovaj veliki tobogan napuhanac donosi pravu Mario avanturu u tvoje dvorište — savršen za rođendane i sve male obožavatelje kultne igre. Visok 6 metara s velikim toboganom, dovoljno prostora za skakanje i penjanje. Idealan kada želiš pravu wow proslavu koju djeca neće zaboraviti.",
+    dimensions: "7 x 4.2 x 6m",
+    capacity: "Do 6 djece istovremeno",
+    ages: "3–12 godina",
+    included: [
+      "Najam napuhanca za cijeli dan (8h)",
+      "Besplatna dostava do 10km od Zagreba",
+      "Montaža i demontaža na lokaciji",
+    ],
+    price: "150",
+    seo: {
+      title: "Super Mario tobogan napuhanac za najam | Hop Hop Napuhanci Zagreb",
+      description:
+        "Super Mario tobogan napuhanac za najam u Zagrebu! Dimenzije 7x4.2x6m, veliki tobogan, do 6 djece, uzrast 3-12 god. Dostava i montaža uključeni — 150€/dan.",
+      ogImage: "/placeholder.svg",
+    },
+  },
 ];

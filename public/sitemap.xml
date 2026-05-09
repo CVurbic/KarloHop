@@ -52,6 +52,16 @@
     </image:image>
   </url>
   <url>
+    <loc>https://hophop-napuhanci.com/super-mario-tobogan</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://hophop-napuhanci.com/placeholder.svg</image:loc>
+      <image:title>Super Mario tobogan napuhanac za najam Zagreb</image:title>
+    </image:image>
+  </url>
+  <url>
     <loc>https://hophop-napuhanci.com/savjeti</loc>
     <lastmod>2026-05-06</lastmod>
     <changefreq>weekly</changefreq>

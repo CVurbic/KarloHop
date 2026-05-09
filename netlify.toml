@@ -34,6 +34,11 @@
   to = "/paw-patrol-napuhanac/index.html"
   status = 200
 
+[[redirects]]
+  from = "/super-mario-tobogan"
+  to = "/super-mario-tobogan/index.html"
+  status = 200
+
 # Blog and admin routes — SPA fallback
 [[redirects]]
   from = "/savjeti/*"
