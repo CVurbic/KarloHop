@@ -53,11 +53,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const BOUNCERS = [
-  { name: "Minecraft Party", color: "bg-blue-500", lightColor: "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300", dotColor: "bg-blue-400" },
-  { name: "Dino Park", color: "bg-teal-500", lightColor: "bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-300", dotColor: "bg-teal-400" },
-  { name: "Jednorog", color: "bg-pink-500", lightColor: "bg-pink-100 text-pink-800 dark:bg-pink-900/40 dark:text-pink-300", dotColor: "bg-pink-400" },
-  { name: "Paw Patrol", color: "bg-yellow-500", lightColor: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300", dotColor: "bg-yellow-400" },
-  { name: "Super Mario", color: "bg-red-500", lightColor: "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300", dotColor: "bg-red-400" },
+  { name: "Minecraft Party", color: "bg-blue-500", lightColor: "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300", dotColor: "bg-blue-400", price: "100" },
+  { name: "Dino Park", color: "bg-teal-500", lightColor: "bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-300", dotColor: "bg-teal-400", price: "100" },
+  { name: "Jednorog", color: "bg-pink-500", lightColor: "bg-pink-100 text-pink-800 dark:bg-pink-900/40 dark:text-pink-300", dotColor: "bg-pink-400", price: "100" },
+  { name: "Paw Patrol", color: "bg-yellow-500", lightColor: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300", dotColor: "bg-yellow-400", price: "100" },
+  { name: "Super Mario", color: "bg-red-500", lightColor: "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300", dotColor: "bg-red-400", price: "150" },
 ];
 
 const STATUS_OPTIONS = [
@@ -161,6 +161,8 @@ const BookingManager = () => {
   const handlePaste = () => {
     const parsed = parseReservation(pasteText);
     const nameParts = parsed.name.split(" ");
+    const parsedPrice = parsed.price.replace(/[^\d.]/g, "");
+    const bouncer = BOUNCERS.find((b) => b.name === parsed.bouncer);
     setFormData({
       name: nameParts[0] || "",
       surname: nameParts.slice(1).join(" ") || "",
@@ -169,7 +171,7 @@ const BookingManager = () => {
       delivery_address: parsed.address,
       booking_start_date: parsed.date,
       selected_bounce_house: parsed.bouncer,
-      price: parsed.price.replace(/[^\d.]/g, ""),
+      price: parsedPrice || (bouncer ? bouncer.price : ""),
       status: "confirmed",
       additional_notes: "",
     });
@@ -482,7 +484,14 @@ const BookingManager = () => {
                 <Label>Napuhanac</Label>
                 <Select
                   value={formData.selected_bounce_house}
-                  onValueChange={(v) => setFormData({ ...formData, selected_bounce_house: v })}
+                  onValueChange={(v) => {
+                    const bouncer = BOUNCERS.find((b) => b.name === v);
+                    setFormData((prev) => ({
+                      ...prev,
+                      selected_bounce_house: v,
+                      price: bouncer ? bouncer.price : prev.price,
+                    }));
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Odaberi" />
