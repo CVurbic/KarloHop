@@ -131,8 +131,8 @@ const DeliverySection = () => {
 
           {/* Mascot Image */}
           <div className="flex justify-center">
-            <div className="relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-3xl"></div>
+            <div className="relative">
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2/3 aspect-square bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-2xl pointer-events-none"></div>
               <img
                 src="/assets/mascot-delivery.webp"
                 alt="Hop Hop mascot delivering bounce houses"
