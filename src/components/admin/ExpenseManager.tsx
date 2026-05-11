@@ -16,7 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Plus, Trash2, Fuel, Megaphone, Wrench, Warehouse } from "lucide-react";
+import { Plus, Trash2, Fuel, Megaphone, Wrench, Users } from "lucide-react";
 import { format } from "date-fns";
 import { hr } from "date-fns/locale";
 import { useAllExpenses, useCreateExpense, useDeleteExpense } from "@/hooks/useExpenses";
@@ -25,10 +25,23 @@ import { toast } from "sonner";
 const CATEGORIES = [
   { value: "fuel", label: "Gorivo", icon: Fuel, color: "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300" },
   { value: "marketing", label: "Marketing", icon: Megaphone, color: "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300" },
-  { value: "depreciation", label: "Amortizacija", icon: Wrench, color: "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300" },
-  { value: "garage", label: "Garaža", icon: Warehouse, color: "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300" },
-  { value: "other", label: "Ostalo", icon: Wrench, color: "bg-muted text-foreground" },
+  { value: "workers", label: "Radnici", icon: Users, color: "bg-pink-100 text-pink-800 dark:bg-pink-900/40 dark:text-pink-300" },
 ];
+
+const buildCategoryStats = (items: { category: string; amount: number }[]) => {
+  const totals: Record<string, number> = {};
+  let total = 0;
+  items.forEach((e) => {
+    const amt = Number(e.amount);
+    totals[e.category] = (totals[e.category] || 0) + amt;
+    total += amt;
+  });
+  return CATEGORIES.map((cat) => ({
+    ...cat,
+    total: totals[cat.value] || 0,
+    percentage: total > 0 ? (((totals[cat.value] || 0) / total) * 100).toFixed(0) : "0",
+  }));
+};
 
 const EMPTY_FORM = {
   category: "",
@@ -45,24 +58,24 @@ const ExpenseManager = () => {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(EMPTY_FORM);
 
-  // Category stats
-  const categoryStats = useMemo(() => {
-    const totals: Record<string, number> = {};
-    let total = 0;
-    expenses.forEach((e) => {
-      const amt = Number(e.amount);
-      totals[e.category] = (totals[e.category] || 0) + amt;
-      total += amt;
-    });
+  // Category stats (all-time)
+  const categoryStats = useMemo(() => buildCategoryStats(expenses), [expenses]);
 
-    return CATEGORIES.map((cat) => ({
-      ...cat,
-      total: totals[cat.value] || 0,
-      percentage: total > 0 ? (((totals[cat.value] || 0) / total) * 100).toFixed(0) : "0",
-    }));
-  }, [expenses]);
+  // Category stats (current month)
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+  const monthlyCategoryStats = useMemo(() => {
+    const monthly = expenses.filter((e) => {
+      const d = new Date(e.expense_date);
+      return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+    });
+    return buildCategoryStats(monthly);
+  }, [expenses, currentMonth, currentYear]);
 
   const totalExpenses = categoryStats.reduce((s, c) => s + c.total, 0);
+  const monthlyTotal = monthlyCategoryStats.reduce((s, c) => s + c.total, 0);
+  const currentMonthLabel = format(now, "LLLL yyyy.", { locale: hr });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,34 +118,67 @@ const ExpenseManager = () => {
         </Button>
       </div>
 
-      {/* Category Summary Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-        {categoryStats.map((cat) => {
-          const Icon = cat.icon;
-          return (
-            <Card key={cat.value}>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className={`p-2 rounded-lg ${cat.color}`}>
-                    <Icon className="h-4 w-4" />
+      {/* All-time section */}
+      <div className="space-y-3">
+        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Ukupno</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+          {categoryStats.map((cat) => {
+            const Icon = cat.icon;
+            return (
+              <Card key={cat.value}>
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className={`p-2 rounded-lg ${cat.color}`}>
+                      <Icon className="h-4 w-4" />
+                    </div>
+                    <span className="text-sm font-medium">{cat.label}</span>
                   </div>
-                  <span className="text-sm font-medium">{cat.label}</span>
-                </div>
-                <p className="text-xl font-bold">{cat.total.toFixed(2)} €</p>
-                <p className="text-xs text-muted-foreground">{cat.percentage}% ukupnog</p>
-              </CardContent>
-            </Card>
-          );
-        })}
+                  <p className="text-xl font-bold">{cat.total.toFixed(2)} €</p>
+                  <p className="text-xs text-muted-foreground">{cat.percentage}% ukupnog</p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+        <Card>
+          <CardContent className="pt-6 flex items-center justify-between">
+            <span className="text-lg font-medium">Ukupni troškovi</span>
+            <span className="text-2xl font-bold text-red-600">{totalExpenses.toFixed(2)} €</span>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Total */}
-      <Card>
-        <CardContent className="pt-6 flex items-center justify-between">
-          <span className="text-lg font-medium">Ukupni troškovi</span>
-          <span className="text-2xl font-bold text-red-600">{totalExpenses.toFixed(2)} €</span>
-        </CardContent>
-      </Card>
+      {/* Current month section */}
+      <div className="space-y-3">
+        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+          Trenutni mjesec — <span className="capitalize">{currentMonthLabel}</span>
+        </h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+          {monthlyCategoryStats.map((cat) => {
+            const Icon = cat.icon;
+            return (
+              <Card key={cat.value}>
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className={`p-2 rounded-lg ${cat.color}`}>
+                      <Icon className="h-4 w-4" />
+                    </div>
+                    <span className="text-sm font-medium">{cat.label}</span>
+                  </div>
+                  <p className="text-xl font-bold">{cat.total.toFixed(2)} €</p>
+                  <p className="text-xs text-muted-foreground">{cat.percentage}% mjeseca</p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+        <Card>
+          <CardContent className="pt-6 flex items-center justify-between">
+            <span className="text-lg font-medium">Troškovi ovog mjeseca</span>
+            <span className="text-2xl font-bold text-red-600">{monthlyTotal.toFixed(2)} €</span>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Expense List */}
       <Card>
