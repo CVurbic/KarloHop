@@ -41,7 +41,7 @@ export const napuhanci: Product[] = [
     ages: "3–12 godina",
     included: [
       "Najam napuhanca za cijeli dan (8h)",
-      "Besplatna dostava do 10km od Zagreba",
+      "Besplatna dostava do 15km od Arene Zagreb",
       "Montaža i demontaža na lokaciji",
     ],
     price: "100",
@@ -73,7 +73,7 @@ export const napuhanci: Product[] = [
     ages: "3–12 godina",
     included: [
       "Najam napuhanca za cijeli dan (8h)",
-      "Besplatna dostava do 10km od Zagreba",
+      "Besplatna dostava do 15km od Arene Zagreb",
       "Montaža i demontaža na lokaciji",
     ],
     price: "100",
@@ -105,7 +105,7 @@ export const napuhanci: Product[] = [
     ages: "3–12 godina",
     included: [
       "Najam napuhanca za cijeli dan (8h)",
-      "Besplatna dostava do 10km od Zagreba",
+      "Besplatna dostava do 15km od Arene Zagreb",
       "Montaža i demontaža na lokaciji",
     ],
     price: "100",
@@ -133,7 +133,7 @@ export const napuhanci: Product[] = [
     ages: "3–12 godina",
     included: [
       "Najam napuhanca za cijeli dan (8h)",
-      "Besplatna dostava do 10km od Zagreba",
+      "Besplatna dostava do 15km od Arene Zagreb",
       "Montaža i demontaža na lokaciji",
     ],
     price: "100",
@@ -161,7 +161,7 @@ export const napuhanci: Product[] = [
     ages: "3–12 godina",
     included: [
       "Najam napuhanca za cijeli dan (8h)",
-      "Besplatna dostava do 10km od Zagreba",
+      "Besplatna dostava do 15km od Arene Zagreb",
       "Montaža i demontaža na lokaciji",
     ],
     price: "150",
