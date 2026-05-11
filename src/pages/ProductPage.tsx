@@ -270,7 +270,7 @@ const ProductPage = () => {
                     Dostava
                   </CardTitle>
                   <p className="font-bold text-foreground text-lg">
-                    Besplatno do 10km
+                    Besplatno do 15km
                   </p>
                 </CardContent>
               </Card>

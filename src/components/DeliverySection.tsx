@@ -1,6 +1,61 @@
 import { MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+const freeDeliveryAreas = [
+  "Novi Zagreb",
+  "Lanište",
+  "Blato",
+  "Remetinec",
+  "Kajzerica",
+  "Siget",
+  "Sopot",
+  "Središće",
+  "Utrina",
+  "Travno",
+  "Zapruđe",
+  "Dugave",
+  "Sveta Klara",
+  "Botinec",
+  "Odra",
+  "Buzin",
+  "Veliko Polje",
+  "Hrvatski Leskovac",
+  "Lučko",
+  "Demerje",
+  "Stupnik",
+  "Rakitje",
+  "Kerestinec",
+  "Sveta Nedelja",
+  "Brezovica",
+  "Jarun",
+  "Knežija",
+  "Srednjaci",
+  "Vrbani",
+  "Prečko",
+  "Špansko",
+  "Malešnica",
+  "Stenjevec",
+  "Vrapče",
+  "Črnomerec",
+  "Podsused",
+  "Trešnjevka",
+  "Trnje",
+  "Kruge",
+  "Savica",
+  "Centar (Donji Grad)",
+  "Maksimir",
+  "Peščenica",
+  "Dubrava",
+];
+
+const paidDeliveryAreas = [
+  "Velika Gorica",
+  "Samobor",
+  "Zaprešić",
+  "Sesvete",
+  "Ostala mjesta izvan 15 km",
+];
+
 const DeliverySection = () => {
   return (
     <section className="py-20 bg-background">
@@ -13,9 +68,9 @@ const DeliverySection = () => {
                 Dostavljamo u <span className="text-primary">Zagrebu</span> i okolici
               </h2>
             </div>
-            
+
             <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-              Naš tim brzo i sigurno dostavlja napuhance direktno na vašu lokaciju. Nudimo besplatnu dostavu unutar 10km, a za lokacije do 30km dostava je po dogovoru. Osobno preuzimanje je moguće u našoj garaži na adresi Lanište 26.
+              Naš tim brzo i sigurno dostavlja napuhance direktno na vašu lokaciju. Nudimo besplatnu dostavu unutar 15 km od Arene Zagreb, a za sve lokacije izvan tog radijusa dostava se naplaćuje 40€. Osobno preuzimanje je moguće u našoj garaži na adresi Lanište 26.
             </p>
 
             <div className="space-y-4 mb-8">
@@ -25,11 +80,43 @@ const DeliverySection = () => {
               </div>
               <div className="flex items-center justify-center lg:justify-start">
                 <MapPin className="h-5 w-5 text-primary mr-3" />
-                <span className="text-lg">Besplatna dostava do 10km</span>
+                <span className="text-lg">Besplatna dostava do 15 km od Arene Zagreb</span>
               </div>
               <div className="flex items-center justify-center lg:justify-start">
                 <MapPin className="h-5 w-5 text-primary mr-3" />
-                <span className="text-lg">Dostava do 30km po dogovoru</span>
+                <span className="text-lg">Izvan 15 km — dostava 40€</span>
+              </div>
+            </div>
+
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-foreground mb-3 text-center lg:text-left">
+                Besplatna dostava pokriva:
+              </h3>
+              <div className="flex flex-wrap gap-2 justify-center lg:justify-start">
+                {freeDeliveryAreas.map((area) => (
+                  <span
+                    key={area}
+                    className="inline-block bg-primary/10 text-primary text-sm font-medium px-3 py-1 rounded-full"
+                  >
+                    {area}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-foreground mb-3 text-center lg:text-left">
+                Dostava 40€:
+              </h3>
+              <div className="flex flex-wrap gap-2 justify-center lg:justify-start">
+                {paidDeliveryAreas.map((area) => (
+                  <span
+                    key={area}
+                    className="inline-block bg-muted text-muted-foreground text-sm font-medium px-3 py-1 rounded-full"
+                  >
+                    {area}
+                  </span>
+                ))}
               </div>
             </div>
 

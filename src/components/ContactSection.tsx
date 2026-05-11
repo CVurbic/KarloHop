@@ -182,7 +182,7 @@ const ContactSection = () => {
                     <div>
                       <h4 className="font-semibold text-foreground mb-1">Adresa</h4>
                       <p className="text-muted-foreground">Lanište 26, Zagreb</p>
-                      <p className="text-sm text-muted-foreground">Dostava do 30km</p>
+                      <p className="text-sm text-muted-foreground">Besplatna dostava do 15km</p>
                     </div>
                   </div>
 

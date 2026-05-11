@@ -89,7 +89,7 @@ const Footer = () => {
                 <MapPin className="h-4 w-4 text-primary mr-3 mt-1" />
                 <span className="text-background/80">
                   Lanište 26, Zagreb<br />
-                  Dostava do 30km
+                  Besplatna dostava do 15km
                 </span>
               </div>
             </div>

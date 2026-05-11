@@ -86,8 +86,8 @@ const ProductShowcase = () => {
                   Dimenzije: {product.dimensions}
                 </p>
                 <p className="text-xs text-muted-foreground/70 mb-4">
-                  *Cijena se odnosi na osobno preuzimanje po dogovoru ili dostavu do 10km
-                  udaljenosti
+                  *Cijena se odnosi na osobno preuzimanje po dogovoru ili dostavu do 15km
+                  od Arene Zagreb
                 </p>
                 <div className="flex items-center justify-between mb-3">
                   <div className="text-2xl font-bold text-primary">

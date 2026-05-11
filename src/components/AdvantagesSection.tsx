@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 const AdvantagesSection = () => {
   const advantages = [{
     title: "Besplatna dostava",
-    description: "Dostavljamo napuhance besplatno do 10km udaljenosti",
+    description: "Dostavljamo napuhance besplatno do 15km od Arene Zagreb",
     image: "/assets/mascot-delivery.webp",
     bgColor: "from-primary/10 to-primary/5"
   }, {
