@@ -1,5 +1,8 @@
+import { useState } from "react";
 import { MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+const MOBILE_VISIBLE_COUNT = 12;
 
 const freeDeliveryAreas = [
   "Novi Zagreb",
@@ -57,6 +60,9 @@ const paidDeliveryAreas = [
 ];
 
 const DeliverySection = () => {
+  const [showAllFreeAreas, setShowAllFreeAreas] = useState(false);
+  const hiddenFreeCount = freeDeliveryAreas.length - MOBILE_VISIBLE_COUNT;
+
   return (
     <section className="py-20 bg-background">
       <div className="container mx-auto px-4">
@@ -74,16 +80,16 @@ const DeliverySection = () => {
             </p>
 
             <div className="space-y-4 mb-8">
-              <div className="flex items-center justify-center lg:justify-start">
-                <MapPin className="h-5 w-5 text-primary mr-3" />
+              <div className="flex items-start justify-center lg:justify-start text-left">
+                <MapPin className="h-5 w-5 text-primary mr-3 mt-1 flex-shrink-0" />
                 <span className="text-lg">Montaža uračunata u cijenu</span>
               </div>
-              <div className="flex items-center justify-center lg:justify-start">
-                <MapPin className="h-5 w-5 text-primary mr-3" />
+              <div className="flex items-start justify-center lg:justify-start text-left">
+                <MapPin className="h-5 w-5 text-primary mr-3 mt-1 flex-shrink-0" />
                 <span className="text-lg">Besplatna dostava do 15 km od Arene Zagreb</span>
               </div>
-              <div className="flex items-center justify-center lg:justify-start">
-                <MapPin className="h-5 w-5 text-primary mr-3" />
+              <div className="flex items-start justify-center lg:justify-start text-left">
+                <MapPin className="h-5 w-5 text-primary mr-3 mt-1 flex-shrink-0" />
                 <span className="text-lg">Izvan 15 km — dostava 40€</span>
               </div>
             </div>
@@ -93,15 +99,29 @@ const DeliverySection = () => {
                 Besplatna dostava pokriva:
               </h3>
               <div className="flex flex-wrap gap-2 justify-center lg:justify-start">
-                {freeDeliveryAreas.map((area) => (
+                {freeDeliveryAreas.map((area, index) => (
                   <span
                     key={area}
-                    className="inline-block bg-primary/10 text-primary text-sm font-medium px-3 py-1 rounded-full"
+                    className={`inline-block bg-primary/10 text-primary text-sm font-medium px-3 py-1 rounded-full ${
+                      index >= MOBILE_VISIBLE_COUNT && !showAllFreeAreas
+                        ? "hidden lg:inline-block"
+                        : ""
+                    }`}
                   >
                     {area}
                   </span>
                 ))}
               </div>
+              {hiddenFreeCount > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setShowAllFreeAreas((v) => !v)}
+                  className="lg:hidden mt-3 text-sm font-semibold text-primary underline-offset-4 hover:underline mx-auto block"
+                  aria-expanded={showAllFreeAreas}
+                >
+                  {showAllFreeAreas ? "Sakrij" : `Prikaži sve (+${hiddenFreeCount})`}
+                </button>
+              )}
             </div>
 
             <div className="mb-8">
