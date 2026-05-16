@@ -15,6 +15,51 @@ export interface BlogPost {
   scheduled_at: string | null;
   created_at: string | null;
   updated_at: string | null;
+  ai_generated?: boolean;
+  topic_id?: string | null;
+}
+
+export function useTopicQueueStats() {
+  return useQuery({
+    queryKey: ["blog-topic-queue", "stats"],
+    queryFn: async () => {
+      const { data, error } = await (supabase as unknown as {
+        from: (t: string) => { select: (s: string) => Promise<{ data: Array<{ id: string; used: boolean }> | null; error: unknown }> };
+      })
+        .from("blog_topic_queue")
+        .select("id, used");
+      if (error) throw error as Error;
+      const rows = data || [];
+      return {
+        total: rows.length,
+        remaining: rows.filter((r) => !r.used).length,
+      };
+    },
+  });
+}
+
+export function useGenerateAiPost() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke(
+        "generate-weekly-blog",
+        { body: {} }
+      );
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      return data as {
+        success: boolean;
+        post: { id: string; slug: string; title: string };
+        topic: { id: string; topic_title: string };
+      };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["blog-posts"] });
+      queryClient.invalidateQueries({ queryKey: ["blog-topic-queue"] });
+    },
+  });
 }
 
 // Fetch all published posts (public) - includes scheduled posts whose time has passed
