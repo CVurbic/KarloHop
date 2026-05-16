@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
-import { Plus, Edit, Trash2, Eye } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Plus, Edit, Trash2, Eye, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -21,13 +21,38 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useAllPosts, useDeletePost } from "@/hooks/useBlogPosts";
+import {
+  useAllPosts,
+  useDeletePost,
+  useGenerateAiPost,
+  useTopicQueueStats,
+} from "@/hooks/useBlogPosts";
 import { useToast } from "@/hooks/use-toast";
 
 const BlogManager = () => {
   const { data: posts, isLoading } = useAllPosts();
+  const { data: queueStats } = useTopicQueueStats();
   const deletePost = useDeletePost();
+  const generateAi = useGenerateAiPost();
   const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const handleGenerate = async () => {
+    try {
+      const result = await generateAi.mutateAsync();
+      toast({
+        title: "AI članak je spreman kao skica",
+        description: `"${result.post.title}" - otvorite i pregledajte prije objave.`,
+      });
+      navigate(`/hop-upravljanje/clanci/${result.post.id}`);
+    } catch (e) {
+      toast({
+        title: "Greška pri generiranju",
+        description: (e as Error).message,
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleDelete = async (id: string) => {
     try {
@@ -57,14 +82,39 @@ const BlogManager = () => {
           <h1 className="text-2xl font-bold text-foreground">Članci</h1>
           <p className="text-muted-foreground text-sm mt-1">
             Upravljajte blog člancima za "Savjeti i ideje"
+            {queueStats && (
+              <span className="ml-2 text-xs">
+                · {queueStats.remaining}/{queueStats.total} AI tema preostalo
+              </span>
+            )}
           </p>
         </div>
-        <Link to="/hop-upravljanje/clanci/novi">
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            Novi članak
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Button
+            variant="outline"
+            className="gap-2"
+            onClick={handleGenerate}
+            disabled={generateAi.isPending || queueStats?.remaining === 0}
+            title={
+              queueStats?.remaining === 0
+                ? "Nema više tema u redu - dodajte nove u blog_topic_queue"
+                : "Generiraj novu skicu pomoću AI-ja"
+            }
+          >
+            {generateAi.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Sparkles className="h-4 w-4" />
+            )}
+            {generateAi.isPending ? "Generiram..." : "Generiraj AI članak"}
           </Button>
-        </Link>
+          <Link to="/hop-upravljanje/clanci/novi">
+            <Button className="gap-2 w-full">
+              <Plus className="h-4 w-4" />
+              Novi članak
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {isLoading ? (
@@ -96,7 +146,21 @@ const BlogManager = () => {
             <TableBody>
               {posts.map((post) => (
                 <TableRow key={post.id}>
-                  <TableCell className="font-medium">{post.title}</TableCell>
+                  <TableCell className="font-medium">
+                    <div className="flex items-center gap-2">
+                      <span>{post.title}</span>
+                      {post.ai_generated && (
+                        <Badge
+                          variant="outline"
+                          className="gap-1 text-xs bg-purple-50 text-purple-700 border-purple-200"
+                          title="Generirano pomoću AI-ja"
+                        >
+                          <Sparkles className="h-3 w-3" />
+                          AI
+                        </Badge>
+                      )}
+                    </div>
+                  </TableCell>
                   <TableCell>
                     <Badge
                       variant={
