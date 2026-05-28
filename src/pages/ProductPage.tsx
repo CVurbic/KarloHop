@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import BookingSection from "@/components/BookingSection";
 import Footer from "@/components/Footer";
-import WhatsAppButton from "@/components/WhatsAppButton";
+import MrHopChat from "@/components/MrHopChat";
 import { useEffect } from "react";
 import { useProductBySlug, usePublishedProducts } from "@/hooks/useProducts";
 import ProductSticker from "@/components/ProductSticker";
@@ -408,7 +408,7 @@ const ProductPage = () => {
         </section>
 
         <Footer />
-        <WhatsAppButton />
+        <MrHopChat />
       </div>
     </>
   );
