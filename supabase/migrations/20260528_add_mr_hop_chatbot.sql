@@ -11,6 +11,8 @@ ALTER TABLE bookings ADD COLUMN IF NOT EXISTS source text NOT NULL DEFAULT 'form
 
 -- Keep chatbot bookings as 'pending' (the team confirms them by phone),
 -- while form bookings keep their existing auto-confirm behaviour.
+-- Based on the latest normalize_booking (see 20260509_add_super_mario_product.sql):
+-- preserves Super Mario name mapping and per-bouncer price defaults.
 CREATE OR REPLACE FUNCTION normalize_booking()
 RETURNS trigger
 LANGUAGE plpgsql
@@ -25,14 +27,21 @@ BEGIN
         NEW.selected_bounce_house := 'Dino Park';
       WHEN 'jednorog', 'jednorog-svijet', 'jednorog svijet', 'unicorn' THEN
         NEW.selected_bounce_house := 'Jednorog';
+      WHEN 'super mario', 'super-mario', 'mario', 'super mario tobogan', 'super-mario-tobogan' THEN
+        NEW.selected_bounce_house := 'Super Mario';
       ELSE
+        -- leave as-is if already correct or unknown
         NULL;
     END CASE;
   END IF;
 
-  -- Set default price to 100 if not provided
+  -- Set default price based on bouncer when not provided
   IF NEW.price IS NULL THEN
-    NEW.price := 100;
+    IF NEW.selected_bounce_house = 'Super Mario' THEN
+      NEW.price := 150;
+    ELSE
+      NEW.price := 100;
+    END IF;
   END IF;
 
   -- Form bookings auto-confirm; chatbot bookings stay 'pending' for review.
