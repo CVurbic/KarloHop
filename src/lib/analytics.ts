@@ -36,4 +36,18 @@ export const analytics = {
       click_location: location,
     });
   },
+
+  trackChatOpen: () => {
+    trackEvent("mr_hop_open", {
+      event_category: "engagement",
+    });
+  },
+
+  trackChatBooking: (bounceHouse: string, date: string) => {
+    trackEvent("mr_hop_booking", {
+      event_category: "engagement",
+      bounce_house_type: bounceHouse,
+      booking_date: date,
+    });
+  },
 };

@@ -1,1 +1,5 @@
 project_id = "egwtrsfcobwybcnbqsok"
+
+# Mr. Hop chatbot is a public endpoint (anonymous visitors), so no JWT required.
+[functions.mr-hop-chat]
+verify_jwt = false

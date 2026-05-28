@@ -8,7 +8,7 @@ import BookingSection from "@/components/BookingSection";
 import FAQSection from "@/components/FAQSection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
-import WhatsAppButton from "@/components/WhatsAppButton";
+import MrHopChat from "@/components/MrHopChat";
 
 const Index = () => {
   return (
@@ -23,7 +23,7 @@ const Index = () => {
       <FAQSection />
       <ContactSection />
       <Footer />
-      <WhatsAppButton />
+      <MrHopChat />
     </div>
   );
 };
