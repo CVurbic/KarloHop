@@ -3,7 +3,7 @@ import { MessageCircle, X, Send, Loader2, Phone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { analytics } from "@/lib/analytics";
 
-const AVATAR_SRC = "/assets/mr-hop.png";
+const AVATAR_SRC = "/assets/ZEKO%209.1.png";
 const AVATAR_FALLBACK = "/assets/rezervacije-2.webp";
 const PHONE_DISPLAY = "095 865 5213";
 const WHATSAPP_URL =
