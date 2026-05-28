@@ -21,6 +21,7 @@ const BlogManager = lazy(() => import("./components/admin/BlogManager"));
 const BlogEditorPage = lazy(() => import("./components/admin/BlogEditor"));
 const ProductManager = lazy(() => import("./components/admin/ProductManager"));
 const ProductEditorPage = lazy(() => import("./components/admin/ProductEditor"));
+const ChatLogManager = lazy(() => import("./components/admin/ChatLogManager"));
 
 const queryClient = new QueryClient();
 
@@ -52,6 +53,7 @@ const App = () => (
               >
                 <Route path="pregled" element={<Suspense fallback={<PageLoader />}><DashboardHome /></Suspense>} />
                 <Route path="rezervacije" element={<Suspense fallback={<PageLoader />}><BookingManager /></Suspense>} />
+                <Route path="razgovori" element={<Suspense fallback={<PageLoader />}><ChatLogManager /></Suspense>} />
                 <Route path="prihodi" element={<Suspense fallback={<PageLoader />}><RevenueView /></Suspense>} />
                 <Route path="troskovi" element={<Suspense fallback={<PageLoader />}><ExpenseManager /></Suspense>} />
                 <Route path="clanci" element={<Suspense fallback={<PageLoader />}><BlogManager /></Suspense>} />
