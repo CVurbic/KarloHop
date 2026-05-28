@@ -362,7 +362,7 @@ serve(async (req) => {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     // ---- Parse + validate input ----
-    let payload: { messages?: ChatMessage[]; isPreview?: boolean };
+    let payload: { messages?: ChatMessage[]; isPreview?: boolean; conversationId?: string };
     try {
       payload = await req.json();
     } catch {
@@ -464,6 +464,34 @@ serve(async (req) => {
 
     if (!finalText) {
       finalText = "Oprostite, možete li ponoviti pitanje? Rado pomažem oko napuhanaca i rezervacija.";
+    }
+
+    // ---- Persist conversation log (best-effort; never breaks the chat) ----
+    try {
+      const conversationId = typeof payload.conversationId === "string"
+        ? payload.conversationId.trim()
+        : "";
+      if (/^[0-9a-fA-F-]{36}$/.test(conversationId)) {
+        const transcript = [
+          ...messages.map((m) => ({ role: m.role, content: m.content })),
+          { role: "assistant", content: finalText },
+        ];
+        await supabase.from("mr_hop_chat_logs").upsert(
+          {
+            conversation_id: conversationId,
+            transcript,
+            message_count: transcript.length,
+            booking: bookingCreated ?? null,
+            booking_created: Boolean(bookingCreated),
+            is_test: isPreview,
+            ip,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "conversation_id" },
+        );
+      }
+    } catch (logErr) {
+      console.error("mr-hop-chat log error:", logErr);
     }
 
     return json({ reply: finalText, bookingCreated });

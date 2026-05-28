@@ -54,6 +54,12 @@ const MrHopChat = () => {
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  // Stable id for this conversation so the backend can keep one log row per chat.
+  const conversationId = useRef(
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+  );
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -85,7 +91,11 @@ const MrHopChat = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke("mr-hop-chat", {
-        body: { messages: apiMessages, isPreview: isPreviewEnv() },
+        body: {
+          messages: apiMessages,
+          isPreview: isPreviewEnv(),
+          conversationId: conversationId.current,
+        },
       });
 
       if (error) throw error;

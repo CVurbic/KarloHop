@@ -122,6 +122,45 @@ export type Database = {
         }
         Relationships: []
       }
+      mr_hop_chat_logs: {
+        Row: {
+          id: string
+          conversation_id: string
+          transcript: Json
+          message_count: number
+          booking: Json | null
+          booking_created: boolean
+          is_test: boolean
+          ip: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          conversation_id: string
+          transcript?: Json
+          message_count?: number
+          booking?: Json | null
+          booking_created?: boolean
+          is_test?: boolean
+          ip?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          conversation_id?: string
+          transcript?: Json
+          message_count?: number
+          booking?: Json | null
+          booking_created?: boolean
+          is_test?: boolean
+          ip?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       settings: {
         Row: {
           key: string

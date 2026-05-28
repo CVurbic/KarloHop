@@ -3,3 +3,8 @@ project_id = "egwtrsfcobwybcnbqsok"
 # Mr. Hop chatbot is a public endpoint (anonymous visitors), so no JWT required.
 [functions.mr-hop-chat]
 verify_jwt = false
+
+# Daily chat digest is triggered by pg_cron and authorises itself with an
+# in-DB shared secret (x-digest-secret header), so no JWT is required.
+[functions.send-chat-digest]
+verify_jwt = false
