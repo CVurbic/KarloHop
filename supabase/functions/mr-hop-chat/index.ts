@@ -40,16 +40,34 @@ interface ChatMessage {
 // ---------------------------------------------------------------------------
 // Knowledge base — single source of truth for what Mr. Hop knows.
 // ---------------------------------------------------------------------------
+// `name` MUST match the value stored in bookings.selected_bounce_house
+// (the same canonical value the booking form submits + normalize_booking trigger).
+// `label` is the friendly display name shown to users.
 const PRODUCTS = [
-  { name: "Jednorog svijet", dim: "5,5 x 4,5 x 4,5 m", price: 100 },
-  { name: "Minecraft Party", dim: "5,5 x 4,5 x 4,5 m", price: 100 },
-  { name: "Dino Park", dim: "5,5 x 4 x 4,5 m", price: 100 },
-  { name: "Paw Patrol", dim: "5 x 5 x 4 m", price: 100 },
-  { name: "Super Mario", dim: "7 x 4,2 x 6 m", price: 150 },
+  { name: "Jednorog", label: "Jednorog svijet", dim: "5,5 x 4,5 x 4,5 m", price: 100 },
+  { name: "Minecraft Party", label: "Minecraft party", dim: "5,5 x 4,5 x 4,5 m", price: 100 },
+  { name: "Dino Park", label: "Dino park", dim: "5,5 x 4 x 4,5 m", price: 100 },
+  { name: "Paw Patrol", label: "Paw Patrol avantura", dim: "5 x 5 x 4 m", price: 100 },
+  { name: "Super Mario", label: "Super Mario Tobogan", dim: "7 x 4,2 x 6 m", price: 150 },
 ];
 
-// Valid booking values for selected_bounce_house (match DB normalize_booking).
-const VALID_HOUSES = PRODUCTS.map((p) => p.name);
+// Friendly names offered to the model; always resolved to canonical before any DB use.
+const HOUSE_LABELS = PRODUCTS.map((p) => p.label);
+
+// Resolve any user/model-provided name to the canonical bookings value.
+function toCanonicalHouse(input: string | undefined): string | null {
+  const s = (input ?? "").trim().toLowerCase();
+  if (!s) return null;
+  for (const p of PRODUCTS) {
+    if (s === p.name.toLowerCase() || s === p.label.toLowerCase()) return p.name;
+  }
+  if (s.includes("jednorog") || s.includes("unicorn")) return "Jednorog";
+  if (s.includes("minecraft")) return "Minecraft Party";
+  if (s.includes("dino")) return "Dino Park";
+  if (s.includes("paw")) return "Paw Patrol";
+  if (s.includes("mario")) return "Super Mario";
+  return null;
+}
 
 const FREE_DELIVERY_AREAS = [
   "Novi Zagreb", "Lanište", "Blato", "Remetinec", "Kajzerica", "Siget",
@@ -67,7 +85,7 @@ const PAID_DELIVERY_AREAS = [
 
 function buildSystemPrompt(isPreview: boolean): string {
   const productLines = PRODUCTS.map(
-    (p) => `- ${p.name}: dimenzije ${p.dim} (duljina x širina x visina), do 6 djece istovremeno, dob 3–12 godina, cijena ${p.price}€/dan.`,
+    (p) => `- ${p.label}: dimenzije ${p.dim} (duljina x širina x visina), do 6 djece istovremeno, dob 3–12 godina, cijena ${p.price}€/dan.`,
   ).join("\n");
 
   return `Ti si "Mr. Hop", ljubazni i veseli pomoćnik za rezervacije tvrtke Hop Hop Napuhanci (najam napuhanaca u Zagrebu i okolici). Pomažeš roditeljima oko pitanja i rezervacija napuhanaca.
@@ -132,7 +150,7 @@ const TOOLS = [
       properties: {
         bounce_house: {
           type: "string",
-          enum: VALID_HOUSES,
+          enum: HOUSE_LABELS,
           description: "Naziv napuhanca.",
         },
         date: {
@@ -161,7 +179,7 @@ const TOOLS = [
         date: { type: "string", description: "Datum u formatu YYYY-MM-DD." },
         bounce_house: {
           type: "string",
-          enum: VALID_HOUSES,
+          enum: HOUSE_LABELS,
           description: "Naziv napuhanca.",
         },
         notes: { type: "string", description: "Dodatne napomene (neobavezno)." },
@@ -189,10 +207,10 @@ async function runCheckAvailability(
   supabase: ServiceClient,
   input: { bounce_house?: string; date?: string },
 ): Promise<string> {
-  const house = input.bounce_house ?? "";
+  const house = toCanonicalHouse(input.bounce_house);
   const date = input.date ?? "";
-  if (!VALID_HOUSES.includes(house)) {
-    return `Nepoznat napuhanac. Dostupni su: ${VALID_HOUSES.join(", ")}.`;
+  if (!house) {
+    return `Nepoznat napuhanac. Dostupni su: ${HOUSE_LABELS.join(", ")}.`;
   }
   if (!isValidDate(date)) {
     return "Datum nije valjan ili je u prošlosti. Zatraži ispravan datum (YYYY-MM-DD) u budućnosti.";
@@ -216,11 +234,11 @@ async function runCreateBooking(
   input: Record<string, string>,
   isPreview: boolean,
 ): Promise<{ result: string; booking?: unknown }> {
-  const house = input.bounce_house ?? "";
+  const house = toCanonicalHouse(input.bounce_house);
   const date = input.date ?? "";
 
-  if (!VALID_HOUSES.includes(house)) {
-    return { result: `Nepoznat napuhanac. Dostupni su: ${VALID_HOUSES.join(", ")}.` };
+  if (!house) {
+    return { result: `Nepoznat napuhanac. Dostupni su: ${HOUSE_LABELS.join(", ")}.` };
   }
   if (!isValidDate(date)) {
     return { result: "Datum nije valjan ili je u prošlosti. Zatraži ispravan datum." };
