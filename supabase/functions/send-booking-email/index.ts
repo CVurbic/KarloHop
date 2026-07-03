@@ -165,7 +165,7 @@ function buildCustomerEmailHtml(data: CustomerEmailData): string {
           <td style="padding:30px 40px 10px;">
             <p style="font-size:16px;color:#1b2a4a;margin:0;">Po\u0161tovani/a <strong>${data.safeName}</strong>,</p>
             <p style="font-size:14px;color:#555;margin:12px 0 0;line-height:1.6;">
-              Primili smo va\u0161u rezervaciju i uskoro \u0107emo vas kontaktirati radi potvrde termina i dogovora oko dostave.
+              Primili smo va\u0161u rezervaciju. Javit \u0107emo vam se samo ukoliko budu potrebni dodatni detalji \u2014 u suprotnom je rezervacija zaprimljena i termin dogovoren prema odabranom datumu.
             </p>
           </td>
         </tr>
@@ -200,9 +200,9 @@ function buildCustomerEmailHtml(data: CustomerEmailData): string {
           <td style="padding:0 40px 20px;">
             <h3 style="font-size:15px;color:#1b2a4a;margin:0 0 12px;">Sljede\u0107i koraci:</h3>
             <table cellpadding="0" cellspacing="0" style="font-size:14px;color:#555;">
-              <tr><td style="padding:4px 0;">1. Kontaktirat \u0107emo vas telefonom radi potvrde</td></tr>
-              <tr><td style="padding:4px 0;">2. Dogovorit \u0107emo to\u010Dno vrijeme dostave</td></tr>
-              <tr><td style="padding:4px 0;">3. Dostavit \u0107emo i postaviti napuhanac na va\u0161u lokaciju</td></tr>
+              <tr><td style="padding:4px 0;">1. Dovozimo i postavljamo napuhanac ujutro, izme\u0111u 08:00 i 11:00</td></tr>
+              <tr><td style="padding:4px 0;">2. Odvozimo i demontiramo napuhanac od 19:00 nadalje</td></tr>
+              <tr><td style="padding:4px 0;">3. Ako budu potrebni dodatni detalji, javit \u0107emo vam se prije termina</td></tr>
             </table>
           </td>
         </tr>

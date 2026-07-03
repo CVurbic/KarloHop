@@ -100,7 +100,7 @@ function buildSystemPrompt(isPreview: boolean): string {
 
 # Podaci o napuhancima
 ${productLines}
-Najam traje cijeli dan (oko 8 sati). U cijenu su uključeni dostava (vidi zone niže), montaža i demontaža te osnovno čišćenje.
+Napuhanac se iznajmljuje na jedan dan (vidi termine dovoza/odvoza niže). U cijenu su uključeni dostava (vidi zone niže), montaža i demontaža te osnovno čišćenje.
 
 # Potreban prostor
 Kad te pitaju koliko prostora treba, navedi TOČNE dimenzije traženog napuhanca i savjetuj da se oko njega ostavi dodatni slobodni prostor, a POGOTOVO IZA napuhanca (zbog tobogana i puhala/ventilatora) — prostor iza je važniji nego sa strana. Teren neka bude ravan (trava ili beton), bez oštrih predmeta i prepreka, s pristupom struji u blizini. Za unutarnju upotrebu potrebna je visina stropa barem 4 m. Nemoj izmišljati točan broj metara razmaka — reci da kod nestandardnih ili skučenih lokacija slobodno provjere s nama.
@@ -117,7 +117,7 @@ Kad te pitaju koliko prostora treba, navedi TOČNE dimenzije traženog napuhanca
 
 # Termini (dovoz i prikupljanje)
 - Dovoz, postavljanje i montaža napuhanca odvijaju se ujutro, otprilike između 8:00 i 11:00.
-- Prikupljanje (demontaža i odvoz) je navečer, od 20:00 nadalje.
+- Prikupljanje (demontaža i odvoz) je navečer, od 19:00 nadalje.
 
 # Plaćanje i uvjeti
 - Plaćanje: gotovina, bankovni prijenos ili kartica. Plaća se prije istovara na lokaciji ili pri preuzimanju u garaži.
@@ -132,7 +132,7 @@ Možeš stvarno napraviti rezervaciju, ali uz STROGA pravila:
 - Prije nego pozoveš alat za rezervaciju, sažmi sve podatke korisniku i pitaj za izričitu potvrdu.
 - Uvijek prvo provjeri dostupnost alatom "check_availability" za traženi datum i napuhanac.
 - Ako je termin zauzet, ispričaj se i predloži drugi datum.
-- Nakon uspješne rezervacije reci korisniku da je zahtjev ZAPRIMLJEN i da je status "na čekanju" te da ćemo ga nazvati radi potvrde. Rezervacija nije konačna dok je ne potvrdimo.
+- Nakon uspješne rezervacije reci korisniku da je zahtjev ZAPRIMLJEN te da ćemo ga kontaktirati SAMO ukoliko budu potrebni dodatni detalji — inače je rezervacija prihvaćena i nema potrebe za daljnjom potvrdom.
 - Ako korisnik želi razgovor s osobom, uputi ga na telefon 095 865 5213 ili WhatsApp.
 ${isPreview ? "\n# Napomena: trenutno radiš u TESTNOM (preview) okruženju. Rezervacije napravljene ovdje označavaju se kao test i ne smatraju se pravima." : ""}`;
 }
@@ -289,7 +289,7 @@ async function runCreateBooking(
   }
 
   return {
-    result: `USPJEH: rezervacija zaprimljena (status: na čekanju). ${house} za ${date}. Reci korisniku da ćemo ga nazvati radi potvrde.`,
+    result: `USPJEH: rezervacija zaprimljena. ${house} za ${date}. Reci korisniku da je rezervacija zaprimljena i da ćemo ga kontaktirati samo ukoliko budu potrebni dodatni detalji.`,
     booking: data,
   };
 }

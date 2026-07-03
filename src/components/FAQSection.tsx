@@ -8,7 +8,7 @@ const FAQSection = () => {
     },
     {
       question: "Kako ranije napraviti rezervaciju i koliko unaprijed?",
-      answer: "Preporučujemo da rezervirate barem 2-4 tjedna unaprijed, osobito za vikende i visoku sezonu (svibanj – rujan). Kako bismo osigurali napuhanac za vaš termin, potrebno je potvrditi svoju rezervaciju prilikom poziva ili poruke nakon online zahtjeva. Cjelokupan iznos plaća se na dan preuzimanja napuhanca gotovinom, bankovnim prijenosom ili kartično."
+      answer: "Preporučujemo da rezervirate barem 2-4 tjedna unaprijed, osobito za vikende i visoku sezonu (svibanj – rujan). Vaša rezervacija je zaprimljena čim ispunite online zahtjev — javit ćemo vam se samo ukoliko budu potrebni dodatni detalji. Cjelokupan iznos plaća se online uz zahtjev linka za plaćanje ili na licu mjesta prilikom preuzimanja (gotovinom, bankovnim prijenosom ili karticom)."
     },
     {
       question: "Na koje lokacije dostavljamo napuhance?",
@@ -16,7 +16,7 @@ const FAQSection = () => {
     },
     {
       question: "Koliko dugo traje najam i mogu li produžiti vrijeme najma?",
-      answer: "Standardni najam traje 8 sati (npr. 10.00-18.00). Produženje najma moguće je i na drugi dan uz 50% uštede. U tom slučaju dolazimo drugi dan predvečer po napuhanac."
+      answer: "Dovoz je ujutro između 08:00 i 11:00, a odvoz i demontaža su od 19:00 nadalje. Produženje najma moguće je i na drugi dan uz 50% uštede. U tom slučaju dolazimo drugi dan predvečer po napuhanac."
     },
     {
       question: "Koje su sigurnosne mjere za napuhance?",
@@ -44,7 +44,7 @@ const FAQSection = () => {
     },
     {
       question: "Kako se odvija plaćanje i otkazivanje?",
-      answer: "Plaćanje se može izvršiti bankovnim prijenosom, gotovinom ili putem kartice (ovisno o dogovoru). Plaćanje se odvija prije istovara napuhanca na lokaciji ili prilikom preuzimanja u našoj garaži na adresi Lanište 26."
+      answer: "Plaćanje je moguće online, uz zahtjev linka za plaćanje, ili na licu mjesta prilikom preuzimanja napuhanca (gotovinom, bankovnim prijenosom ili karticom) — na lokaciji dostave ili u našoj garaži na adresi Lanište 26."
     },
     {
       question: "Mogu li vidjeti više o napuhancima i rezervacijama?",

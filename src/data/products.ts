@@ -40,7 +40,7 @@ export const napuhanci: Product[] = [
     capacity: "Do 6 djece istovremeno",
     ages: "3–12 godina",
     included: [
-      "Najam napuhanca za cijeli dan (8h)",
+      "Dovoz ujutro (08:00–11:00), odvoz i demontaža od 19:00 nadalje",
       "Besplatna dostava do 15km od Arene Zagreb",
       "Montaža i demontaža na lokaciji",
     ],
@@ -72,7 +72,7 @@ export const napuhanci: Product[] = [
     capacity: "Do 6 djece istovremeno",
     ages: "3–12 godina",
     included: [
-      "Najam napuhanca za cijeli dan (8h)",
+      "Dovoz ujutro (08:00–11:00), odvoz i demontaža od 19:00 nadalje",
       "Besplatna dostava do 15km od Arene Zagreb",
       "Montaža i demontaža na lokaciji",
     ],
@@ -104,7 +104,7 @@ export const napuhanci: Product[] = [
     capacity: "Do 6 djece istovremeno",
     ages: "3–12 godina",
     included: [
-      "Najam napuhanca za cijeli dan (8h)",
+      "Dovoz ujutro (08:00–11:00), odvoz i demontaža od 19:00 nadalje",
       "Besplatna dostava do 15km od Arene Zagreb",
       "Montaža i demontaža na lokaciji",
     ],
@@ -132,7 +132,7 @@ export const napuhanci: Product[] = [
     capacity: "Do 6 djece istovremeno",
     ages: "3–12 godina",
     included: [
-      "Najam napuhanca za cijeli dan (8h)",
+      "Dovoz ujutro (08:00–11:00), odvoz i demontaža od 19:00 nadalje",
       "Besplatna dostava do 15km od Arene Zagreb",
       "Montaža i demontaža na lokaciji",
     ],
@@ -160,7 +160,7 @@ export const napuhanci: Product[] = [
     capacity: "Do 6 djece istovremeno",
     ages: "3–12 godina",
     included: [
-      "Najam napuhanca za cijeli dan (8h)",
+      "Dovoz ujutro (08:00–11:00), odvoz i demontaža od 19:00 nadalje",
       "Besplatna dostava do 15km od Arene Zagreb",
       "Montaža i demontaža na lokaciji",
     ],

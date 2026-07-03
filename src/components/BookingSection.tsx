@@ -172,8 +172,8 @@ const BookingSection = () => {
       }
 
       toast({
-        title: "🎉 Rezervacija uspješno poslana!",
-        description: "Vaša rezervacija je uspješno zabilježena. Kontaktirat ćemo Vas uskoro.",
+        title: "🎉 Rezervacija zaprimljena!",
+        description: "Vaša rezervacija je uspješno zaprimljena. Javit ćemo vam se samo ukoliko budu potrebni dodatni detalji.",
         className: "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 max-w-md",
       });
 
