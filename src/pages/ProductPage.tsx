@@ -1,6 +1,6 @@
 import { useParams, Link, Navigate, useLocation } from "react-router-dom";
 import { napuhanci } from "@/data/products";
-import { ArrowLeft, Ruler, Baby, CheckCircle, Phone, Clock, Truck } from "lucide-react";
+import { ArrowLeft, Ruler, Baby, CheckCircle, Phone, Clock, Truck, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import BookingSection from "@/components/BookingSection";
@@ -254,10 +254,10 @@ const ProductPage = () => {
                     <Clock className="h-7 w-7 text-warning" />
                   </div>
                   <CardTitle className="text-sm text-muted-foreground mb-1">
-                    Trajanje najma
+                    Dovoz i odvoz
                   </CardTitle>
                   <p className="font-bold text-foreground text-lg">
-                    8 sati / dan
+                    08:00–11:00 / od 19:00
                   </p>
                 </CardContent>
               </Card>
@@ -291,6 +291,28 @@ const ProductPage = () => {
                     <span className="text-foreground">{item}</span>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            {/* Delivery & Payment Info */}
+            <div className="max-w-2xl mx-auto mt-6 grid sm:grid-cols-2 gap-4">
+              <div className="bg-primary/5 border border-primary/10 rounded-xl p-5">
+                <h4 className="font-bold text-foreground mb-2 flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-primary" />
+                  Dovoz i odvoz
+                </h4>
+                <p className="text-muted-foreground text-sm">
+                  Dovoz je ujutro između 08:00 i 11:00, a odvoz i demontaža su od 19:00 nadalje.
+                </p>
+              </div>
+              <div className="bg-accent/5 border border-accent/10 rounded-xl p-5">
+                <h4 className="font-bold text-foreground mb-2 flex items-center gap-2">
+                  <CreditCard className="h-5 w-5 text-accent" />
+                  Plaćanje
+                </h4>
+                <p className="text-muted-foreground text-sm">
+                  Plaćanje je moguće online uz zahtjev linka za plaćanje, ili na licu mjesta prilikom preuzimanja napuhanca.
+                </p>
               </div>
             </div>
           </div>

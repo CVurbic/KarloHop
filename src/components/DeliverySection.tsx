@@ -92,6 +92,10 @@ const DeliverySection = () => {
                 <MapPin className="h-5 w-5 text-primary mr-3 mt-1 flex-shrink-0" />
                 <span className="text-lg">Izvan 15 km — dostava 40€</span>
               </div>
+              <div className="flex items-start justify-center lg:justify-start text-left">
+                <MapPin className="h-5 w-5 text-primary mr-3 mt-1 flex-shrink-0" />
+                <span className="text-lg">Dovoz ujutro 08:00–11:00, odvoz i demontaža od 19:00 nadalje</span>
+              </div>
             </div>
 
             <div className="mb-8">
