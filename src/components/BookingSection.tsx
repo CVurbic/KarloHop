@@ -11,7 +11,9 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { analytics } from "@/lib/analytics";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { loadGoogleMaps } from "@/lib/googleMaps";
+import LocationConfirmDialog from "@/components/LocationConfirmDialog";
 
 // Form validation schema
 const formSchema = z.object({
@@ -47,6 +49,11 @@ const BookingSection = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [availabilityStatus, setAvailabilityStatus] = useState<string>("");
   const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
+
+  const addressInputRef = useRef<HTMLInputElement | null>(null);
+  const [pendingPlace, setPendingPlace] = useState<{ address: string; lat: number; lng: number } | null>(null);
+  // ponytail: lat/lng captured client-side and ready to send once `bookings` has the columns; not sent to create_public_booking yet
+  const confirmedLocationRef = useRef<{ lat: number; lng: number } | null>(null);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -99,6 +106,42 @@ const BookingSection = () => {
 
     checkAvailability();
   }, [selectedDate, selectedBounceHouse]);
+
+  useEffect(() => {
+    let autocomplete: google.maps.places.Autocomplete | null = null;
+
+    loadGoogleMaps().then((g) => {
+      if (!addressInputRef.current) return;
+
+      autocomplete = new g.maps.places.Autocomplete(addressInputRef.current, {
+        fields: ["formatted_address", "geometry"],
+        componentRestrictions: { country: "hr" },
+      });
+
+      autocomplete.addListener("place_changed", () => {
+        const place = autocomplete!.getPlace();
+        const location = place.geometry?.location;
+        if (!location || !place.formatted_address) return;
+
+        confirmedLocationRef.current = null;
+        setPendingPlace({
+          address: place.formatted_address,
+          lat: location.lat(),
+          lng: location.lng(),
+        });
+      });
+    });
+
+    return () => {
+      if (autocomplete) google.maps.event.clearInstanceListeners(autocomplete);
+    };
+  }, []);
+
+  const handleLocationConfirm = (address: string, lat: number, lng: number) => {
+    confirmedLocationRef.current = { lat, lng };
+    form.setValue("delivery_address", address, { shouldValidate: true });
+    setPendingPlace(null);
+  };
 
   const onSubmit = async (values: FormData) => {
     setIsSubmitting(true);
@@ -305,7 +348,14 @@ const BookingSection = () => {
                                 Lokacija dostave
                               </FormLabel>
                               <FormControl>
-                                <Input placeholder="Adresa za dostavu" {...field} />
+                                <Input
+                                  placeholder="Počnite tipkati adresu..."
+                                  {...field}
+                                  ref={(el) => {
+                                    field.ref(el);
+                                    addressInputRef.current = el;
+                                  }}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -460,6 +510,17 @@ const BookingSection = () => {
           </div>
         </div>
       </div>
+
+      {pendingPlace && (
+        <LocationConfirmDialog
+          open={!!pendingPlace}
+          onOpenChange={(open) => !open && setPendingPlace(null)}
+          address={pendingPlace.address}
+          lat={pendingPlace.lat}
+          lng={pendingPlace.lng}
+          onConfirm={handleLocationConfirm}
+        />
+      )}
     </section>
   );
 };
