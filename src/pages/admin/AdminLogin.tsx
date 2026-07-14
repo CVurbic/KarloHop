@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAdmin } from "@/hooks/useAdmin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,14 +12,17 @@ const AdminLogin = () => {
   const [submitting, setSubmitting] = useState(false);
   const { signIn, isAdmin, loading, user } = useAdmin();
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
 
   // Redirect once admin status is confirmed (works for both fresh login and already logged in)
+  // Ako je stiglo s /radnik (ili druge zasticene rute) preko ProtectedRoute, vrati se tamo.
   useEffect(() => {
     if (!loading && isAdmin) {
-      navigate("/hop-upravljanje/clanci", { replace: true });
+      const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname;
+      navigate(from ?? "/hop-upravljanje/clanci", { replace: true });
     }
-  }, [loading, isAdmin, navigate]);
+  }, [loading, isAdmin, navigate, location.state]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

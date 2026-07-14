@@ -1,8 +1,9 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAdmin } from "@/hooks/useAdmin";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAdmin, loading, user } = useAdmin();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -13,7 +14,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!user || !isAdmin) {
-    return <Navigate to="/hop-upravljanje" replace />;
+    return <Navigate to="/hop-upravljanje" replace state={{ from: location }} />;
   }
 
   return <>{children}</>;
