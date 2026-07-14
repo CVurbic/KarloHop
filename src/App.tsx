@@ -13,6 +13,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const SavjetiPage = lazy(() => import("./pages/SavjetiPage"));
 const BlogPostPage = lazy(() => import("./pages/BlogPostPage"));
 const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
+const RadnikPage = lazy(() => import("./pages/radnik/RadnikPage"));
 const DashboardHome = lazy(() => import("./components/admin/DashboardHome"));
 const BookingManager = lazy(() => import("./components/admin/BookingManager"));
 const RevenueView = lazy(() => import("./components/admin/RevenueView"));
@@ -64,6 +65,14 @@ const App = () => (
                 <Route path="proizvodi/:id" element={<Suspense fallback={<PageLoader />}><ProductEditorPage /></Suspense>} />
               </Route>
             </Route>
+            <Route
+              path="/radnik"
+              element={
+                <ProtectedRoute>
+                  <RadnikPage />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/:slug" element={<ProductPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
