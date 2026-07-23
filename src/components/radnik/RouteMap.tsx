@@ -13,6 +13,19 @@ export type RadnikStop = {
 export type Leg = { minutes: number };
 export type RouteResult = { stops: RadnikStop[]; legs: Leg[]; mapsUrl: string };
 
+// iste boje kao BOUNCERS.color u RevenueView.tsx/BookingCalendar.tsx (500 shade) -> marker = ista boja kao napuhanac svugdje drugdje u appu
+const NAPUHANAC_COLORS: Record<string, string> = {
+  "Minecraft Party": "#3b82f6",
+  "Dino Park": "#14b8a6",
+  Jednorog: "#ec4899",
+  "Paw Patrol": "#eab308",
+  "Super Mario": "#dc2626",
+};
+const DEFAULT_PIN_COLOR = "#0AA8E0";
+
+// solid teardrop pin, 24x24 viewBox (Material "place" bez rupe) -> boja + broj unutra
+const PIN_PATH = "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z";
+
 // putanja kroz sve stopove redom kakvim su predani (bez optimizacije) -> koristi se i za pojedinacni krug i za "sve lokacije danas"
 export function buildMapsUrl(origin: { lat: number; lng: number }, stops: { lat: number; lng: number }[]) {
   const waypoints = stops.map((s) => `${s.lat},${s.lng}`).join("|");
@@ -39,7 +52,13 @@ export function RouteMap({ origin, stops, onRoute }: Props) {
     loadGoogleMaps().then((g) => {
       if (cancelled || !mapRef.current || stops.length === 0) return;
 
-      const map = new g.maps.Map(mapRef.current, { center: origin, zoom: 12 });
+      const map = new g.maps.Map(mapRef.current, {
+        center: origin,
+        zoom: 12,
+        disableDefaultUI: true,
+        gestureHandling: "greedy",
+        styles: [{ featureType: "poi", stylers: [{ visibility: "off" }] }],
+      });
       const renderer = new g.maps.DirectionsRenderer({ map, suppressMarkers: true });
       const service = new g.maps.DirectionsService();
 
@@ -63,9 +82,37 @@ export function RouteMap({ origin, stops, onRoute }: Props) {
 
           onRoute({ stops: orderedStops, legs, mapsUrl: buildMapsUrl(origin, orderedStops) });
 
-          new g.maps.Marker({ position: origin, map, label: "S", title: "Skladište" });
+          new g.maps.Marker({
+            position: origin,
+            map,
+            title: "Skladište",
+            icon: {
+              path: g.maps.SymbolPath.CIRCLE,
+              scale: 8,
+              fillColor: DEFAULT_PIN_COLOR,
+              fillOpacity: 1,
+              strokeColor: "#ffffff",
+              strokeWeight: 2,
+            },
+          });
           orderedStops.forEach((s, i) => {
-            new g.maps.Marker({ position: { lat: s.lat, lng: s.lng }, map, label: `${i + 1}`, title: s.name });
+            const color = NAPUHANAC_COLORS[s.napuhanac[0]] ?? DEFAULT_PIN_COLOR;
+            new g.maps.Marker({
+              position: { lat: s.lat, lng: s.lng },
+              map,
+              title: s.name,
+              icon: {
+                path: PIN_PATH,
+                fillColor: color,
+                fillOpacity: 1,
+                strokeColor: "#1e293b",
+                strokeWeight: 1,
+                scale: 1.6,
+                anchor: new g.maps.Point(12, 22),
+                labelOrigin: new g.maps.Point(12, 9),
+              },
+              label: { text: `${i + 1}`, color: "#ffffff", fontSize: "12px", fontWeight: "700" },
+            });
           });
         },
       );
