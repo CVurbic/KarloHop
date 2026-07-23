@@ -13,6 +13,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const SavjetiPage = lazy(() => import("./pages/SavjetiPage"));
 const BlogPostPage = lazy(() => import("./pages/BlogPostPage"));
 const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
+const RadnikPage = lazy(() => import("./pages/radnik/RadnikPage"));
 const DashboardHome = lazy(() => import("./components/admin/DashboardHome"));
 const BookingManager = lazy(() => import("./components/admin/BookingManager"));
 const RevenueView = lazy(() => import("./components/admin/RevenueView"));
@@ -22,6 +23,8 @@ const BlogEditorPage = lazy(() => import("./components/admin/BlogEditor"));
 const ProductManager = lazy(() => import("./components/admin/ProductManager"));
 const ProductEditorPage = lazy(() => import("./components/admin/ProductEditor"));
 const ChatLogManager = lazy(() => import("./components/admin/ChatLogManager"));
+const AccountManager = lazy(() => import("./components/admin/AccountManager"));
+const MessageTemplateManager = lazy(() => import("./components/admin/MessageTemplateManager"));
 
 const queryClient = new QueryClient();
 
@@ -62,8 +65,18 @@ const App = () => (
                 <Route path="proizvodi" element={<Suspense fallback={<PageLoader />}><ProductManager /></Suspense>} />
                 <Route path="proizvodi/novi" element={<Suspense fallback={<PageLoader />}><ProductEditorPage /></Suspense>} />
                 <Route path="proizvodi/:id" element={<Suspense fallback={<PageLoader />}><ProductEditorPage /></Suspense>} />
+                <Route path="racuni" element={<Suspense fallback={<PageLoader />}><AccountManager /></Suspense>} />
+                <Route path="poruke" element={<Suspense fallback={<PageLoader />}><MessageTemplateManager /></Suspense>} />
               </Route>
             </Route>
+            <Route
+              path="/radnik"
+              element={
+                <ProtectedRoute allow={["admin", "radnik"]}>
+                  <RadnikPage />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/:slug" element={<ProductPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
