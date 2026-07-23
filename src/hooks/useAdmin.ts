@@ -5,36 +5,40 @@ import type { User } from "@supabase/supabase-js";
 export function useAdmin() {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isRadnik, setIsRadnik] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkAdmin = async (currentUser: User | null) => {
+    const checkRoles = async (currentUser: User | null) => {
       if (!currentUser) {
         setUser(null);
         setIsAdmin(false);
+        setIsRadnik(false);
         setLoading(false);
         return;
       }
 
       setUser(currentUser);
 
-      const { data } = await supabase.rpc("has_role", {
-        _user_id: currentUser.id,
-        _role: "admin",
-      });
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", currentUser.id);
 
-      setIsAdmin(!!data);
+      const roles = (data ?? []).map((r) => r.role);
+      setIsAdmin(roles.includes("admin"));
+      setIsRadnik(roles.includes("radnik"));
       setLoading(false);
     };
 
     supabase.auth.getSession().then(({ data: { session } }) => {
-      checkAdmin(session?.user ?? null);
+      checkRoles(session?.user ?? null);
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      checkAdmin(session?.user ?? null);
+      checkRoles(session?.user ?? null);
     });
 
     return () => subscription.unsubscribe();
@@ -52,7 +56,8 @@ export function useAdmin() {
     await supabase.auth.signOut();
     setUser(null);
     setIsAdmin(false);
+    setIsRadnik(false);
   };
 
-  return { user, isAdmin, loading, signIn, signOut };
+  return { user, isAdmin, isRadnik, loading, signIn, signOut };
 }
