@@ -21,6 +21,7 @@ const BOUNCERS = [
   { name: "Dino Park", color: "#14b8a6", key: "dino" },
   { name: "Jednorog", color: "#ec4899", key: "jednorog" },
   { name: "Paw Patrol", color: "#eab308", key: "paw" },
+  { name: "Nogometni izazov", color: "#22c55e", key: "nogomet" },
   { name: "Super Mario", color: "#dc2626", key: "mario" },
 ];
 

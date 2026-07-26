@@ -398,7 +398,7 @@ const BookingManager = () => {
                     <SelectValue placeholder="Odaberi" />
                   </SelectTrigger>
                   <SelectContent>
-                    {BOUNCERS.map((b) => (
+                    {BOUNCERS.filter((b) => !b.hidden).map((b) => (
                       <SelectItem key={b.name} value={b.name}>{b.name}</SelectItem>
                     ))}
                   </SelectContent>

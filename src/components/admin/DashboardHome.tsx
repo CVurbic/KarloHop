@@ -31,6 +31,7 @@ const BOUNCER_COLORS: Record<string, string> = {
   "Dino Park": "bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-300",
   "Jednorog": "bg-pink-100 text-pink-800 dark:bg-pink-900/40 dark:text-pink-300",
   "Paw Patrol": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300",
+  "Nogometni izazov": "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300",
   "Super Mario": "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300",
 };
 
@@ -39,6 +40,7 @@ const BOUNCER_CHART_COLORS: Record<string, string> = {
   "Dino Park": "#14b8a6",
   "Jednorog": "#ec4899",
   "Paw Patrol": "#eab308",
+  "Nogometni izazov": "#22c55e",
   "Super Mario": "#dc2626",
 };
 
