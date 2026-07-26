@@ -5,6 +5,9 @@ import { loadGoogleMaps } from "@/lib/googleMaps";
 
 type Review = { text: string; name: string; rating: number };
 
+// Google Place ID lokacije (javni podatak). Može se nadjačati env varijablom.
+const GOOGLE_PLACE_ID = "ChIJAXOoMV9lZkcReSnflK6mPdQ";
+
 // Rezerva ako Google recenzije nisu dostupne (nema Place ID-a ili API zakaže) —
 // tako sekcija nikad ne ostane prazna i zadrži isti izgled.
 const fallbackReviews: Review[] = [
@@ -27,7 +30,8 @@ const ReviewsSection = () => {
 
   // Dohvati prave Google recenzije preko Places API-ja i zamijeni rezervu.
   useEffect(() => {
-    const placeId = import.meta.env.VITE_GOOGLE_PLACE_ID as string | undefined;
+    const placeId =
+      (import.meta.env.VITE_GOOGLE_PLACE_ID as string | undefined) || GOOGLE_PLACE_ID;
     if (!placeId) return; // Place ID nije postavljen -> ostaje rezerva
 
     let cancelled = false;
