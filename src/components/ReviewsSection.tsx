@@ -22,6 +22,8 @@ const fallbackReviews: Review[] = [
 
 const ReviewsSection = () => {
   const [reviews, setReviews] = useState<Review[]>(fallbackReviews);
+  // Ukupna ocjena i broj recenzija s Google-a (null dok se ne dohvati).
+  const [summary, setSummary] = useState<{ rating: number; count: number } | null>(null);
 
   // Dohvati prave Google recenzije preko Places API-ja i zamijeni rezervu.
   useEffect(() => {
@@ -38,7 +40,7 @@ const ReviewsSection = () => {
         )) as google.maps.PlacesLibrary;
 
         const place = new Place({ id: placeId });
-        await place.fetchFields({ fields: ["reviews"] });
+        await place.fetchFields({ fields: ["reviews", "rating", "userRatingCount"] });
 
         const googleReviews: Review[] = (place.reviews ?? [])
           .map((r) => ({
@@ -50,6 +52,9 @@ const ReviewsSection = () => {
 
         if (!cancelled && googleReviews.length > 0) {
           setReviews(googleReviews);
+        }
+        if (!cancelled && typeof place.rating === "number" && place.userRatingCount) {
+          setSummary({ rating: place.rating, count: place.userRatingCount });
         }
       } catch (err) {
         // Kod greške zadržavamo rezervne recenzije — sekcija ostaje ispravna.
@@ -145,6 +150,18 @@ const ReviewsSection = () => {
           Što kažu <span className="text-primary">zadovoljni roditelji</span>
         </h2>
         <p className="text-muted-foreground text-center">Recenzije zadovoljnih roditelja i djece</p>
+
+        {summary && (
+          <div className="flex items-center justify-center gap-2 mt-4">
+            <div className="flex gap-1">{renderStars(summary.rating)}</div>
+            <span className="text-foreground font-semibold">
+              {summary.rating.toLocaleString("hr-HR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+            </span>
+            <span className="text-muted-foreground text-sm">
+              · {summary.count} recenzija na Google-u
+            </span>
+          </div>
+        )}
       </div>
 
       <div 
