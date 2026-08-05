@@ -20,7 +20,11 @@ const bookingSchema = z.object({
   booking_start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   selected_bounce_house: z.string().min(1).max(100),
   delivery_address: z.string().min(5).max(255),
+  late_pickup: z.boolean().optional().default(false),
 });
+
+// Surcharge (€) added when the late night pickup add-on is selected.
+const LATE_PICKUP_PRICE = 30;
 
 type BookingEmailRequest = z.infer<typeof bookingSchema>;
 
@@ -42,9 +46,16 @@ interface BusinessEmailData {
   safeBounceHouse: string;
   bookingStartDate: string;
   safeAddress: string;
+  latePickup: boolean;
 }
 
 function buildBusinessEmailHtml(data: BusinessEmailData): string {
+  const latePickupRow = data.latePickup
+    ? `<tr style="background-color:#fff3cd;">
+                <td style="font-weight:bold;">Kasno preuzimanje:</td>
+                <td>Da — odvoz nakon 22:00 (+${LATE_PICKUP_PRICE} €)</td>
+              </tr>`
+    : "";
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -93,6 +104,7 @@ function buildBusinessEmailHtml(data: BusinessEmailData): string {
                 <td style="font-weight:bold;">Adresa dostave:</td>
                 <td>${data.safeAddress}</td>
               </tr>
+              ${latePickupRow}
             </table>
           </td>
         </tr>
@@ -137,9 +149,21 @@ interface CustomerEmailData {
   safeBounceHouse: string;
   bookingStartDate: string;
   safeAddress: string;
+  latePickup: boolean;
 }
 
 function buildCustomerEmailHtml(data: CustomerEmailData): string {
+  const latePickupRow = data.latePickup
+    ? `<tr>
+                    <td style="font-weight:bold;">Kasno preuzimanje:</td>
+                    <td>Da (+${LATE_PICKUP_PRICE} €)</td>
+                  </tr>`
+    : "";
+  // When late pickup is selected the inflatable is collected after 22:00 instead
+  // of the usual "from 19:00" step.
+  const pickupStep = data.latePickup
+    ? "2. Odvozimo i demontiramo napuhanac nakon 22:00 (kasno preuzimanje)"
+    : "2. Odvozimo i demontiramo napuhanac od 19:00 nadalje";
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -189,6 +213,7 @@ function buildCustomerEmailHtml(data: CustomerEmailData): string {
                     <td style="font-weight:bold;">Adresa dostave:</td>
                     <td>${data.safeAddress}</td>
                   </tr>
+                  ${latePickupRow}
                 </table>
               </td></tr>
             </table>
@@ -201,7 +226,7 @@ function buildCustomerEmailHtml(data: CustomerEmailData): string {
             <h3 style="font-size:15px;color:#1b2a4a;margin:0 0 12px;">Sljede\u0107i koraci:</h3>
             <table cellpadding="0" cellspacing="0" style="font-size:14px;color:#555;">
               <tr><td style="padding:4px 0;">1. Dovozimo i postavljamo napuhanac ujutro, izme\u0111u 08:00 i 11:00</td></tr>
-              <tr><td style="padding:4px 0;">2. Odvozimo i demontiramo napuhanac od 19:00 nadalje</td></tr>
+              <tr><td style="padding:4px 0;">${pickupStep}</td></tr>
               <tr><td style="padding:4px 0;">3. Ako budu potrebni dodatni detalji, javit \u0107emo vam se prije termina</td></tr>
             </table>
           </td>
@@ -292,6 +317,7 @@ const handler = async (req: Request): Promise<Response> => {
         safeBounceHouse,
         bookingStartDate: bookingData.booking_start_date,
         safeAddress,
+        latePickup: bookingData.late_pickup,
       }),
     });
 
@@ -305,6 +331,7 @@ const handler = async (req: Request): Promise<Response> => {
         safeBounceHouse,
         bookingStartDate: bookingData.booking_start_date,
         safeAddress,
+        latePickup: bookingData.late_pickup,
       }),
     });
 

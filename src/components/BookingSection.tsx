@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Calendar, Clock, Phone, User, Castle, CheckCircle, Loader2, MapPin } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Calendar, Clock, Phone, User, Castle, CheckCircle, Loader2, MapPin, Moon } from "lucide-react";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,6 +16,8 @@ import { useState, useEffect, useRef } from "react";
 import AddressField from "@/components/AddressField";
 import { usePublishedBounceHouses } from "@/hooks/useBounceHouseOptions";
 import { rawValuesForSlug } from "@/lib/bounceHouseCompat";
+import LateNightUpsellDialog from "@/components/LateNightUpsellDialog";
+import { LATE_PICKUP_PRICE, getNightImage } from "@/lib/lateNightPickup";
 
 // Checks availability across every raw value a booking could hold for this product slug
 // (the slug itself + legacy short names from before bookings stored slugs — see bounceHouseCompat.ts).
@@ -49,6 +52,7 @@ const formSchema = z.object({
   delivery_address: z.string().min(5, "Adresa mora biti duža od 5 znakova").max(255, "Adresa ne smije biti duža od 255 znakova"),
   booking_start_date: z.string().min(1, "Molimo odaberite datum"),
   selected_bounce_house: z.string().min(1, "Molimo odaberite napuhanac"),
+  late_pickup: z.boolean(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -76,6 +80,12 @@ const BookingSection = () => {
   const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
   const { data: bounceHouses = [] } = usePublishedBounceHouses();
 
+  // Late night pickup upsell: when the customer submits without ticking the
+  // toggle (and the chosen inflatable has a night image), we intercept and show
+  // the upsell interstitial. `upsellValues` holds the submission until the
+  // customer either adds the add-on or declines.
+  const [upsellValues, setUpsellValues] = useState<FormData | null>(null);
+
   const confirmedLocationRef = useRef<{ lat: number; lng: number } | null>(null);
 
   const form = useForm<FormData>({
@@ -88,6 +98,7 @@ const BookingSection = () => {
       delivery_address: "",
       booking_start_date: "",
       selected_bounce_house: "",
+      late_pickup: false,
     },
   });
 
@@ -118,7 +129,33 @@ const BookingSection = () => {
     };
   }, [selectedDate, selectedBounceHouse]);
 
-  const onSubmit = async (values: FormData) => {
+  // Entry point from the form. If the customer hasn't opted into late pickup and
+  // the chosen inflatable has a night image, show the upsell first; otherwise
+  // (already opted in, or football which has no night image) submit directly.
+  const onSubmit = (values: FormData) => {
+    if (!values.late_pickup && getNightImage(values.selected_bounce_house)) {
+      setUpsellValues(values);
+      return;
+    }
+    submitBooking(values);
+  };
+
+  const handleUpsellAccept = () => {
+    const values = upsellValues;
+    setUpsellValues(null);
+    if (!values) return;
+    form.setValue("late_pickup", true);
+    submitBooking({ ...values, late_pickup: true });
+  };
+
+  const handleUpsellDecline = () => {
+    const values = upsellValues;
+    setUpsellValues(null);
+    if (!values) return;
+    submitBooking({ ...values, late_pickup: false });
+  };
+
+  const submitBooking = async (values: FormData) => {
     setIsSubmitting(true);
 
     try {
@@ -153,6 +190,7 @@ const BookingSection = () => {
           p_multiple_days: values.multiple_days || false,
           p_lat: confirmedLocationRef.current?.lat ?? null,
           p_lng: confirmedLocationRef.current?.lng ?? null,
+          p_late_pickup: values.late_pickup || false,
         });
 
       if (error) {
@@ -406,6 +444,37 @@ const BookingSection = () => {
                             </FormItem>
                           )}
                         />
+
+                        {/* Late night pickup upsell toggle */}
+                        <FormField
+                          control={form.control}
+                          name="late_pickup"
+                          render={({ field }) => (
+                            <FormItem className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="space-y-1">
+                                  <FormLabel className="flex items-center gap-2 text-base font-semibold">
+                                    <Moon className="h-4 w-4 text-primary" />
+                                    Kasno noćno preuzimanje
+                                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary">
+                                      +{LATE_PICKUP_PRICE} €
+                                    </span>
+                                  </FormLabel>
+                                  <p className="text-sm text-muted-foreground">
+                                    Po napuhanac dolazimo tek nakon 22:00.
+                                  </p>
+                                </div>
+                                <FormControl>
+                                  <Switch
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                    aria-label="Kasno noćno preuzimanje"
+                                  />
+                                </FormControl>
+                              </div>
+                            </FormItem>
+                          )}
+                        />
                       </div>
                     </motion.div>
 
@@ -490,6 +559,17 @@ const BookingSection = () => {
         </div>
       </div>
 
+      {upsellValues && getNightImage(upsellValues.selected_bounce_house) && (
+        <LateNightUpsellDialog
+          open={!!upsellValues}
+          // Dismissing via overlay/Esc keeps the booking going without the add-on.
+          onOpenChange={(open) => !open && handleUpsellDecline()}
+          imageSrc={getNightImage(upsellValues.selected_bounce_house)!}
+          bounceHouseName={upsellValues.selected_bounce_house}
+          onAccept={handleUpsellAccept}
+          onDecline={handleUpsellDecline}
+        />
+      )}
     </section>
   );
 };

@@ -49,6 +49,7 @@ export type Database = {
           email: string | null
           google_calendar_event_id: string | null
           id: string
+          late_pickup: boolean | null
           multiple_days: boolean | null
           name: string
           phone: string | null
@@ -67,6 +68,7 @@ export type Database = {
           email?: string | null
           google_calendar_event_id?: string | null
           id?: string
+          late_pickup?: boolean | null
           multiple_days?: boolean | null
           name: string
           phone?: string | null
@@ -85,6 +87,7 @@ export type Database = {
           email?: string | null
           google_calendar_event_id?: string | null
           id?: string
+          late_pickup?: boolean | null
           multiple_days?: boolean | null
           name?: string
           phone?: string | null
@@ -342,6 +345,22 @@ export type Database = {
           booking_id: string
           unavailable_date: string
         }[]
+      }
+      create_public_booking: {
+        Args: {
+          p_name: string
+          p_surname: string
+          p_email?: string | null
+          p_phone?: string | null
+          p_delivery_address?: string | null
+          p_booking_start_date?: string | null
+          p_selected_bounce_house?: string | null
+          p_additional_notes?: string | null
+          p_add_table_set?: boolean | null
+          p_multiple_days?: boolean | null
+          p_late_pickup?: boolean | null
+        }
+        Returns: Json
       }
       check_rate_limit: {
         Args: {
