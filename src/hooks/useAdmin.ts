@@ -53,7 +53,11 @@ export function useAdmin() {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    // scope "local" briše sesiju odmah iz localStorage-a bez čekanja na
+    // odgovor Supabase servera — ako taj poziv omane (istekao token, mreža),
+    // "global" scope zna ostaviti staru sesiju u localStorage-u netaknutu,
+    // pa korisnika Odjava vrati natrag u dashboard umjesto na login.
+    await supabase.auth.signOut({ scope: "local" });
     setUser(null);
     setIsAdmin(false);
     setIsRadnik(false);

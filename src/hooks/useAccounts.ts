@@ -52,6 +52,13 @@ export function useUpdateAccountRole() {
   });
 }
 
+export function useResetPassword() {
+  return useMutation({
+    mutationFn: async ({ userId, password }: { userId: string; password?: string }) =>
+      invoke<{ password: string }>({ action: "resetPassword", userId, password }),
+  });
+}
+
 export function useDeleteAccount() {
   const queryClient = useQueryClient();
 

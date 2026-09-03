@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import { hr } from "date-fns/locale";
-import { Plus, Trash2, Users } from "lucide-react";
+import { Copy, KeyRound, Plus, Trash2, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -44,7 +44,9 @@ import {
   useAccounts,
   useCreateAccount,
   useUpdateAccountRole,
+  useResetPassword,
   useDeleteAccount,
+  type Account,
   type AccountRole,
 } from "@/hooks/useAccounts";
 import { useToast } from "@/hooks/use-toast";
@@ -58,6 +60,7 @@ const AccountManager = () => {
   const { data: accounts, isLoading } = useAccounts();
   const createAccount = useCreateAccount();
   const updateRole = useUpdateAccountRole();
+  const resetPassword = useResetPassword();
   const deleteAccount = useDeleteAccount();
   const { toast } = useToast();
 
@@ -65,6 +68,11 @@ const AccountManager = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<AccountRole>("radnik");
+  const [resetTarget, setResetTarget] = useState<Account | null>(null);
+  const [resetPasswordInput, setResetPasswordInput] = useState("");
+  const [resetResult, setResetResult] = useState<{ email: string; password: string } | null>(
+    null
+  );
 
   const resetForm = () => {
     setEmail("");
@@ -95,6 +103,26 @@ const AccountManager = () => {
     } catch (err) {
       toast({
         title: "Greška pri promjeni role",
+        description: err instanceof Error ? err.message : undefined,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetTarget) return;
+    try {
+      const { password: newPassword } = await resetPassword.mutateAsync({
+        userId: resetTarget.id,
+        password: resetPasswordInput || undefined,
+      });
+      setResetResult({ email: resetTarget.email ?? "", password: newPassword });
+      setResetTarget(null);
+      setResetPasswordInput("");
+    } catch (err) {
+      toast({
+        title: "Greška pri resetiranju lozinke",
         description: err instanceof Error ? err.message : undefined,
         variant: "destructive",
       });
@@ -237,6 +265,14 @@ const AccountManager = () => {
                       : "Nikad"}
                   </TableCell>
                   <TableCell className="text-right">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      title="Resetiraj lozinku"
+                      onClick={() => setResetTarget(account)}
+                    >
+                      <KeyRound className="h-4 w-4" />
+                    </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button
@@ -274,6 +310,72 @@ const AccountManager = () => {
           </Table>
         </div>
       )}
+
+      <Dialog
+        open={!!resetTarget}
+        onOpenChange={(open) => {
+          if (!open) {
+            setResetTarget(null);
+            setResetPasswordInput("");
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Resetiraj lozinku — {resetTarget?.email}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleResetPassword} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="reset-password">Nova lozinka</Label>
+              <Input
+                id="reset-password"
+                type="text"
+                value={resetPasswordInput}
+                onChange={(e) => setResetPasswordInput(e.target.value)}
+                minLength={6}
+                placeholder="Ostavi prazno za nasumičnu lozinku"
+              />
+            </div>
+            <DialogFooter>
+              <Button type="submit" disabled={resetPassword.isPending}>
+                {resetPassword.isPending ? "Postavljanje..." : "Postavi lozinku"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!resetResult} onOpenChange={(open) => !open && setResetResult(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Nova lozinka postavljena</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Prenesi ovu lozinku korisniku "{resetResult?.email}" izvan aplikacije (SMS, osobno...).
+            Neće biti ponovno prikazana.
+          </p>
+          <div className="flex items-center gap-2">
+            <Input readOnly value={resetResult?.password ?? ""} className="font-mono" />
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              title="Kopiraj"
+              onClick={() => {
+                if (resetResult) {
+                  navigator.clipboard.writeText(resetResult.password);
+                  toast({ title: "Lozinka kopirana." });
+                }
+              }}
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setResetResult(null)}>Zatvori</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

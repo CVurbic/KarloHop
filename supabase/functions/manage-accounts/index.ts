@@ -114,6 +114,23 @@ serve(async (req: Request) => {
       return json({ ok: true });
     }
 
+    if (action === "resetPassword") {
+      const { userId, password } = body as { userId: string; password?: string };
+      if (!userId) return json({ error: "Nedostaje userId." }, 400);
+      if (password && password.length < 6) {
+        return json({ error: "Lozinka mora imati barem 6 znakova." }, 400);
+      }
+
+      const newPassword = password || crypto.randomUUID().replace(/-/g, "").slice(0, 12);
+
+      const { error: updateError } = await admin.auth.admin.updateUserById(userId, {
+        password: newPassword,
+      });
+      if (updateError) return json({ error: updateError.message }, 400);
+
+      return json({ password: newPassword });
+    }
+
     if (action === "delete") {
       const { userId } = body as { userId: string };
       if (!userId) return json({ error: "Nedostaje userId." }, 400);
