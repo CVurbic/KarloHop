@@ -1,16 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { hr } from "date-fns/locale";
-import { CalendarDays, MapPin, MapPinned, Phone, PartyPopper, X } from "lucide-react";
+import { CalendarDays, LogOut, MapPin, MapPinned, Phone, PartyPopper, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { FloatingActionMenu } from "@/components/radnik/FloatingActionMenu";
+import { useAdmin } from "@/hooks/useAdmin";
 import { useAllBookings } from "@/hooks/useBookings";
 import { geocodeAddress } from "@/lib/geocode";
-import { TripCard, navHref } from "@/components/radnik/TripCard";
+import { TripCard } from "@/components/radnik/TripCard";
 import { OverviewMap } from "@/components/radnik/OverviewMap";
-import { buildMapsUrl, type RadnikStop } from "@/components/radnik/RouteMap";
+import { type RadnikStop } from "@/components/radnik/RouteMap";
 import LocationConfirmDialog from "@/components/LocationConfirmDialog";
 import { BookingCalendar, BOUNCERS } from "@/components/BookingCalendar";
 
@@ -89,6 +90,8 @@ function groupIntoTrips(stops: LocalStop[]): LocalStop[][] {
 }
 
 export default function RadnikPage() {
+  const { signOut } = useAdmin();
+  const navigate = useNavigate();
   const { data: allBookings, isLoading, isError, refetch } = useAllBookings();
   const savedSession = useRef(loadSession()).current;
   const [selectedDate, setSelectedDate] = useState<string | null>(savedSession?.selectedDate ?? null);
@@ -102,7 +105,6 @@ export default function RadnikPage() {
   const [pinTarget, setPinTarget] = useState<number | null>(null);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [autoFallback, setAutoFallback] = useState(false);
-  const [activeNavStop, setActiveNavStop] = useState<RadnikStop | null>(null);
   const autoSelectedRef = useRef(!!savedSession?.selectedDate);
 
   useEffect(() => {
@@ -166,6 +168,11 @@ export default function RadnikPage() {
 
   const removeStop = (i: number) => setStops((prev) => prev.filter((_, idx) => idx !== i));
 
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/hop-upravljanje");
+  };
+
   const resetTrip = () => {
     setTripGroups(null);
     setStops([]);
@@ -194,14 +201,12 @@ export default function RadnikPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [confirmedBookings, isLoading, isError]);
 
-  const submit = () => {
-    if (stops.length === 0) {
-      setError("Nema rezervacija za odabrani dan.");
-      return;
-    }
-    setError("");
+  // auto-izracunaj rute cim su svi stopovi geocodani (bez rucnog "Izracunaj rutu" klika) -> ceka fix pina ako netko fail-a
+  useEffect(() => {
+    if (stops.length === 0 || stops.some((s) => s.geocodeFailed)) return;
     setTripGroups(groupIntoTrips(stops));
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stops]);
 
   return (
     <div className="min-h-screen bg-muted/30 p-4 pb-24 sm:p-6 lg:p-8 lg:pb-8">
@@ -209,24 +214,33 @@ export default function RadnikPage() {
         <header className="flex items-start justify-between gap-3">
           <div>
             <h1 className="text-xl font-bold">Ruta dana</h1>
-            <p className="text-sm text-muted-foreground">
+            <button
+              onClick={() => setCalendarOpen(true)}
+              className="flex items-center gap-1.5 text-sm text-muted-foreground cursor-pointer lg:pointer-events-none"
+            >
               {selectedDateObj ? (
-                <span className="font-medium text-foreground capitalize">
+                <span className="font-medium text-foreground capitalize underline decoration-dotted underline-offset-4 lg:no-underline">
                   {format(selectedDateObj, "EEEE, d. MMMM yyyy.", { locale: hr })}
                 </span>
               ) : (
                 "Hop Hop Napuhanci — radnik"
               )}
-            </p>
+              <CalendarDays className="h-3.5 w-3.5 shrink-0 lg:hidden" />
+            </button>
             {autoFallback && (
               <p className="text-xs text-muted-foreground">Nema rezervacija danas — prikazan prvi sljedeći dan s rezervacijom.</p>
             )}
           </div>
-          {tripGroups && (
-            <Button variant="outline" onClick={resetTrip} className="shrink-0">
-              ← Nova ruta
+          <div className="flex shrink-0 items-center gap-2">
+            {tripGroups && (
+              <Button variant="outline" onClick={resetTrip}>
+                ← Nova ruta
+              </Button>
+            )}
+            <Button variant="ghost" size="icon" onClick={handleSignOut} title="Odjava">
+              <LogOut className="h-4 w-4" />
             </Button>
-          )}
+          </div>
         </header>
 
         <div className="mt-6 lg:grid lg:grid-cols-[400px_1fr] lg:items-start lg:gap-6">
@@ -349,14 +363,6 @@ export default function RadnikPage() {
                       Max {MAX_PER_TRIP} napuhanca po vožnji — app sam dijeli u krugove i grupira po blizini.
                     </p>
                   )}
-
-                  <Button
-                    onClick={submit}
-                    disabled={stops.length === 0 || stops.some((s) => s.geocodeFailed)}
-                    className="w-full"
-                  >
-                    Izračunaj rutu(e) za dan
-                  </Button>
                 </CardContent>
               </Card>
             )}
@@ -374,7 +380,6 @@ export default function RadnikPage() {
                     origin={WAREHOUSE}
                     stops={group}
                     storageKey={`${selectedDate}-${i}`}
-                    onActiveStopChange={setActiveNavStop}
                   />
                 ))}
               </div>
@@ -388,41 +393,6 @@ export default function RadnikPage() {
           </div>
         </div>
       </div>
-
-      {/* jedan fiksni FAB za cijeli /radnik flow, nebitno gdje se korisnik nalazi -> kalendar uvijek, karta kad postoji aktivna dostava */}
-      <FloatingActionMenu
-        className="bottom-4 right-4 lg:hidden"
-        actions={[
-          {
-            key: "calendar",
-            label: "Odaberi dan",
-            icon: <CalendarDays className="h-5 w-5" />,
-            onClick: () => setCalendarOpen(true),
-          },
-          ...(activeNavStop
-            ? [
-                {
-                  key: "navigate",
-                  label: "Otvori navigaciju do trenutne lokacije",
-                  icon: <MapPin className="h-5 w-5" />,
-                  href: navHref(activeNavStop),
-                },
-              ]
-            : stops.some((s) => !s.geocodeFailed)
-            ? [
-                {
-                  key: "navigate-all",
-                  label: "Otvori navigaciju kroz sve lokacije",
-                  icon: <MapPin className="h-5 w-5" />,
-                  href: buildMapsUrl(
-                    WAREHOUSE,
-                    stops.filter((s) => !s.geocodeFailed),
-                  ),
-                },
-              ]
-            : []),
-        ]}
-      />
 
       {pinTarget !== null && (
         <LocationConfirmDialog

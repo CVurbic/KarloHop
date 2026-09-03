@@ -161,6 +161,36 @@ export type Database = {
         }
         Relationships: []
       }
+      message_templates: {
+        Row: {
+          id: string
+          key: string
+          label: string
+          body: string
+          placeholders: string[]
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          key: string
+          label: string
+          body: string
+          placeholders?: string[]
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          key?: string
+          label?: string
+          body?: string
+          placeholders?: string[]
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       settings: {
         Row: {
           key: string
@@ -244,7 +274,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user"
+      app_role: "admin" | "moderator" | "user" | "radnik"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -372,7 +402,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator", "user"],
+      app_role: ["admin", "moderator", "user", "radnik"],
     },
   },
 } as const

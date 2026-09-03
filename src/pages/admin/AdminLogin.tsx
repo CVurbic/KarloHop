@@ -10,19 +10,25 @@ const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const { signIn, isAdmin, loading, user } = useAdmin();
+  const { signIn, isAdmin, isRadnik, loading, user } = useAdmin();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
 
-  // Redirect once admin status is confirmed (works for both fresh login and already logged in)
+  // Redirect once role status is confirmed (works for both fresh login and already logged in)
   // Ako je stiglo s /radnik (ili druge zasticene rute) preko ProtectedRoute, vrati se tamo.
+  // Radnik-only racun (bez admin role) nikad ne smije zavrsiti na admin dashboardu.
   useEffect(() => {
-    if (!loading && isAdmin) {
-      const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname;
+    if (loading || (!isAdmin && !isRadnik)) return;
+
+    const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname;
+
+    if (isAdmin) {
       navigate(from ?? "/hop-upravljanje/clanci", { replace: true });
+    } else {
+      navigate(from && from.startsWith("/radnik") ? from : "/radnik", { replace: true });
     }
-  }, [loading, isAdmin, navigate, location.state]);
+  }, [loading, isAdmin, isRadnik, navigate, location.state]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
