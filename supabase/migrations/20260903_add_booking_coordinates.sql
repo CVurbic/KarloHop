@@ -5,6 +5,13 @@ ALTER TABLE public.bookings
   ADD COLUMN IF NOT EXISTS lat double precision,
   ADD COLUMN IF NOT EXISTS lng double precision;
 
+-- Adding p_lat/p_lng changes the signature, so the old p_late_pickup overload
+-- (from a feature not present on this branch) is dropped first to avoid an
+-- ambiguous-function error at call time (PGRST203).
+DROP FUNCTION IF EXISTS public.create_public_booking(
+  text, text, text, text, text, date, text, text, boolean, boolean, boolean
+);
+
 CREATE OR REPLACE FUNCTION public.create_public_booking(
   p_name text,
   p_surname text,
