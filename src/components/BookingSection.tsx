@@ -52,7 +52,6 @@ const BookingSection = () => {
 
   const addressInputRef = useRef<HTMLInputElement | null>(null);
   const [pendingPlace, setPendingPlace] = useState<{ address: string; lat: number; lng: number } | null>(null);
-  // ponytail: lat/lng captured client-side and ready to send once `bookings` has the columns; not sent to create_public_booking yet
   const confirmedLocationRef = useRef<{ lat: number; lng: number } | null>(null);
 
   const form = useForm<FormData>({
@@ -179,6 +178,8 @@ const BookingSection = () => {
           p_additional_notes: values.additional_notes || null,
           p_add_table_set: values.add_table_set || false,
           p_multiple_days: values.multiple_days || false,
+          p_lat: confirmedLocationRef.current?.lat ?? null,
+          p_lng: confirmedLocationRef.current?.lng ?? null,
         });
 
       if (error) {
@@ -222,6 +223,7 @@ const BookingSection = () => {
 
       analytics.trackBookingSubmission(values.selected_bounce_house, values.booking_start_date);
       form.reset();
+      confirmedLocationRef.current = null;
       setAvailabilityStatus("");
     } catch (error) {
       console.error('Error submitting booking:', error);
@@ -351,6 +353,12 @@ const BookingSection = () => {
                                 <Input
                                   placeholder="Počnite tipkati adresu..."
                                   {...field}
+                                  onChange={(e) => {
+                                    // rucna izmjena nakon potvrde pina -> koordinate vise ne
+                                    // odgovaraju tocno tekstu, ne saljemo ih na backend
+                                    confirmedLocationRef.current = null;
+                                    field.onChange(e);
+                                  }}
                                   ref={(el) => {
                                     field.ref(el);
                                     addressInputRef.current = el;

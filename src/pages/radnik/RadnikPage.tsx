@@ -146,7 +146,10 @@ export default function RadnikPage() {
 
     await Promise.all(
       forDate.map(async (b) => {
-        const coords = await geocodeAddress(b.delivery_address ?? "");
+        // koordinate su spremljene kod kreiranja rezervacije (BookingSection) --
+        // geokodiraj samo starije rezervacije kojima jos fale
+        const coords =
+          b.lat != null && b.lng != null ? { lat: b.lat, lng: b.lng } : await geocodeAddress(b.delivery_address ?? "");
         geocoded.push({
           name: `${b.name} ${b.surname}`.trim(),
           phone: b.phone ?? "",
