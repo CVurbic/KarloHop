@@ -9,6 +9,8 @@ export interface Booking {
   email: string | null;
   phone: string | null;
   delivery_address: string | null;
+  lat: number | null;
+  lng: number | null;
   booking_start_date: string;
   booking_end_date: string | null;
   selected_bounce_house: string | null;
