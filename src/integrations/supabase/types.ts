@@ -95,6 +95,57 @@ export type Database = {
         }
         Relationships: []
       }
+      booking_reports: {
+        Row: {
+          id: string
+          booking_id: string
+          klinovi_count: number | null
+          delivery_note: string | null
+          delivery_photo_paths: string[]
+          delivered_at: string | null
+          delivered_by: string | null
+          pickup_condition: string | null
+          pickup_note: string | null
+          pickup_photo_paths: string[]
+          picked_up_at: string | null
+          picked_up_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          booking_id: string
+          klinovi_count?: number | null
+          delivery_note?: string | null
+          delivery_photo_paths?: string[]
+          delivered_at?: string | null
+          delivered_by?: string | null
+          pickup_condition?: string | null
+          pickup_note?: string | null
+          pickup_photo_paths?: string[]
+          picked_up_at?: string | null
+          picked_up_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          booking_id?: string
+          klinovi_count?: number | null
+          delivery_note?: string | null
+          delivery_photo_paths?: string[]
+          delivered_at?: string | null
+          delivered_by?: string | null
+          pickup_condition?: string | null
+          pickup_note?: string | null
+          pickup_photo_paths?: string[]
+          picked_up_at?: string | null
+          picked_up_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       expenses: {
         Row: {
           id: string

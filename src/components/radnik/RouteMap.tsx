@@ -10,6 +10,8 @@ export type RadnikStop = {
   lat: number;
   lng: number;
   napuhanac: string[];
+  // rezervacije na ovoj adresi (merge po adresi moze spojiti vise) -> lookup booking_reports handoffa
+  bookingIds?: string[];
 };
 
 export type Leg = { minutes: number };

@@ -197,7 +197,7 @@ const AccountManager = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="radnik">Radnik — samo pristup ruti dostave</SelectItem>
+                    <SelectItem value="radnik">Radnik — pristup ruti dostave i skupljanja</SelectItem>
                     <SelectItem value="admin">Admin — puni pristup upravljanju</SelectItem>
                   </SelectContent>
                 </Select>

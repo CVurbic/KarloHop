@@ -26,7 +26,7 @@ const AdminLogin = () => {
     if (isAdmin) {
       navigate(from ?? "/hop-upravljanje/clanci", { replace: true });
     } else {
-      navigate(from && from.startsWith("/radnik") ? from : "/radnik", { replace: true });
+      navigate(from && from.startsWith("/radnik") ? from : "/radnik/dostava", { replace: true });
     }
   }, [loading, isAdmin, isRadnik, navigate, location.state]);
 

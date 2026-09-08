@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
 import AdminLayout from "./components/admin/AdminLayout";
@@ -69,11 +69,20 @@ const App = () => (
                 <Route path="poruke" element={<Suspense fallback={<PageLoader />}><MessageTemplateManager /></Suspense>} />
               </Route>
             </Route>
+            <Route path="/radnik" element={<Navigate to="/radnik/dostava" replace />} />
             <Route
-              path="/radnik"
+              path="/radnik/dostava"
               element={
                 <ProtectedRoute allow={["admin", "radnik"]}>
-                  <RadnikPage />
+                  <RadnikPage key="delivery" />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/radnik/skupljanje"
+              element={
+                <ProtectedRoute allow={["admin", "radnik"]}>
+                  <RadnikPage key="pickup" mode="pickup" />
                 </ProtectedRoute>
               }
             />

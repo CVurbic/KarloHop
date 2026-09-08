@@ -44,6 +44,24 @@ export async function uploadCoverImage(file: File): Promise<string | null> {
   return publicUrl;
 }
 
+// Foto s terena (dostava: postavljeni napuhanac; skupljanje: stanje pri povratu).
+// Bucket 'radnik-photos' je PRIVATAN -> vracamo path, citatelj radi createSignedUrl.
+export async function uploadRadnikPhoto(file: File, bookingId: string): Promise<string | null> {
+  const ext = file.name.split(".").pop() || "jpg";
+  const path = `${bookingId}/${Date.now()}.${ext}`;
+
+  const { error } = await supabase.storage
+    .from("radnik-photos")
+    .upload(path, file, { cacheControl: "3600", upsert: false });
+
+  if (error) {
+    console.error("Upload error:", error);
+    return null;
+  }
+
+  return path;
+}
+
 export async function uploadProductImage(
   file: File,
   productId: string

@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { hr } from "date-fns/locale";
-import { CalendarDays, LogOut, MapPin, MapPinned, Phone, PartyPopper, X } from "lucide-react";
+import { CalendarDays, ChevronLeft, LogOut, MapPin, MapPinned, Phone, PartyPopper, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useAllBookings } from "@/hooks/useBookings";
@@ -26,10 +27,32 @@ type LocalStop = RadnikStop & { geocodeFailed?: boolean };
 
 type SavedSession = { selectedDate: string; stops: LocalStop[]; tripGroups: LocalStop[][] | null };
 
-// nastavak dostave nakon refresha/gasenja app-a na mobitelu -> spremi cijelu sesiju
-function loadSession(): SavedSession | null {
+type Mode = "delivery" | "pickup";
+
+// dvije smjene dijele isti tok (kalendar, karta, krugovi) -> razlikuje ih samo copy + izvor datuma + smjer checkliste
+const COPY = {
+  delivery: {
+    title: "Ruta dana",
+    brand: "Hop Hop Napuhanci — radnik",
+    noStops: "Nema dostava za odabrani dan.",
+    emptyTrips: "Krugovi za dostavu prikazat će se ovdje nakon što odabereš dan i izračunaš rutu.",
+    perTrip: (n: number) => `Max ${n} napuhanca po vožnji — app sam dijeli u krugove i grupira po blizini.`,
+  },
+  pickup: {
+    title: "Skupljanje dana",
+    brand: "Hop Hop Napuhanci — skupljanje",
+    noStops: "Nema skupljanja za odabrani dan.",
+    emptyTrips: "Krugovi za skupljanje prikazat će se ovdje nakon što odabereš dan.",
+    perTrip: (n: number) => `Max ${n} napuhanca po vožnji — app sam dijeli u krugove i grupira po blizini.`,
+  },
+} as const;
+
+const sessionKey = (mode: Mode) => (mode === "pickup" ? "radnik-session-pickup" : "radnik-session");
+
+// nastavak smjene nakon refresha/gasenja app-a na mobitelu -> spremi cijelu sesiju (odvojeno po smjeni)
+function loadSession(mode: Mode): SavedSession | null {
   try {
-    const raw = localStorage.getItem("radnik-session");
+    const raw = localStorage.getItem(sessionKey(mode));
     return raw ? JSON.parse(raw) : null;
   } catch {
     return null;
@@ -61,10 +84,11 @@ function mergeStopsByAddress(list: LocalStop[]): LocalStop[] {
     const existingIdx = indexByAddress.get(key);
     if (existingIdx === undefined) {
       indexByAddress.set(key, merged.length);
-      merged.push({ ...s, napuhanac: [...s.napuhanac] });
+      merged.push({ ...s, napuhanac: [...s.napuhanac], bookingIds: [...(s.bookingIds ?? [])] });
     } else {
       const existing = merged[existingIdx];
       existing.napuhanac.push(...s.napuhanac);
+      existing.bookingIds = [...(existing.bookingIds ?? []), ...(s.bookingIds ?? [])];
       if (!existing.phone && s.phone) existing.phone = s.phone;
       if (existing.geocodeFailed && !s.geocodeFailed) existing.geocodeFailed = false;
     }
@@ -91,12 +115,18 @@ function groupIntoTrips(stops: LocalStop[]): LocalStop[][] {
   return trips;
 }
 
-export default function RadnikPage() {
+export default function RadnikPage({ mode = "delivery" }: { mode?: Mode }) {
+  const t = COPY[mode];
   const { signOut } = useAdmin();
   const navigate = useNavigate();
   const { data: allBookings, isLoading, isError, refetch } = useAllBookings();
   const { data: bounceHouses = [] } = useAllBounceHouses();
-  const savedSession = useRef(loadSession()).current;
+  // odbaci spremljenu sesiju od prije uvodenja bookingIds -> stari stopovi nemaju veze s booking_reports (handoff, foto)
+  const savedSession = useMemo(() => {
+    const s = loadSession(mode);
+    if (s?.stops?.length && !s.stops.every((st) => st.bookingIds?.length)) return null;
+    return s;
+  }, [mode]);
   const [selectedDate, setSelectedDate] = useState<string | null>(savedSession?.selectedDate ?? null);
   const [currentMonth, setCurrentMonth] = useState(() =>
     savedSession?.selectedDate ? new Date(`${savedSession.selectedDate}T00:00:00`) : new Date(),
@@ -113,19 +143,24 @@ export default function RadnikPage() {
   useEffect(() => {
     try {
       if (!selectedDate) {
-        localStorage.removeItem("radnik-session");
+        localStorage.removeItem(sessionKey(mode));
         return;
       }
-      localStorage.setItem("radnik-session", JSON.stringify({ selectedDate, stops, tripGroups }));
+      localStorage.setItem(sessionKey(mode), JSON.stringify({ selectedDate, stops, tripGroups }));
     } catch {
-      // ponytail: localStorage moze failati (privatni mod, full storage) -> nastavak dostave tada nece raditi, ne blokiraj app
+      // ponytail: localStorage moze failati (privatni mod, full storage) -> nastavak smjene tada nece raditi, ne blokiraj app
     }
-  }, [selectedDate, stops, tripGroups]);
+  }, [selectedDate, stops, tripGroups, mode]);
 
-  const confirmedBookings = useMemo(
-    () => (allBookings ?? []).filter((b) => b.status === "confirmed"),
-    [allBookings],
-  );
+  const shiftBookings = useMemo(() => {
+    const confirmed = (allBookings ?? []).filter((b) => b.status === "confirmed");
+    if (mode !== "pickup") return confirmed;
+    // dan skupljanja = kraj najma; jednodnevni najam nema end date -> isti dan kao dostava
+    return confirmed.map((b) => ({
+      ...b,
+      booking_start_date: b.booking_end_date ?? b.booking_start_date,
+    }));
+  }, [allBookings, mode]);
 
   const selectedDateObj = useMemo(
     () => (selectedDate ? new Date(`${selectedDate}T00:00:00`) : null),
@@ -138,7 +173,7 @@ export default function RadnikPage() {
     setError("");
     setAutoFallback(isAuto && date !== format(new Date(), "yyyy-MM-dd"));
 
-    const forDate = confirmedBookings.filter((b) => b.booking_start_date === date);
+    const forDate = shiftBookings.filter((b) => b.booking_start_date === date);
     if (forDate.length === 0) {
       setStops([]);
       return;
@@ -160,6 +195,7 @@ export default function RadnikPage() {
           lat: coords?.lat ?? 0,
           lng: coords?.lng ?? 0,
           napuhanac: [b.selected_bounce_house ?? ""],
+          bookingIds: [b.id],
           geocodeFailed: !coords,
         });
       }),
@@ -186,16 +222,22 @@ export default function RadnikPage() {
     setError("");
   };
 
-  // auto-odabir dana pri ucitavanju: danas ako ima rezervacija, inace prvi sljedeci dan s rezervacijom
+  // kalendar je na desktopu uvijek vidljiv (lijevi stupac); dialog otvaramo samo ispod lg
+  const openMobileCalendar = () => {
+    if (window.matchMedia("(max-width: 1023px)").matches) setCalendarOpen(true);
+  };
+
+  // auto-odabir dana pri ucitavanju: danas ako ima rezervacija, inace prvi sljedeci dan s rezervacijom;
+  // ako nema nijednog nadolazeceg -> odmah otvori kalendar (nema praznog ekrana bez konteksta)
   useEffect(() => {
-    if (autoSelectedRef.current || isLoading || isError || confirmedBookings.length === 0) return;
+    if (autoSelectedRef.current || isLoading || isError) return;
     autoSelectedRef.current = true;
 
     const todayKey = format(new Date(), "yyyy-MM-dd");
-    const hasToday = confirmedBookings.some((b) => b.booking_start_date === todayKey);
+    const hasToday = shiftBookings.some((b) => b.booking_start_date === todayKey);
     const targetDate = hasToday
       ? todayKey
-      : confirmedBookings
+      : shiftBookings
           .map((b) => b.booking_start_date)
           .filter((d) => d >= todayKey)
           .sort()[0];
@@ -203,9 +245,11 @@ export default function RadnikPage() {
     if (targetDate) {
       setCurrentMonth(new Date(`${targetDate}T00:00:00`));
       handleSelectDate(targetDate, true);
+    } else {
+      openMobileCalendar();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [confirmedBookings, isLoading, isError]);
+  }, [shiftBookings, isLoading, isError]);
 
   // auto-izracunaj rute cim su svi stopovi geocodani (bez rucnog "Izracunaj rutu" klika) -> ceka fix pina ako netko fail-a
   useEffect(() => {
@@ -218,10 +262,10 @@ export default function RadnikPage() {
     <div className="min-h-screen bg-muted/30 p-4 pb-24 sm:p-6 lg:p-8 lg:pb-8">
       <div className="mx-auto w-full max-w-md lg:max-w-7xl">
         <header className="flex items-start justify-between gap-3">
-          <div>
-            <h1 className="text-xl font-bold">Ruta dana</h1>
+          <div className="min-w-0">
+            <h1 className="text-xl font-bold">{t.title}</h1>
             <button
-              onClick={() => setCalendarOpen(true)}
+              onClick={openMobileCalendar}
               className="flex items-center gap-1.5 text-sm text-muted-foreground cursor-pointer lg:pointer-events-none"
             >
               {selectedDateObj ? (
@@ -229,21 +273,48 @@ export default function RadnikPage() {
                   {format(selectedDateObj, "EEEE, d. MMMM yyyy.", { locale: hr })}
                 </span>
               ) : (
-                "Hop Hop Napuhanci — radnik"
+                t.brand
               )}
               <CalendarDays className="h-3.5 w-3.5 shrink-0 lg:hidden" />
             </button>
+            {selectedDate && (
+              <button
+                onClick={() => {
+                  resetTrip();
+                  openMobileCalendar();
+                }}
+                className="mt-1 flex items-center gap-0.5 text-xs font-medium text-muted-foreground hover:text-foreground"
+              >
+                <ChevronLeft className="h-3 w-3" /> Promijeni dan
+              </button>
+            )}
             {autoFallback && (
               <p className="text-xs text-muted-foreground">Nema rezervacija danas — prikazan prvi sljedeći dan s rezervacijom.</p>
             )}
           </div>
-          <div className="flex shrink-0 items-center gap-2">
-            {tripGroups && (
-              <Button variant="outline" onClick={resetTrip}>
-                ← Nova ruta
-              </Button>
-            )}
-            <Button variant="ghost" size="icon" onClick={handleSignOut} title="Odjava">
+          <div className="flex shrink-0 flex-col items-end gap-2">
+            {/* stalni prekidač smjene -> uvijek jasno u kojoj si i kako u drugu */}
+            <div className="flex rounded-lg border bg-muted/40 p-0.5 text-xs font-medium">
+              <Link
+                to="/radnik/dostava"
+                className={cn(
+                  "rounded-md px-2.5 py-1 transition-colors",
+                  mode === "delivery" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                Dostava
+              </Link>
+              <Link
+                to="/radnik/skupljanje"
+                className={cn(
+                  "rounded-md px-2.5 py-1 transition-colors",
+                  mode === "pickup" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                Skupljanje
+              </Link>
+            </div>
+            <Button variant="ghost" size="icon" onClick={handleSignOut} title="Odjava" className="h-7 w-7">
               <LogOut className="h-4 w-4" />
             </Button>
           </div>
@@ -264,7 +335,7 @@ export default function RadnikPage() {
               <>
                 <div className="hidden lg:block">
                   <BookingCalendar
-                    bookings={confirmedBookings}
+                    bookings={shiftBookings}
                     currentMonth={currentMonth}
                     onMonthChange={setCurrentMonth}
                     selectedDate={selectedDateObj}
@@ -287,7 +358,7 @@ export default function RadnikPage() {
                     </DialogHeader>
                     <div className="p-4 pt-2">
                       <BookingCalendar
-                        bookings={confirmedBookings}
+                        bookings={shiftBookings}
                         currentMonth={currentMonth}
                         onMonthChange={setCurrentMonth}
                         selectedDate={selectedDateObj}
@@ -314,7 +385,7 @@ export default function RadnikPage() {
                 <CardContent className="p-5 space-y-3">
                   {stops.length === 0 && (
                     <p className="text-sm text-muted-foreground">
-                      {selectedDate ? "Nema dostava za odabrani dan." : "Odaberi dan u kalendaru."}
+                      {selectedDate ? t.noStops : "Odaberi dan u kalendaru."}
                     </p>
                   )}
                   {stops.length > 0 && <OverviewMap origin={WAREHOUSE} stops={stops} />}
@@ -373,9 +444,7 @@ export default function RadnikPage() {
                     </div>
                   ))}
                   {stops.length > 0 && (
-                    <p className="text-xs text-muted-foreground">
-                      Max {MAX_PER_TRIP} napuhanca po vožnji — app sam dijeli u krugove i grupira po blizini.
-                    </p>
+                    <p className="text-xs text-muted-foreground">{t.perTrip(MAX_PER_TRIP)}</p>
                   )}
                 </CardContent>
               </Card>
@@ -391,16 +460,17 @@ export default function RadnikPage() {
                   <TripCard
                     key={i}
                     index={i}
+                    mode={mode}
                     origin={WAREHOUSE}
                     stops={group}
-                    storageKey={`${selectedDate}-${i}`}
+                    storageKey={`${mode}-${selectedDate}-${i}`}
                   />
                 ))}
               </div>
             ) : (
               <Card className="hidden lg:block border-dashed">
                 <CardContent className="p-10 text-center text-sm text-muted-foreground">
-                  Krugovi za dostavu prikazat će se ovdje nakon što odabereš dan i izračunaš rutu.
+                  {t.emptyTrips}
                 </CardContent>
               </Card>
             )}
