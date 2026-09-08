@@ -32,6 +32,7 @@ const NAPUHANAC_LABELS: Record<string, string> = {
   "Minecraft Party": "Minecraft party",
   "Dino Park": "Dino park",
   "Paw Patrol": "Paw Patrol avantura",
+  "Nogometni izazov": "Nogometni izazov",
   "Super Mario": "Super Mario Tobogan",
 };
 

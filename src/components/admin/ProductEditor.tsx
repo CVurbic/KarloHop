@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -64,6 +65,7 @@ const ProductEditor = () => {
   const [seoDescription, setSeoDescription] = useState("");
   const [seoOgImage, setSeoOgImage] = useState("");
   const [sortOrder, setSortOrder] = useState(0);
+  const [hidden, setHidden] = useState(false);
   const [saving, setSaving] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingMain, setUploadingMain] = useState(false);
@@ -97,6 +99,7 @@ const ProductEditor = () => {
       setSeoDescription(existingProduct.seo_description || "");
       setSeoOgImage(existingProduct.seo_og_image || "");
       setSortOrder(existingProduct.sort_order || 0);
+      setHidden(existingProduct.status === "hidden");
     }
   }, [existingProduct]);
 
@@ -210,20 +213,24 @@ const ProductEditor = () => {
         seo_title: seoTitle.trim() || null,
         seo_description: seoDescription.trim() || null,
         seo_og_image: seoOgImage || null,
-        status: publishNow ? "published" : "draft",
+        // A hidden product is never shown on the site regardless of which save
+        // button was used. Turn the toggle off to publish / save as draft.
+        status: hidden ? "hidden" : publishNow ? "published" : "draft",
         sort_order: sortOrder,
       };
 
+      const savedTitle = hidden
+        ? "Proizvod skriven sa stranice."
+        : publishNow
+          ? "Proizvod objavljen!"
+          : "Skica spremljena.";
+
       if (isEditing) {
         await updateProduct.mutateAsync({ id: id!, ...productData });
-        toast({
-          title: publishNow ? "Proizvod objavljen!" : "Skica spremljena.",
-        });
+        toast({ title: savedTitle });
       } else {
         await createProduct.mutateAsync(productData);
-        toast({
-          title: publishNow ? "Proizvod objavljen!" : "Skica spremljena.",
-        });
+        toast({ title: savedTitle });
         navigate("/hop-upravljanje/proizvodi");
       }
     } catch (err: unknown) {
@@ -487,6 +494,36 @@ const ProductEditor = () => {
 
         {/* Sidebar */}
         <div className="space-y-6">
+          {/* Visibility */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm">Vidljivost</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <Label htmlFor="hidden" className="text-sm font-medium">
+                    Sakrij proizvod
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Kad je uključeno, proizvod se ne prikazuje na stranici ni u
+                    popisu za rezervaciju, ali ostaje spremljen ovdje.
+                  </p>
+                </div>
+                <Switch
+                  id="hidden"
+                  checked={hidden}
+                  onCheckedChange={setHidden}
+                />
+              </div>
+              {hidden && (
+                <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                  Proizvod je skriven i neće biti vidljiv posjetiteljima.
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           {/* Price */}
           <Card>
             <CardHeader>

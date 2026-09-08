@@ -12,7 +12,8 @@ export function loadGoogleMaps(): Promise<typeof google> {
 
     const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+    // language=hr osigurava da recenzije i tekstovi stižu na hrvatskom bez obzira na jezik uređaja
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&language=hr&region=HR`;
     script.async = true;
     script.onload = () => resolve(window.google);
     script.onerror = () => reject(new Error("Google Maps script failed to load"));

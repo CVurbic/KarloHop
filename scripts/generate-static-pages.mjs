@@ -74,18 +74,18 @@ const products = [
     price: "100",
   },
   {
-    slug: "super-mario-tobogan",
-    name: "Super Mario Tobogan",
-    title: "Super Mario tobogan napuhanac za najam | Hop Hop Napuhanci Zagreb",
+    slug: "nogomet-napuhanac",
+    name: "Nogometni izazov",
+    title: "Nogometni izazov napuhanac za najam | Hop Hop Napuhanci Zagreb",
     description:
-      "Super Mario tobogan napuhanac za najam u Zagrebu! Dimenzije 7x4.2x6m, veliki tobogan, do 6 djece, uzrast 3-12 god. Dostava i montaža uključeni — 150€/dan.",
-    image: "/placeholder.svg",
+      "Nogometni izazov napuhanac s loptom za najam u Zagrebu! Dimenzije 4x2.5x2.4m, za 2 ili više igrača, uzrast 4–14 god. Dostava i montaža uključeni — 100€/dan.",
+    image: "/assets/NOGOMET.png",
     longDesc:
-      "Skoči u svijet Super Marija! Veliki tobogan napuhanac, visok 6 metara, donosi pravu Mario avanturu u tvoje dvorište — savršen za rođendane i sve male obožavatelje kultne igre.",
-    dimensions: "7 x 4.2 x 6m",
-    capacity: "Do 6 djece istovremeno",
-    ages: "3–12 godina",
-    price: "150",
+      "Zabijte pobjednički gol! Nogometni izazov je napuhanac za sve male (i velike) ljubitelje nogometa — dva ili više igrača nadmeću se tko će zabiti više golova. Uz napuhanac uvijek dolazi i lopta, pa zabava može početi odmah.",
+    dimensions: "4 x 2.5 x 2.4m",
+    capacity: "2 ili više igrača istovremeno",
+    ages: "4–14 godina",
+    price: "100",
   },
 ];
 

@@ -85,8 +85,20 @@ export function parseReservation(text: string, products: BounceHouseOption[] = [
 
   // Resolve the free-typed bouncer text to a real product slug
   if (result.bouncer) {
-    const match = matchBounceHouse(result.bouncer, products);
-    if (match) result.bouncer = match.slug;
+    const b = result.bouncer.toLowerCase();
+    if (b.includes("dino")) {
+      result.bouncer = "Dino Park";
+    } else if (b.includes("minecraft")) {
+      result.bouncer = "Minecraft Party";
+    } else if (b.includes("jednorog") || b.includes("unicorn")) {
+      result.bouncer = "Jednorog";
+    } else if (b.includes("paw") || b.includes("patrol")) {
+      result.bouncer = "Paw Patrol";
+    } else if (b.includes("nogomet") || b.includes("football")) {
+      result.bouncer = "Nogometni izazov";
+    } else if (b.includes("mario")) {
+      result.bouncer = "Super Mario";
+    }
   }
 
   return result;

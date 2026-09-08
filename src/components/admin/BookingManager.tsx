@@ -407,8 +407,8 @@ const BookingManager = () => {
                     <SelectValue placeholder="Odaberi" />
                   </SelectTrigger>
                   <SelectContent>
-                    {bounceHouses.map((b) => (
-                      <SelectItem key={b.slug} value={b.slug}>{b.name}</SelectItem>
+                    {BOUNCERS.filter((b) => !b.hidden).map((b) => (
+                      <SelectItem key={b.name} value={b.name}>{b.name}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>

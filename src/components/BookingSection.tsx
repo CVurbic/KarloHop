@@ -437,19 +437,21 @@ const BookingSection = () => {
                           name="booking_start_date"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Datum rezervacije</FormLabel>
-                              <BookingCalendar
-                                bookings={[]}
-                                currentMonth={calendarMonth}
-                                onMonthChange={setCalendarMonth}
-                                selectedDate={field.value ? new Date(`${field.value}T00:00:00`) : null}
-                                onSelectDate={(day) => field.onChange(format(day, 'yyyy-MM-dd'))}
-                                showLegend={false}
-                                unavailableDates={fullyBookedDates}
-                              />
-                              <FormControl>
-                                <input type="hidden" {...field} />
-                              </FormControl>
+                              <FormLabel>Izbor napuhanca</FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Odaberite napuhanac" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="Jednorog">Jednorog svijet - 100€</SelectItem>
+                                  <SelectItem value="Minecraft Party">Minecraft party - 100€</SelectItem>
+                                  <SelectItem value="Dino Park">Dino park - 100€</SelectItem>
+                                  <SelectItem value="Paw Patrol">Paw Patrol avantura - 100€</SelectItem>
+                                  <SelectItem value="Nogometni izazov">Nogometni izazov - 100€</SelectItem>
+                                </SelectContent>
+                              </Select>
                               <FormMessage />
                             </FormItem>
                           )}

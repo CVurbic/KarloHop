@@ -18,8 +18,26 @@ import {
 } from "date-fns";
 import { hr } from "date-fns/locale";
 import type { Booking } from "@/hooks/useBookings";
-import type { BounceHouseOption } from "@/hooks/useBounceHouseOptions";
-import { toBounceHouseSlug } from "@/lib/bounceHouseCompat";
+
+export type Bouncer = {
+  name: string;
+  color: string;
+  lightColor: string;
+  dotColor: string;
+  price: string;
+  hidden?: boolean;
+};
+
+// `hidden: true` bouncers are kept for historical bookings (colouring, labels,
+// revenue) but are excluded from the "new booking" selection dropdowns.
+export const BOUNCERS: Bouncer[] = [
+  { name: "Minecraft Party", color: "bg-blue-500", lightColor: "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300", dotColor: "bg-blue-400", price: "100" },
+  { name: "Dino Park", color: "bg-teal-500", lightColor: "bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-300", dotColor: "bg-teal-400", price: "100" },
+  { name: "Jednorog", color: "bg-pink-500", lightColor: "bg-pink-100 text-pink-800 dark:bg-pink-900/40 dark:text-pink-300", dotColor: "bg-pink-400", price: "100" },
+  { name: "Paw Patrol", color: "bg-yellow-500", lightColor: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300", dotColor: "bg-yellow-400", price: "100" },
+  { name: "Nogometni izazov", color: "bg-green-500", lightColor: "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300", dotColor: "bg-green-400", price: "100" },
+  { name: "Super Mario", color: "bg-red-500", lightColor: "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300", dotColor: "bg-red-400", price: "150", hidden: true },
+];
 
 const DAY_NAMES = ["Pon", "Uto", "Sri", "Čet", "Pet", "Sub", "Ned"];
 

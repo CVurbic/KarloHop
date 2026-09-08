@@ -177,10 +177,18 @@ const ProductManager = () => {
                   <TableCell>
                     <Badge
                       variant={
-                        product.status === "published" ? "default" : "secondary"
+                        product.status === "published"
+                          ? "default"
+                          : product.status === "hidden"
+                            ? "outline"
+                            : "secondary"
                       }
                     >
-                      {product.status === "published" ? "Objavljeno" : "Skica"}
+                      {product.status === "published"
+                        ? "Objavljeno"
+                        : product.status === "hidden"
+                          ? "Skriveno"
+                          : "Skica"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
