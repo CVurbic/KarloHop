@@ -1,9 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Calendar, Clock, Phone, User, Castle, CheckCircle, Loader2, MapPin } from "lucide-react";
+import { Calendar, Clock, Phone, User, Castle, CheckCircle, CheckCircle2, Loader2, MapPin } from "lucide-react";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,6 +13,34 @@ import { analytics } from "@/lib/analytics";
 import { useState, useEffect, useRef } from "react";
 import { loadGoogleMaps } from "@/lib/googleMaps";
 import LocationConfirmDialog from "@/components/LocationConfirmDialog";
+import { BookingCalendar } from "@/components/BookingCalendar";
+import { format, startOfMonth, endOfMonth } from "date-fns";
+import { usePublishedBounceHouses } from "@/hooks/useBounceHouseOptions";
+import { rawValuesForSlug } from "@/lib/bounceHouseCompat";
+
+// Checks availability across every raw value a booking could hold for this product slug
+// (the slug itself + legacy short names from before bookings stored slugs — see bounceHouseCompat.ts).
+async function fetchUnavailableDates(slug: string, startDate: string, endDate: string): Promise<Set<string>> {
+  const results = await Promise.all(
+    rawValuesForSlug(slug).map((rawValue) =>
+      supabase.rpc('check_availability_safe', {
+        bounce_house_name: rawValue,
+        check_start_date: startDate,
+        check_end_date: endDate,
+      })
+    )
+  );
+
+  const dates = new Set<string>();
+  for (const { data, error } of results) {
+    if (error) {
+      console.error('Error checking availability:', error);
+      continue;
+    }
+    (data || []).forEach((r: { unavailable_date: string }) => dates.add(r.unavailable_date));
+  }
+  return dates;
+}
 
 // Form validation schema
 const formSchema = z.object({
@@ -47,8 +74,13 @@ const itemVariants = {
 
 const BookingSection = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [availabilityStatus, setAvailabilityStatus] = useState<string>("");
-  const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
+  const [calendarMonth, setCalendarMonth] = useState(new Date());
+  // Slugs of bounce houses already booked on the chosen date -> shown greyed out as "Rezervirano".
+  const [bookedHouses, setBookedHouses] = useState<Set<string>>(new Set());
+  const [isLoadingAvailability, setIsLoadingAvailability] = useState(false);
+  // Days in the visible month where every bounce house is booked -> calendar marks them red/locked.
+  const [fullyBookedDates, setFullyBookedDates] = useState<Set<string>>(new Set());
+  const { data: bounceHouses = [] } = usePublishedBounceHouses();
 
   const addressInputRef = useRef<HTMLInputElement | null>(null);
   const [pendingPlace, setPendingPlace] = useState<{ address: string; lat: number; lng: number } | null>(null);
@@ -68,43 +100,61 @@ const BookingSection = () => {
   });
 
   const selectedDate = form.watch("booking_start_date");
-  const selectedBounceHouse = form.watch("selected_bounce_house");
+  const slugsKey = bounceHouses.map((b) => b.slug).join(",");
 
+  // Date picked -> check every bounce house for that day so booked ones can be greyed out.
+  // ponytail: N parallel per-house RPC calls (fine for ~6 products); add a check_all_availability(date) RPC if the product list grows.
   useEffect(() => {
-    const checkAvailability = async () => {
-      if (!selectedDate || !selectedBounceHouse) {
-        setAvailabilityStatus("");
-        return;
-      }
+    if (!selectedDate) {
+      setBookedHouses(new Set());
+      return;
+    }
 
-      setIsCheckingAvailability(true);
+    form.setValue("selected_bounce_house", "");
+    setBookedHouses(new Set());
+    setIsLoadingAvailability(true);
 
-      try {
-        // Use the database function to check availability securely
-        const { data, error } = await supabase
-          .rpc('check_availability_safe', {
-            bounce_house_name: selectedBounceHouse,
-            check_start_date: selectedDate,
-            check_end_date: selectedDate
-          });
+    let cancelled = false;
+    Promise.all(
+      bounceHouses.map(async (b) =>
+        [b.slug, (await fetchUnavailableDates(b.slug, selectedDate, selectedDate)).has(selectedDate)] as const
+      )
+    ).then((entries) => {
+      if (cancelled) return;
+      setBookedHouses(new Set(entries.filter(([, booked]) => booked).map(([slug]) => slug)));
+      setIsLoadingAvailability(false);
+    });
 
-        if (error) throw error;
-
-        if (data && data.length > 0) {
-          setAvailabilityStatus("❌ Ovaj napuhanac je već rezerviran za odabrani datum");
-        } else {
-          setAvailabilityStatus("✅ Dostupno za rezervaciju!");
-        }
-      } catch (error) {
-        console.error('Error checking availability:', error);
-        setAvailabilityStatus("");
-      } finally {
-        setIsCheckingAvailability(false);
-      }
+    return () => {
+      cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDate, slugsKey]);
 
-    checkAvailability();
-  }, [selectedDate, selectedBounceHouse]);
+  // Visible month -> find days where every bounce house is booked, so the calendar can lock + redden them.
+  useEffect(() => {
+    if (bounceHouses.length === 0) return;
+
+    const start = format(startOfMonth(calendarMonth), "yyyy-MM-dd");
+    const end = format(endOfMonth(calendarMonth), "yyyy-MM-dd");
+
+    let cancelled = false;
+    Promise.all(bounceHouses.map((b) => fetchUnavailableDates(b.slug, start, end))).then((sets) => {
+      if (cancelled) return;
+      const counts = new Map<string, number>();
+      sets.forEach((s) => s.forEach((d) => counts.set(d, (counts.get(d) ?? 0) + 1)));
+      const full = new Set<string>();
+      counts.forEach((n, d) => {
+        if (n >= bounceHouses.length) full.add(d);
+      });
+      setFullyBookedDates(full);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [calendarMonth, slugsKey]);
 
   useEffect(() => {
     let autocomplete: google.maps.places.Autocomplete | null = null;
@@ -147,16 +197,13 @@ const BookingSection = () => {
 
     try {
       // Double-check availability before submitting
-      const { data: availabilityData, error: availabilityError } = await supabase
-        .rpc('check_availability_safe', {
-          bounce_house_name: values.selected_bounce_house,
-          check_start_date: values.booking_start_date,
-          check_end_date: values.booking_start_date
-        });
+      const clashes = await fetchUnavailableDates(
+        values.selected_bounce_house,
+        values.booking_start_date,
+        values.booking_start_date
+      );
 
-      if (availabilityError) {
-        console.error('Error checking availability:', availabilityError);
-      } else if (availabilityData && availabilityData.length > 0) {
+      if (clashes.has(values.booking_start_date)) {
         toast({
           title: "Napuhanac već rezerviran",
           description: "Ovaj napuhanac je već rezerviran za odabrani datum. Molimo odaberite drugi datum.",
@@ -186,10 +233,14 @@ const BookingSection = () => {
         throw error;
       }
 
+      // DB/availability keep the slug; email + calendar want the human-readable product name
+      const bounceHouseName =
+        bounceHouses.find((b) => b.slug === values.selected_bounce_house)?.name || values.selected_bounce_house;
+
       // Send email notification
       try {
         const { error: emailError } = await supabase.functions.invoke('send-booking-email', {
-          body: values
+          body: { ...values, selected_bounce_house: bounceHouseName }
         });
 
         if (emailError) {
@@ -207,7 +258,7 @@ const BookingSection = () => {
       try {
         if (insertedBooking) {
           await supabase.functions.invoke('sync-google-calendar', {
-            body: insertedBooking
+            body: { ...insertedBooking, selected_bounce_house: bounceHouseName }
           });
         }
       } catch (calendarError) {
@@ -224,7 +275,7 @@ const BookingSection = () => {
       analytics.trackBookingSubmission(values.selected_bounce_house, values.booking_start_date);
       form.reset();
       confirmedLocationRef.current = null;
-      setAvailabilityStatus("");
+      setBookedHouses(new Set());
     } catch (error) {
       console.error('Error submitting booking:', error);
       toast({
@@ -380,61 +431,89 @@ const BookingSection = () => {
                         </div>
                         <h3 className="text-lg font-semibold text-foreground">Detalji rezervacije</h3>
                       </div>
-                      <div className="bg-muted/30 rounded-xl p-5 space-y-4">
-                        <FormField
-                          control={form.control}
-                          name="selected_bounce_house"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Izbor napuhanca</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Odaberite napuhanac" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="Jednorog">Jednorog svijet - 100€</SelectItem>
-                                  <SelectItem value="Minecraft Party">Minecraft party - 100€</SelectItem>
-                                  <SelectItem value="Dino Park">Dino park - 100€</SelectItem>
-                                  <SelectItem value="Paw Patrol">Paw Patrol avantura - 100€</SelectItem>
-                                  <SelectItem value="Super Mario">Super Mario Tobogan - 150€</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
+                      <div className="bg-muted/30 rounded-xl p-5 space-y-6">
                         <FormField
                           control={form.control}
                           name="booking_start_date"
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Datum rezervacije</FormLabel>
+                              <BookingCalendar
+                                bookings={[]}
+                                currentMonth={calendarMonth}
+                                onMonthChange={setCalendarMonth}
+                                selectedDate={field.value ? new Date(`${field.value}T00:00:00`) : null}
+                                onSelectDate={(day) => field.onChange(format(day, 'yyyy-MM-dd'))}
+                                showLegend={false}
+                                unavailableDates={fullyBookedDates}
+                              />
                               <FormControl>
-                                <Input
-                                  type="date"
-                                  {...field}
-                                  min={new Date().toISOString().split('T')[0]}
-                                />
+                                <input type="hidden" {...field} />
                               </FormControl>
-                              {availabilityStatus && (
-                                <motion.p
-                                  initial={{ opacity: 0, height: 0 }}
-                                  animate={{ opacity: 1, height: "auto" }}
-                                  className={`text-sm mt-2 font-semibold ${
-                                    availabilityStatus.includes("✅") ? "text-green-600" : "text-red-600"
-                                  }`}
-                                >
-                                  {isCheckingAvailability ? "Provjeravam dostupnost..." : availabilityStatus}
-                                </motion.p>
-                              )}
                               <FormMessage />
                             </FormItem>
                           )}
                         />
 
+                        <FormField
+                          control={form.control}
+                          name="selected_bounce_house"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Izbor napuhanca</FormLabel>
+                              {!selectedDate ? (
+                                <p className="text-sm text-muted-foreground italic">
+                                  Prvo odaberite datum da vidite dostupne napuhance
+                                </p>
+                              ) : isLoadingAvailability ? (
+                                <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                  Provjeravam dostupnost...
+                                </p>
+                              ) : (
+                                <div className="grid sm:grid-cols-2 gap-3">
+                                  {bounceHouses.map((b) => {
+                                    const booked = bookedHouses.has(b.slug);
+                                    const selected = field.value === b.slug;
+                                    return (
+                                      <button
+                                        key={b.slug}
+                                        type="button"
+                                        disabled={booked}
+                                        onClick={() => field.onChange(b.slug)}
+                                        className={`flex items-center justify-between gap-2 rounded-xl border p-3 text-left transition-all ${
+                                          booked
+                                            ? "border-border bg-muted/40 opacity-50 cursor-not-allowed"
+                                            : selected
+                                            ? "border-primary bg-primary/10 shadow-playful"
+                                            : "border-border hover:border-primary/50 hover:bg-muted/50 active:scale-[0.98]"
+                                        }`}
+                                      >
+                                        <span className="min-w-0">
+                                          <span className="block font-semibold text-foreground truncate">{b.name}</span>
+                                          <span className="block text-sm text-muted-foreground">
+                                            {b.discountPrice || b.price}€
+                                          </span>
+                                        </span>
+                                        {booked ? (
+                                          <span className="shrink-0 text-xs font-semibold uppercase text-destructive">
+                                            Rezervirano
+                                          </span>
+                                        ) : selected ? (
+                                          <CheckCircle2 className="h-5 w-5 shrink-0 text-primary" />
+                                        ) : null}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                              <FormControl>
+                                <input type="hidden" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </div>
                     </motion.div>
 

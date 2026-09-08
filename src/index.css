@@ -32,6 +32,12 @@ All colors MUST be HSL.
     --warning: 39 97% 58%; /* Yellow */
     --warning-foreground: 221 39% 11%;
 
+    /* Distinct from --accent (brand lime-green, decorative): a clear green for
+       "available/success" status, since accent's hue 67 reads as pale yellow
+       at low opacity and doesn't contrast enough against --destructive red. */
+    --success: 142 71% 40%;
+    --success-foreground: 0 0% 100%;
+
     --orange: 24 95% 53%; /* Orange */
     --orange-foreground: 0 0% 100%;
 
@@ -65,6 +71,9 @@ All colors MUST be HSL.
     /* Glass effects */
     --glass-blue-bg: rgba(173, 216, 230, 0.2);
     --glass-blue-border: rgba(173, 216, 230, 0.3);
+
+    /* Strong custom easing (default CSS easings feel weak/sluggish for UI motion) */
+    --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
 
     --chart-tooltip-bg: #fff;
     --chart-tooltip-border: #e5e7eb;
@@ -107,6 +116,9 @@ All colors MUST be HSL.
     --muted-foreground: 215 20.2% 65.1%;
 
     --accent: 67 76% 63%;
+
+    --success: 142 65% 50%;
+    --success-foreground: 221 39% 11%;
     --accent-foreground: 221 39% 11%;
 
     --destructive: 0 62.8% 30.6%;
@@ -138,6 +150,12 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground font-sans;
     overscroll-behavior: none;
+  }
+
+  /* Brand display font on all headings (see tailwind.config.ts fontFamily.display) —
+     body text stays the system sans stack for readability on forms/long copy. */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight;
   }
 
   /* Prevent background shift when mobile menu/dialog opens.
@@ -187,6 +205,24 @@ All colors MUST be HSL.
 
   .mascot-hover:hover {
     transform: scale(1.05) rotate(2deg);
+  }
+
+  /* Booking calendar: each day cell fades/slides in on mount (month change) */
+  @keyframes day-cell-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .day-cell-in {
+      animation: day-cell-in 240ms var(--ease-out-strong) both;
+    }
   }
 }
 

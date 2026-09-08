@@ -13,7 +13,9 @@ import { TripCard } from "@/components/radnik/TripCard";
 import { OverviewMap } from "@/components/radnik/OverviewMap";
 import { type RadnikStop } from "@/components/radnik/RouteMap";
 import LocationConfirmDialog from "@/components/LocationConfirmDialog";
-import { BookingCalendar, BOUNCERS } from "@/components/BookingCalendar";
+import { BookingCalendar } from "@/components/BookingCalendar";
+import { useAllBounceHouses } from "@/hooks/useBounceHouseOptions";
+import { toBounceHouseSlug } from "@/lib/bounceHouseCompat";
 
 // mora odgovarati skladistu koje koristi ruta -> Lanište 26, Zagreb
 const WAREHOUSE = { lat: 45.773021, lng: 15.9444089 };
@@ -93,6 +95,7 @@ export default function RadnikPage() {
   const { signOut } = useAdmin();
   const navigate = useNavigate();
   const { data: allBookings, isLoading, isError, refetch } = useAllBookings();
+  const { data: bounceHouses = [] } = useAllBounceHouses();
   const savedSession = useRef(loadSession()).current;
   const [selectedDate, setSelectedDate] = useState<string | null>(savedSession?.selectedDate ?? null);
   const [currentMonth, setCurrentMonth] = useState(() =>
@@ -269,6 +272,7 @@ export default function RadnikPage() {
                     isLoading={isLoading}
                     showLegend
                     isDaySelectable={(_dateKey, dayBookings) => dayBookings.length > 0}
+                    products={bounceHouses}
                   />
                 </div>
 
@@ -294,6 +298,7 @@ export default function RadnikPage() {
                         isLoading={isLoading}
                         showLegend
                         isDaySelectable={(_dateKey, dayBookings) => dayBookings.length > 0}
+                        products={bounceHouses}
                       />
                     </div>
                   </DialogContent>
@@ -320,8 +325,14 @@ export default function RadnikPage() {
                     >
                       <div className="flex w-1.5 shrink-0 flex-col">
                         {s.napuhanac.map((name, ni) => {
-                          const bouncer = BOUNCERS.find((b) => b.name === name);
-                          return <div key={ni} className={`flex-1 ${bouncer?.dotColor ?? "bg-muted-foreground/30"}`} />;
+                          const bouncer = bounceHouses.find((b) => b.slug === toBounceHouseSlug(name));
+                          return (
+                            <div
+                              key={ni}
+                              className={`flex-1 ${!bouncer?.color ? "bg-muted-foreground/30" : ""}`}
+                              style={bouncer?.color ? { backgroundColor: bouncer.color } : undefined}
+                            />
+                          );
                         })}
                       </div>
                       <div className="flex flex-1 items-start gap-2 px-3 py-3">
