@@ -18,13 +18,14 @@ import {
   X,
   Minus,
   Plus,
-  Navigation,
 } from "lucide-react";
-import { BOUNCERS } from "@/components/BookingCalendar";
 import { RouteMap, type RadnikStop, type RouteResult } from "./RouteMap";
+import { LiveTripMap } from "./LiveTripMap";
 import { loadGoogleMaps } from "@/lib/googleMaps";
 import { useMessageTemplate, fillTemplate } from "@/hooks/useMessageTemplates";
 import { napuhanci } from "@/data/products";
+import { useAllBounceHouses } from "@/hooks/useBounceHouseOptions";
+import { toBounceHouseSlug } from "@/lib/bounceHouseCompat";
 
 const NAPUHANAC_LABELS: Record<string, string> = {
   Jednorog: "Jednorog svijet",
@@ -43,103 +44,6 @@ function napuhanacLabels(names: string[]) {
 function napuhanacImage(name: string): string | undefined {
   const label = NAPUHANAC_LABELS[name] ?? name;
   return napuhanci.find((p) => p.name === label)?.coverImage;
-}
-
-// isti 15km besplatna-dostava radijus koji se koristi po cijelom siteu (Arena Zagreb) -> "u gradu" referenca
-const ZAGREB_CENTER = { lat: 45.7747, lng: 15.8887 };
-const CITY_RADIUS_KM = 15;
-
-function haversineKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
-  const toRad = (d: number) => (d * Math.PI) / 180;
-  const R = 6371;
-  const dLat = toRad(b.lat - a.lat);
-  const dLng = toRad(b.lng - a.lng);
-  const s = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(s));
-}
-
-// mala non-interaktivna karta skladiste->stop, klik otvara punu navigaciju (isti navHref)
-function MiniRouteMap({
-  origin,
-  stop,
-  onClick,
-}: {
-  origin: { lat: number; lng: number };
-  stop: { lat: number; lng: number };
-  onClick: () => void;
-}) {
-  const mapRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    loadGoogleMaps().then((g) => {
-      if (cancelled || !mapRef.current) return;
-
-      // unutar grada -> zumiraj na oboje (skladiste + stop) za kontekst grada
-      // izvan grada -> tesnji zoom na sam stop, skladiste bi ionako bilo predaleko za koristan prikaz
-      const inCity = haversineKm(ZAGREB_CENTER, stop) <= CITY_RADIUS_KM;
-      const center = inCity ? { lat: (origin.lat + stop.lat) / 2, lng: (origin.lng + stop.lng) / 2 } : stop;
-
-      const map = new g.maps.Map(mapRef.current, {
-        center,
-        zoom: inCity ? 10 : 9,
-        disableDefaultUI: true,
-        gestureHandling: "none",
-        keyboardShortcuts: false,
-        styles: [{ featureType: "poi", stylers: [{ visibility: "off" }] }],
-      });
-
-      new g.maps.Marker({
-        position: origin,
-        map,
-        title: "Skladište",
-        icon: {
-          path: g.maps.SymbolPath.CIRCLE,
-          scale: 8,
-          fillColor: "#0AA8E0",
-          fillOpacity: 1,
-          strokeColor: "#ffffff",
-          strokeWeight: 2,
-        },
-      });
-      new g.maps.Marker({ position: stop, map, title: "Dostava" });
-
-      // isprekidana linija skladiste->stop -> vizualno "ovo je ruta", bez stvarnog racunanja directions (to vec radi RouteMap)
-      new g.maps.Polyline({
-        path: [origin, stop],
-        map,
-        geodesic: true,
-        strokeOpacity: 0,
-        icons: [
-          {
-            icon: { path: "M 0,-1 0,1", strokeOpacity: 1, strokeColor: "#0AA8E0", scale: 3 },
-            offset: "0",
-            repeat: "14px",
-          },
-        ],
-      });
-    });
-    return () => {
-      cancelled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [origin.lat, origin.lng, stop.lat, stop.lng]);
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label="Otvori navigaciju"
-      className="relative h-36 w-full cursor-pointer overflow-hidden rounded-lg border transition-transform active:scale-[0.98]"
-    >
-      <div ref={mapRef} className="h-full w-full" />
-      {/* eksplicitan hint da je karta tappable -> ne oslanjamo se na to da user pretpostavi */}
-      <span className="absolute bottom-2 right-2 flex items-center gap-1 rounded-full bg-background/90 px-2.5 py-1 text-xs font-medium text-foreground shadow backdrop-blur">
-        <Navigation className="h-3 w-3" />
-        Navigacija
-      </span>
-    </button>
-  );
 }
 
 // dva eksplicitna gumba (Pozovi / Poruka) umjesto skrivenog izbornika -> ocito je klikabilno bez pogadanja
@@ -288,6 +192,8 @@ export function TripCard({
   storageKey: string;
   onActiveStopChange?: (stop: RadnikStop | null) => void;
 }) {
+  const { data: bounceHouses = [] } = useAllBounceHouses();
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const saved = useMemo(() => loadSavedTrip(storageKey, stops), []);
 
@@ -388,6 +294,9 @@ export function TripCard({
   const totalNapuhanaca = stops.reduce((sum, s) => sum + s.napuhanac.length, 0);
   const activeStop = orderedStops[stepIndex];
 
+  // info panel u ekranu dostave: spušten (vidi se karta) / podignut (checklist) -> karta se resize-a između
+  const [sheetExpanded, setSheetExpanded] = useState(false);
+
   // globalni FAB (RadnikPage) treba znati koja je lokacija aktivna da ponudi "Karta" akciju
   useEffect(() => {
     onActiveStopChange?.(started ? activeStop ?? null : null);
@@ -399,10 +308,8 @@ export function TripCard({
     return () => onActiveStopChange?.(null);
   }, []);
 
-  // otvara Google Maps app (isti navHref kao FAB) -> nova tab da nasa stranica ostane ziva u pozadini
-  const openNav = (stop: RadnikStop) => window.open(navHref(stop), "_blank");
-
   const advance = () => {
+    setSheetExpanded(false); // sljedeća lokacija -> spusti panel da vozač vidi kartu
     if (stepIndex < orderedStops.length - 1) {
       setStepIndex((i) => i + 1);
     } else {
@@ -437,8 +344,14 @@ export function TripCard({
               >
                 <div className="flex w-1.5 shrink-0 flex-col">
                   {s.napuhanac.map((name, ni) => {
-                    const bouncer = BOUNCERS.find((b) => b.name === name);
-                    return <div key={ni} className={`flex-1 ${bouncer?.dotColor ?? "bg-muted-foreground/30"}`} />;
+                    const bouncer = bounceHouses.find((b) => b.slug === toBounceHouseSlug(name));
+                    return (
+                      <div
+                        key={ni}
+                        className={`flex-1 ${!bouncer?.color ? "bg-muted-foreground/30" : ""}`}
+                        style={bouncer?.color ? { backgroundColor: bouncer.color } : undefined}
+                      />
+                    );
                   })}
                 </div>
                 {!started && orderedStops.length > 1 && (
@@ -511,36 +424,58 @@ export function TripCard({
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
-            className="fixed inset-0 z-40 bg-background"
+            className="fixed inset-0 z-40 flex flex-col bg-background"
           >
             <>
-              {/* slika pinana iza scroll sadrzaja (ne skrola) -> sheet ju prekriva/skriva kako user skrola gore */}
-              <div className="absolute inset-x-0 top-0 z-0 h-[33vh] w-full overflow-hidden bg-muted">
-                {napuhanacImage(activeStop.napuhanac[0]) && (
-                  <img
-                    src={napuhanacImage(activeStop.napuhanac[0])}
-                    alt=""
-                    className="h-full w-full object-cover"
-                  />
-                )}
-                {/* izrazeniji fade -> pola slike prelazi u bg boju, info sheet ispod se nastavlja na isti bg pa vizualno "sjedi" na slici */}
-                <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-b from-transparent via-background/80 to-background" />
+              {/* karta zauzima stvarni prostor iznad panela -> centar joj nije skriven */}
+              <div className="relative min-h-0 flex-1">
+                <LiveTripMap
+                  origin={origin}
+                  stops={orderedStops}
+                  activeIndex={stepIndex}
+                  onSelectStop={(i) => {
+                    setStepIndex(i);
+                    setSheetExpanded(false);
+                  }}
+                />
+
+                <button
+                  onClick={() => setStarted(false)}
+                  aria-label="Natrag na pregled"
+                  className="absolute left-3 top-3 z-10 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-background/80 text-foreground shadow backdrop-blur transition-transform hover:bg-background active:scale-90"
+                >
+                  <ArrowLeft className="h-5 w-5" />
+                </button>
+
+                {/* skok u Google Maps preko karte (rezerva za nepoznatu adresu) */}
+                <a
+                  href={navHref(activeStop)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="absolute bottom-3 left-3 z-10 flex items-center gap-2 rounded-full bg-white px-3.5 py-2 text-xs font-semibold text-[#3c4043] shadow-md transition-transform active:scale-95"
+                >
+                  <MapPin className="h-4 w-4 text-[#4285F4]" />
+                  Google Maps
+                </a>
               </div>
 
-              <button
-                onClick={() => setStarted(false)}
-                aria-label="Natrag na pregled"
-                className="absolute left-3 top-3 z-20 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-background/80 text-foreground shadow backdrop-blur transition-transform hover:bg-background active:scale-90"
+              {/* info panel — spušten (vidi se karta) / podignut (checklist); karta se resize-a između */}
+              <div
+                className={`relative z-10 flex shrink-0 flex-col overflow-hidden rounded-t-2xl border-t bg-background shadow-[0_-8px_24px_rgba(0,0,0,0.14)] transition-[height] duration-300 ease-out ${
+                  sheetExpanded ? "h-[62vh]" : "h-[190px]"
+                }`}
               >
-                <ArrowLeft className="h-5 w-5" />
-              </button>
+                <button
+                  type="button"
+                  onClick={() => setSheetExpanded((v) => !v)}
+                  aria-label={sheetExpanded ? "Spusti panel" : "Podigni panel"}
+                  className="flex shrink-0 items-center justify-center py-2.5"
+                >
+                  <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
+                </button>
 
-              <div className="absolute inset-0 z-10 overflow-y-auto">
-                {/* prazan spacer -> pocetna pozicija sadrzaja odmah ispod slike, skrolanjem gore sheet prelazi preko slike */}
-                <div className="h-[33vh]" />
-
-                <div className="-mt-8 space-y-4 rounded-t-2xl bg-background px-4 pb-24 pt-3">
-                  <div className="flex gap-1 pb-1">
+                <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 pb-4">
+                  <div className="flex gap-1">
                     {orderedStops.map((_, si) => (
                       <div key={si} className={`h-1 flex-1 rounded-full ${si <= stepIndex ? "bg-primary" : "bg-muted"}`} />
                     ))}
@@ -553,24 +488,21 @@ export function TripCard({
                     </p>
                   </div>
 
-                  <div className="space-y-3 rounded-xl bg-muted/40 p-3 text-sm">
-                    <div className="space-y-2.5">
-                      <div className="flex min-w-0 items-center gap-2">
-                        <MapPin className="h-4 w-4 shrink-0 text-muted-foreground" />
-                        <span className="truncate">{activeStop.address}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <PartyPopper className="h-4 w-4 shrink-0 text-muted-foreground" />
-                        <span>{napuhanacLabels(activeStop.napuhanac)}</span>
-                      </div>
-                      {activeStop.phone && (
-                        <div className="flex min-w-0 items-center gap-2">
-                          <Phone className="h-4 w-4 shrink-0 text-muted-foreground" />
-                          <PhoneActions stop={activeStop} smsLoading={smsLoading} onSendSms={sendEtaSms} className="min-w-0 flex-1" />
-                        </div>
-                      )}
+                  <div className="space-y-2.5 rounded-xl bg-muted/40 p-3 text-sm">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <MapPin className="h-4 w-4 shrink-0 text-muted-foreground" />
+                      <span>{activeStop.address}</span>
                     </div>
-                    <MiniRouteMap origin={origin} stop={activeStop} onClick={() => openNav(activeStop)} />
+                    <div className="flex items-center gap-2">
+                      <PartyPopper className="h-4 w-4 shrink-0 text-muted-foreground" />
+                      <span>{napuhanacLabels(activeStop.napuhanac)}</span>
+                    </div>
+                    {activeStop.phone && (
+                      <div className="flex min-w-0 items-center gap-2">
+                        <Phone className="h-4 w-4 shrink-0 text-muted-foreground" />
+                        <PhoneActions stop={activeStop} smsLoading={smsLoading} onSendSms={sendEtaSms} className="min-w-0 flex-1" />
+                      </div>
+                    )}
                   </div>
 
                   <div className="space-y-1.5">
@@ -661,7 +593,7 @@ export function TripCard({
                 </div>
               </div>
 
-              <div className="absolute inset-x-0 bottom-0 z-20 flex flex-row items-center justify-between gap-2 border-t bg-background p-4">
+              <div className="z-20 flex shrink-0 flex-row items-center justify-between gap-2 border-t bg-background p-4">
                 <Button
                   variant="ghost"
                   size="lg"

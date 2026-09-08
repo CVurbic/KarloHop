@@ -1,14 +1,26 @@
+import type { BounceHouseOption } from "@/hooks/useBounceHouseOptions";
+
 export interface ParsedReservation {
   name: string;
   email: string;
   phone: string;
+  /** Matched product slug (or the raw pasted text if nothing matched). */
   bouncer: string;
   date: string;
   address: string;
   price: string;
 }
 
-export function parseReservation(text: string): ParsedReservation {
+/** Finds the product whose name shares a significant word with the pasted bouncer text. */
+function matchBounceHouse(rawText: string, products: BounceHouseOption[]): BounceHouseOption | undefined {
+  const words = rawText.toLowerCase().split(/\s+/).filter((w) => w.length >= 4);
+  return products.find((p) => {
+    const nameWords = p.name.toLowerCase().split(/\s+/);
+    return words.some((w) => nameWords.some((nw) => nw.includes(w) || w.includes(nw)));
+  });
+}
+
+export function parseReservation(text: string, products: BounceHouseOption[] = []): ParsedReservation {
   const result: ParsedReservation = {
     name: "",
     email: "",
@@ -71,7 +83,7 @@ export function parseReservation(text: string): ParsedReservation {
     }
   }
 
-  // Normalize bouncer name to match known names
+  // Resolve the free-typed bouncer text to a real product slug
   if (result.bouncer) {
     const b = result.bouncer.toLowerCase();
     if (b.includes("dino")) {
