@@ -1,12 +1,12 @@
-import { createRoot, hydrateRoot } from "react-dom/client";
+import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
 const root = document.getElementById("root")!;
 
-// If pre-rendered HTML exists (from react-snap), hydrate instead of full render
-if (root.hasChildNodes()) {
-  hydrateRoot(root, <App />);
-} else {
-  createRoot(root).render(<App />);
-}
+// #root always ships a <noscript> SEO fallback (see index.html), so it's
+// never actually empty — hasChildNodes()-based hydrateRoot detection was
+// firing unconditionally with no real prerendered markup to match,
+// causing a bogus hydration-mismatch warning. No prerendering (react-snap
+// etc.) is wired up in this project, so plain createRoot is correct.
+createRoot(root).render(<App />);

@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
 import { loadGoogleMaps } from "@/lib/googleMaps";
+import { colorForSlug } from "@/lib/bounceHouseColor";
+import { toBounceHouseSlug } from "@/lib/bounceHouseCompat";
 
 export type RadnikStop = {
   name: string;
@@ -13,14 +15,6 @@ export type RadnikStop = {
 export type Leg = { minutes: number };
 export type RouteResult = { stops: RadnikStop[]; legs: Leg[]; mapsUrl: string };
 
-// iste boje kao BOUNCERS.color u RevenueView.tsx/BookingCalendar.tsx (500 shade) -> marker = ista boja kao napuhanac svugdje drugdje u appu
-const NAPUHANAC_COLORS: Record<string, string> = {
-  "Minecraft Party": "#3b82f6",
-  "Dino Park": "#14b8a6",
-  Jednorog: "#ec4899",
-  "Paw Patrol": "#eab308",
-  "Super Mario": "#dc2626",
-};
 const DEFAULT_PIN_COLOR = "#0AA8E0";
 
 // solid teardrop pin, 24x24 viewBox (Material "place" bez rupe) -> boja + broj unutra
@@ -96,7 +90,8 @@ export function RouteMap({ origin, stops, onRoute }: Props) {
             },
           });
           orderedStops.forEach((s, i) => {
-            const color = NAPUHANAC_COLORS[s.napuhanac[0]] ?? DEFAULT_PIN_COLOR;
+            const slug = toBounceHouseSlug(s.napuhanac[0]);
+            const color = slug ? colorForSlug(slug) : DEFAULT_PIN_COLOR;
             new g.maps.Marker({
               position: { lat: s.lat, lng: s.lng },
               map,

@@ -39,7 +39,9 @@ import {
 import { parseReservation } from "@/lib/parseReservation";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { BookingCalendar, BOUNCERS } from "@/components/BookingCalendar";
+import { BookingCalendar } from "@/components/BookingCalendar";
+import { useAllBounceHouses } from "@/hooks/useBounceHouseOptions";
+import { toBounceHouseSlug } from "@/lib/bounceHouseCompat";
 
 const STATUS_OPTIONS = [
   { value: "pending", label: "Na čekanju" },
@@ -65,6 +67,7 @@ const BookingManager = () => {
   useBookingsRealtime();
 
   const { data: bookings = [], isLoading } = useAllBookings();
+  const { data: bounceHouses = [] } = useAllBounceHouses();
   const createBooking = useCreateBooking();
   const updateBooking = useUpdateBooking();
   const deleteBooking = useDeleteBooking();
@@ -136,10 +139,10 @@ const BookingManager = () => {
   };
 
   const handlePaste = () => {
-    const parsed = parseReservation(pasteText);
+    const parsed = parseReservation(pasteText, bounceHouses);
     const nameParts = parsed.name.split(" ");
     const parsedPrice = parsed.price.replace(/[^\d.]/g, "");
-    const bouncer = BOUNCERS.find((b) => b.name === parsed.bouncer);
+    const bouncer = bounceHouses.find((b) => b.slug === parsed.bouncer);
     setFormData({
       name: nameParts[0] || "",
       surname: nameParts.slice(1).join(" ") || "",
@@ -165,7 +168,9 @@ const BookingManager = () => {
       phone: booking.phone || "",
       delivery_address: booking.delivery_address || "",
       booking_start_date: booking.booking_start_date.split("T")[0],
-      selected_bounce_house: booking.selected_bounce_house || "",
+      // Resolves any legacy short-name value to today's slug so the select shows the right option
+      // (and re-saving quietly upgrades that one booking's stored value — see bounceHouseCompat.ts).
+      selected_bounce_house: toBounceHouseSlug(booking.selected_bounce_house) || "",
       price: booking.price != null ? String(booking.price) : "",
       status: booking.status,
       additional_notes: booking.additional_notes || "",
@@ -239,6 +244,7 @@ const BookingManager = () => {
         selectedDate={selectedDate}
         onSelectDate={setSelectedDate}
         isLoading={isLoading}
+        products={bounceHouses}
       />
 
       {/* Selected date bookings */}
@@ -255,7 +261,7 @@ const BookingManager = () => {
             ) : (
               <div className="space-y-3">
                 {selectedDateBookings.map((booking) => {
-                  const bouncer = BOUNCERS.find((b) => b.name === booking.selected_bounce_house);
+                  const bouncer = bounceHouses.find((b) => b.slug === toBounceHouseSlug(booking.selected_bounce_house));
                   return (
                     <div
                       key={booking.id}
@@ -267,8 +273,11 @@ const BookingManager = () => {
                             {booking.name} {booking.surname}
                           </span>
                           {booking.selected_bounce_house && (
-                            <Badge variant="secondary" className={bouncer?.lightColor || ""}>
-                              {booking.selected_bounce_house}
+                            <Badge
+                              variant="secondary"
+                              style={bouncer?.color ? { backgroundColor: bouncer.color, color: "#fff" } : undefined}
+                            >
+                              {bouncer?.name || booking.selected_bounce_house}
                             </Badge>
                           )}
                         </div>
@@ -386,7 +395,7 @@ const BookingManager = () => {
                 <Select
                   value={formData.selected_bounce_house}
                   onValueChange={(v) => {
-                    const bouncer = BOUNCERS.find((b) => b.name === v);
+                    const bouncer = bounceHouses.find((b) => b.slug === v);
                     setFormData((prev) => ({
                       ...prev,
                       selected_bounce_house: v,
@@ -398,8 +407,8 @@ const BookingManager = () => {
                     <SelectValue placeholder="Odaberi" />
                   </SelectTrigger>
                   <SelectContent>
-                    {BOUNCERS.filter((b) => !b.hidden).map((b) => (
-                      <SelectItem key={b.name} value={b.name}>{b.name}</SelectItem>
+                    {bounceHouses.filter((b) => b.status !== "hidden").map((b) => (
+                      <SelectItem key={b.slug} value={b.slug}>{b.name}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
