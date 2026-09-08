@@ -19,6 +19,41 @@ const ARROW_PATH = "M 0,-9 6,7 0,3 -6,7 Z";
 // zoom u navigacijskom modu ("Kreni") — tijesan, ulična razina
 const NAV_ZOOM = 17;
 
+// glatki zoom: koraci po jednoj razini, svaki korak Google raster karta sama animira ~200ms
+// -> lanac koraka na 130ms djeluje kao kontinuirani zoom, bez vector karte / mapId-a
+function glideCamera(map: google.maps.Map, center: google.maps.LatLngLiteral, targetZoom: number) {
+  map.panTo(center);
+  const target = Math.round(targetZoom);
+  const step = () => {
+    const z = Math.round(map.getZoom() ?? target);
+    if (z === target) return;
+    map.setZoom(z + (target > z ? 1 : -1));
+    window.setTimeout(step, 130);
+  };
+  step();
+}
+
+// zoom razina koja stane `bounds` u trenutni div (uzima u obzir visinu karte kad je panel podignut)
+function zoomForBounds(map: google.maps.Map, bounds: google.maps.LatLngBounds, paddingPx = 70) {
+  const latRad = (lat: number) => {
+    const s = Math.sin((lat * Math.PI) / 180);
+    return Math.log((1 + s) / (1 - s)) / 2;
+  };
+  const div = map.getDiv() as HTMLElement;
+  const ne = bounds.getNorthEast();
+  const sw = bounds.getSouthWest();
+  const latFraction = (latRad(ne.lat()) - latRad(sw.lat())) / Math.PI;
+  const lngDiff = ne.lng() - sw.lng();
+  const lngFraction = (lngDiff < 0 ? lngDiff + 360 : lngDiff) / 360;
+  const w = Math.max(1, div.clientWidth - paddingPx * 2);
+  const h = Math.max(1, div.clientHeight - paddingPx * 2);
+  const zoom = Math.min(
+    Math.log2(h / 256 / (latFraction || 1e-9)),
+    Math.log2(w / 256 / (lngFraction || 1e-9)),
+  );
+  return Math.max(3, Math.min(17, Math.floor(zoom)));
+}
+
 function pinIcon(g: typeof google, stop: RadnikStop, active: boolean): google.maps.Symbol {
   const slug = toBounceHouseSlug(stop.napuhanac[0]);
   const color = slug ? colorForSlug(slug) : WAREHOUSE_COLOR;
@@ -318,26 +353,23 @@ export function LiveTripMap({ origin, stops, activeIndex, onSelectStop }: Props)
     };
   }, []);
 
-  // "Kreni" -> uđi u navigaciju: zumiraj na vozača (ili aktivni stop dok nema GPS-a) i prati ga
+  // "Kreni" -> uđi u navigaciju: glatki zoom na vozača (ili aktivni stop dok nema GPS-a) i prati ga
   const startNav = () => {
     setFollow(true);
     const f = driverPos.current ?? focusStop();
-    if (f && mapObj.current) {
-      mapObj.current.setZoom(NAV_ZOOM);
-      mapObj.current.panTo(f);
-    }
+    if (f && mapObj.current) glideCamera(mapObj.current, f, NAV_ZOOM);
   };
 
-  // "Pregled" -> izađi iz navigacije, pokaži cijeli put vozač -> aktivni stop
+  // "Pregled" -> izađi iz navigacije, glatki zoom out na cijeli put vozač -> aktivni stop
   const stopNav = () => {
     setFollow(false);
     loadGoogleMaps().then((g) => {
+      if (!mapObj.current) return;
       const bounds = new g.maps.LatLngBounds();
       const f = focusStop();
       if (f) bounds.extend(f);
-      if (driverPos.current) bounds.extend(driverPos.current);
-      else bounds.extend(origin);
-      mapObj.current?.fitBounds(bounds, 70);
+      bounds.extend(driverPos.current ?? origin);
+      glideCamera(mapObj.current, bounds.getCenter().toJSON(), zoomForBounds(mapObj.current, bounds));
     });
   };
 
