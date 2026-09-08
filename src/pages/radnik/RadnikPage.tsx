@@ -261,15 +261,42 @@ export default function RadnikPage({ mode = "delivery" }: { mode?: Mode }) {
   return (
     <div className="min-h-screen bg-muted/30 p-4 pb-24 sm:p-6 lg:p-8 lg:pb-8">
       <div className="mx-auto w-full max-w-md lg:max-w-7xl">
-        <header className="flex items-start justify-between gap-3">
+        <header className="flex flex-col gap-3 sm:flex-row-reverse sm:items-start sm:justify-between">
+          {/* utility traka: prekidač smjene + odjava — vlastiti red na mobitelu, ne stišće naslov */}
+          <div className="flex items-center justify-between gap-2 sm:justify-end">
+            <div className="flex rounded-lg border bg-muted/40 p-0.5 text-sm font-medium">
+              <Link
+                to="/radnik/dostava"
+                className={cn(
+                  "rounded-md px-3 py-1.5 transition-transform active:scale-95",
+                  mode === "delivery" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                Dostava
+              </Link>
+              <Link
+                to="/radnik/skupljanje"
+                className={cn(
+                  "rounded-md px-3 py-1.5 transition-transform active:scale-95",
+                  mode === "pickup" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                Skupljanje
+              </Link>
+            </div>
+            <Button variant="ghost" size="icon" onClick={handleSignOut} title="Odjava" className="h-9 w-9 shrink-0">
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </div>
+
           <div className="min-w-0">
-            <h1 className="text-xl font-bold">{t.title}</h1>
+            <h1 className="text-xl font-bold leading-tight">{t.title}</h1>
             <button
               onClick={openMobileCalendar}
-              className="flex items-center gap-1.5 text-sm text-muted-foreground cursor-pointer lg:pointer-events-none"
+              className="mt-0.5 flex items-center gap-1.5 text-sm text-muted-foreground cursor-pointer lg:pointer-events-none"
             >
               {selectedDateObj ? (
-                <span className="font-medium text-foreground capitalize underline decoration-dotted underline-offset-4 lg:no-underline">
+                <span className="inline-block font-medium text-foreground lowercase first-letter:uppercase underline decoration-dotted underline-offset-4 lg:no-underline">
                   {format(selectedDateObj, "EEEE, d. MMMM yyyy.", { locale: hr })}
                 </span>
               ) : (
@@ -283,40 +310,14 @@ export default function RadnikPage({ mode = "delivery" }: { mode?: Mode }) {
                   resetTrip();
                   openMobileCalendar();
                 }}
-                className="mt-1 flex items-center gap-0.5 text-xs font-medium text-muted-foreground hover:text-foreground"
+                className="mt-1.5 flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
               >
-                <ChevronLeft className="h-3 w-3" /> Promijeni dan
+                <ChevronLeft className="h-3.5 w-3.5" /> Promijeni dan
               </button>
             )}
             {autoFallback && (
-              <p className="text-xs text-muted-foreground">Nema rezervacija danas — prikazan prvi sljedeći dan s rezervacijom.</p>
+              <p className="mt-1 text-xs text-muted-foreground">Nema rezervacija danas — prikazan prvi sljedeći dan s rezervacijom.</p>
             )}
-          </div>
-          <div className="flex shrink-0 flex-col items-end gap-2">
-            {/* stalni prekidač smjene -> uvijek jasno u kojoj si i kako u drugu */}
-            <div className="flex rounded-lg border bg-muted/40 p-0.5 text-xs font-medium">
-              <Link
-                to="/radnik/dostava"
-                className={cn(
-                  "rounded-md px-2.5 py-1 transition-colors",
-                  mode === "delivery" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                Dostava
-              </Link>
-              <Link
-                to="/radnik/skupljanje"
-                className={cn(
-                  "rounded-md px-2.5 py-1 transition-colors",
-                  mode === "pickup" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                Skupljanje
-              </Link>
-            </div>
-            <Button variant="ghost" size="icon" onClick={handleSignOut} title="Odjava" className="h-7 w-7">
-              <LogOut className="h-4 w-4" />
-            </Button>
           </div>
         </header>
 
