@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Crosshair, Route as RouteIcon } from "lucide-react";
+import { Navigation, Route as RouteIcon } from "lucide-react";
 import { loadGoogleMaps } from "@/lib/googleMaps";
 import { colorForSlug } from "@/lib/bounceHouseColor";
 import { toBounceHouseSlug } from "@/lib/bounceHouseCompat";
@@ -16,6 +16,8 @@ const REROUTE_MS = 45000;
 const ACCURACY_GATE_M = 60;
 // strelica smjera vožnje (vrh gore = sjever), rotira se po pos.coords.heading
 const ARROW_PATH = "M 0,-9 6,7 0,3 -6,7 Z";
+// zoom u navigacijskom modu ("Kreni") — tijesan, ulična razina
+const NAV_ZOOM = 17;
 
 function pinIcon(g: typeof google, stop: RadnikStop, active: boolean): google.maps.Symbol {
   const slug = toBounceHouseSlug(stop.napuhanac[0]);
@@ -47,8 +49,9 @@ export function LiveTripMap({ origin, stops, activeIndex, onSelectStop }: Props)
   const accCircle = useRef<google.maps.Circle | null>(null);
   const stopMarkers = useRef<google.maps.Marker[]>([]);
   const driverPos = useRef<google.maps.LatLngLiteral | null>(null);
-  const followRef = useRef(true);
-  const [follow, setFollow] = useState(true);
+  // follow = navigacijski mod ("Kreni"): karta prati vozača i drži tijesan zoom
+  const followRef = useRef(false);
+  const [follow, setFollow] = useState(false);
   const [hasFix, setHasFix] = useState(false);
   const [geoMsg, setGeoMsg] = useState<string | null>(null);
 
@@ -123,7 +126,7 @@ export function LiveTripMap({ origin, stops, activeIndex, onSelectStop }: Props)
       });
       mapObj.current = map;
 
-      // vozač rukom pomakne kartu -> prestani pratiti dok ne stisne "Prati me"
+      // vozač rukom pomakne kartu -> izađi iz navigacije dok ne stisne "Kreni"
       map.addListener("dragstart", () => setFollow(false));
 
       new g.maps.Marker({
@@ -315,13 +318,18 @@ export function LiveTripMap({ origin, stops, activeIndex, onSelectStop }: Props)
     };
   }, []);
 
-  const recenter = () => {
+  // "Kreni" -> uđi u navigaciju: zumiraj na vozača (ili aktivni stop dok nema GPS-a) i prati ga
+  const startNav = () => {
     setFollow(true);
     const f = driverPos.current ?? focusStop();
-    if (f) mapObj.current?.panTo(f);
+    if (f && mapObj.current) {
+      mapObj.current.setZoom(NAV_ZOOM);
+      mapObj.current.panTo(f);
+    }
   };
 
-  const fitLeg = () => {
+  // "Pregled" -> izađi iz navigacije, pokaži cijeli put vozač -> aktivni stop
+  const stopNav = () => {
     setFollow(false);
     loadGoogleMaps().then((g) => {
       const bounds = new g.maps.LatLngBounds();
@@ -343,23 +351,24 @@ export function LiveTripMap({ origin, stops, activeIndex, onSelectStop }: Props)
         </div>
       )}
 
-      <div className="absolute right-3 top-3 flex flex-col gap-2">
-        <button
-          type="button"
-          onClick={fitLeg}
-          className="flex items-center gap-1.5 rounded-full bg-background/90 px-3 py-2 text-xs font-medium text-foreground shadow backdrop-blur transition-transform active:scale-95"
-        >
-          <RouteIcon className="h-3.5 w-3.5" />
-          Cijela ruta
-        </button>
-        {!follow && (
+      <div className="absolute right-3 top-3">
+        {follow ? (
           <button
             type="button"
-            onClick={recenter}
-            className="flex items-center gap-1.5 rounded-full bg-primary px-3 py-2 text-xs font-medium text-primary-foreground shadow transition-transform active:scale-95"
+            onClick={stopNav}
+            className="flex items-center gap-1.5 rounded-full bg-background/90 px-3 py-2 text-xs font-medium text-foreground shadow backdrop-blur transition-transform active:scale-95"
           >
-            <Crosshair className="h-3.5 w-3.5" />
-            Prati me
+            <RouteIcon className="h-3.5 w-3.5" />
+            Pregled
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={startNav}
+            className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg transition-transform active:scale-95"
+          >
+            <Navigation className="h-4 w-4" />
+            Kreni
           </button>
         )}
       </div>
