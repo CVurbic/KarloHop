@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Navigation, Route as RouteIcon } from "lucide-react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import "leaflet-rotate"; // patches L.Map with setBearing() + compassBearing handler
 import { drivingRoute } from "@/lib/geo";
 import { colorForSlug } from "@/lib/bounceHouseColor";
 import { toBounceHouseSlug } from "@/lib/bounceHouseCompat";
@@ -48,14 +49,30 @@ function stopIcon(color: string, n: number, active: boolean): L.DivIcon {
   });
 }
 
-function driverIcon(heading: number | null, moving: boolean): L.DivIcon {
+// `arrowDeg` = kut u koji arrow gleda na EKRANU (0 = gore). Kad je karta zaključana
+// na smjer vožnje, arrow uvijek gleda gore pa se predaje 0.
+function driverIcon(arrowDeg: number | null, moving: boolean): L.DivIcon {
   const html =
-    moving && heading != null
-      ? `<svg width="30" height="30" viewBox="-15 -15 30 30" style="transform:rotate(${heading}deg)">
+    moving && arrowDeg != null
+      ? `<svg width="30" height="30" viewBox="-15 -15 30 30" style="transform:rotate(${arrowDeg}deg)">
            <path d="M0,-11 8,9 0,4 -8,9 Z" fill="${DRIVER_COLOR}" stroke="#fff" stroke-width="2"/>
          </svg>`
       : `<div style="width:16px;height:16px;border-radius:9999px;background:${DRIVER_COLOR};border:3px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.2)"></div>`;
   return L.divIcon({ className: "", html, iconSize: [30, 30], iconAnchor: [15, 15] });
+}
+
+// iOS 13+ traži eksplicitnu dozvolu za senzor orijentacije (na user gesture).
+async function requestCompassPermission(): Promise<boolean> {
+  const DOE = (window as unknown as { DeviceOrientationEvent?: { requestPermission?: () => Promise<string> } })
+    .DeviceOrientationEvent;
+  if (DOE && typeof DOE.requestPermission === "function") {
+    try {
+      return (await DOE.requestPermission()) === "granted";
+    } catch {
+      return false;
+    }
+  }
+  return true; // Android / desktop — dozvola nije potrebna
 }
 
 type Props = {
@@ -78,6 +95,8 @@ export function LiveTripMap({ origin, stops, activeIndex, onSelectStop }: Props)
   // follow = navigacijski mod ("Kreni"): karta prati vozača i drži tijesan zoom
   const followRef = useRef(false);
   const [follow, setFollow] = useState(false);
+  // true kad je karta zaključana na kompas mobitela (leaflet-rotate compassBearing handler)
+  const compassOnRef = useRef(false);
   const [hasFix, setHasFix] = useState(false);
   const [geoMsg, setGeoMsg] = useState<string | null>(null);
 
@@ -111,6 +130,17 @@ export function LiveTripMap({ origin, stops, activeIndex, onSelectStop }: Props)
     return s ? { lat: s.lat, lng: s.lng } : null;
   };
 
+  // otključaj rotaciju: ugasi kompas i vrati kartu na sjever-gore
+  const exitRotation = () => {
+    const map = mapObj.current as unknown as {
+      compassBearing?: { disable: () => void };
+      setBearing?: (deg: number) => void;
+    } | null;
+    compassOnRef.current = false;
+    map?.compassBearing?.disable();
+    map?.setBearing?.(0);
+  };
+
   // izračunaj i nacrtaj rutu od `from` do aktivnog stopa
   const routeToActive = async (from: L.LatLngLiteral) => {
     const to = stopsRef.current[activeIndexRef.current];
@@ -131,18 +161,28 @@ export function LiveTripMap({ origin, stops, activeIndex, onSelectStop }: Props)
   useEffect(() => {
     if (!mapRef.current) return;
 
-    const map = L.map(mapRef.current, { fadeAnimation: false, zoomControl: false }).setView(
-      [origin.lat, origin.lng],
-      13,
-    );
+    // rotate: true -> omogući map.setBearing() i compassBearing handler (leaflet-rotate).
+    // touchRotate/rotateControl off: rotaciju kontroliramo samo mi kroz "Kreni".
+    const map = L.map(mapRef.current, {
+      fadeAnimation: false,
+      zoomControl: false,
+      rotate: true,
+      touchRotate: false,
+      rotateControl: false,
+      shiftKeyRotate: false,
+      bearing: 0,
+    } as unknown as L.MapOptions).setView([origin.lat, origin.lng], 13);
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: "&copy; OpenStreetMap",
       maxZoom: 19,
     }).addTo(map);
     mapObj.current = map;
 
-    // vozač rukom pomakne kartu -> izađi iz navigacije dok ne stisne "Kreni"
-    map.on("dragstart", () => setFollow(false));
+    // vozač rukom pomakne kartu -> izađi iz navigacije (i otključaj rotaciju) dok ne stisne "Kreni"
+    map.on("dragstart", () => {
+      setFollow(false);
+      exitRotation();
+    });
 
     L.marker([origin.lat, origin.lng], { icon: warehouseIcon() }).addTo(map).bindTooltip("Skladište");
 
@@ -233,8 +273,10 @@ export function LiveTripMap({ origin, stops, activeIndex, onSelectStop }: Props)
       const map = mapObj.current;
       if (!map) return;
 
-      const moving = heading != null && !Number.isNaN(heading) && (pos.coords.speed ?? 0) > 0.5;
-      const icon = driverIcon(heading, moving);
+      const validHeading = heading != null && !Number.isNaN(heading);
+      const moving = validHeading && (pos.coords.speed ?? 0) > 0.5;
+      // u nav modu je karta zaključana na smjer vožnje -> arrow uvijek gleda gore (0)
+      const icon = driverIcon(followRef.current ? 0 : heading, moving);
       if (!driverMarker.current) {
         driverMarker.current = L.marker(p, { icon, zIndexOffset: 2000 }).addTo(map);
       } else {
@@ -257,7 +299,15 @@ export function LiveTripMap({ origin, stops, activeIndex, onSelectStop }: Props)
         accCircle.current.setRadius(acc || 0);
       }
 
-      if (followRef.current) map.panTo(p);
+      if (followRef.current) {
+        map.panTo(p);
+        // fallback: ako kompas mobitela nije aktivan (nema senzora / dozvola odbijena),
+        // rotiraj kartu po GPS smjeru dok se vozi. -heading da smjer vožnje bude gore.
+        // ponytail: predznak (-heading) potvrditi na terenu, okrenuti ako se vrti krivo.
+        if (!compassOnRef.current && moving) {
+          (map as unknown as { setBearing?: (deg: number) => void }).setBearing?.(-(heading as number));
+        }
+      }
 
       // reroute: na promjenu stopa uvijek; periodično samo iz dovoljno točnog fixa
       const stopChanged = routedIndex.current !== activeIndexRef.current;
@@ -302,16 +352,26 @@ export function LiveTripMap({ origin, stops, activeIndex, onSelectStop }: Props)
     };
   }, []);
 
-  // "Kreni" -> uđi u navigaciju: glatki zoom na vozača (ili aktivni stop dok nema GPS-a) i prati ga
-  const startNav = () => {
+  // "Kreni" -> uđi u navigaciju: zoom na vozača, prati ga i zaključaj kartu na smjer mobitela
+  const startNav = async () => {
     setFollow(true);
     const f = driverPos.current ?? focusStop();
     if (f && mapObj.current) mapObj.current.flyTo(f, NAV_ZOOM);
+
+    // zaključaj rotaciju na kompas mobitela (kao Google Maps). Ako nema senzora ili
+    // je dozvola odbijena -> onPos fallback rotira po GPS smjeru vožnje.
+    const granted = await requestCompassPermission();
+    const map = mapObj.current as unknown as { compassBearing?: { enable: () => void; enabled: () => boolean } } | null;
+    if (granted && map?.compassBearing) {
+      map.compassBearing.enable();
+      compassOnRef.current = map.compassBearing.enabled();
+    }
   };
 
-  // "Pregled" -> izađi iz navigacije, glatki zoom out na cijeli put vozač -> aktivni stop
+  // "Pregled" -> izađi iz navigacije, otključaj rotaciju, zoom out na put vozač -> aktivni stop
   const stopNav = () => {
     setFollow(false);
+    exitRotation();
     const map = mapObj.current;
     if (!map) return;
     const f = focusStop();
