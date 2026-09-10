@@ -1,18 +1,14 @@
-import { loadGoogleMaps } from "@/lib/googleMaps";
+import { searchAddress } from "@/lib/geo";
 
-// ponytail: in-memory cache, isti dan bira se vise puta -> ne placa/cekaj Google opet
+// ponytail: in-memory cache, ista adresa se traži više puta -> ne šalji Photon opet
 const cache = new Map<string, { lat: number; lng: number } | null>();
 
 export async function geocodeAddress(address: string): Promise<{ lat: number; lng: number } | null> {
   if (cache.has(address)) return cache.get(address)!;
 
-  const g = await loadGoogleMaps();
-  const query = address.toLowerCase().includes("hrvatska") ? address : `${address}, Hrvatska`;
-
   try {
-    const { results } = await new g.maps.Geocoder().geocode({ address: query, region: "hr" });
-    const loc = results[0]?.geometry.location;
-    const coords = loc ? { lat: loc.lat(), lng: loc.lng() } : null;
+    const hits = await searchAddress(address);
+    const coords = hits[0] ? { lat: hits[0].lat, lng: hits[0].lng } : null;
     cache.set(address, coords);
     return coords;
   } catch {

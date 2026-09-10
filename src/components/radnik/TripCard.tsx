@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { RouteMap, type RadnikStop, type RouteResult } from "./RouteMap";
 import { LiveTripMap } from "./LiveTripMap";
-import { loadGoogleMaps } from "@/lib/googleMaps";
+import { drivingRoute } from "@/lib/geo";
 import { format } from "date-fns";
 import { useMessageTemplate, fillTemplate } from "@/hooks/useMessageTemplates";
 import { useBookingReports, useUpsertBookingReport } from "@/hooks/useBookingReports";
@@ -228,20 +228,11 @@ function getCurrentPosition(): Promise<GeolocationPosition> {
 async function etaFromCurrentLocation(stop: RadnikStop): Promise<number | undefined> {
   try {
     const pos = await getCurrentPosition();
-    const g = await loadGoogleMaps();
-    const service = new g.maps.DirectionsService();
-    const result = await new Promise<google.maps.DirectionsResult>((resolve, reject) => {
-      service.route(
-        {
-          origin: { lat: pos.coords.latitude, lng: pos.coords.longitude },
-          destination: { lat: stop.lat, lng: stop.lng },
-          travelMode: g.maps.TravelMode.DRIVING,
-        },
-        (result, status) => (status === "OK" && result ? resolve(result) : reject(new Error(status))),
-      );
-    });
-    const seconds = result.routes[0]?.legs[0]?.duration?.value;
-    return seconds ? Math.round(seconds / 60) : undefined;
+    const r = await drivingRoute(
+      { lat: pos.coords.latitude, lng: pos.coords.longitude },
+      { lat: stop.lat, lng: stop.lng },
+    );
+    return r?.minutes;
   } catch {
     return undefined;
   }
@@ -602,7 +593,7 @@ export function TripCard({
           >
             <>
               {/* karta zauzima stvarni prostor iznad panela -> centar joj nije skriven */}
-              <div className="relative min-h-0 flex-1">
+              <div className="relative min-h-0 flex-1 z-0">
                 <LiveTripMap
                   origin={origin}
                   stops={orderedStops}
@@ -616,9 +607,9 @@ export function TripCard({
                 <button
                   onClick={() => setStarted(false)}
                   aria-label="Natrag na pregled"
-                  className="absolute left-3 top-3 z-10 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-background/80 text-foreground shadow backdrop-blur transition-transform hover:bg-background active:scale-90"
+                  className="absolute left-3 top-3 z-[1000] flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-background/80 text-foreground shadow backdrop-blur transition-transform hover:bg-background active:scale-90"
                 >
-                  <ArrowLeft className="h-5 w-5" />
+                  <ArrowLeft className="h-5 w-5 " />
                 </button>
 
                 {/* skok u Google Maps preko karte (rezerva za nepoznatu adresu) */}
@@ -626,7 +617,7 @@ export function TripCard({
                   href={navHref(activeStop)}
                   target="_blank"
                   rel="noreferrer"
-                  className="absolute bottom-3 left-3 z-10 flex items-center gap-2 rounded-full bg-white px-3.5 py-2 text-xs font-semibold text-[#3c4043] shadow-md transition-transform active:scale-95"
+                  className="absolute bottom-3 left-3 z-[1000] flex items-center gap-2 rounded-full bg-white px-3.5 py-2 text-xs font-semibold text-[#3c4043] shadow-md transition-transform active:scale-95"
                 >
                   <MapPin className="h-4 w-4 text-[#4285F4]" />
                   Google Maps

@@ -1,16 +1,12 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Star } from "lucide-react";
-import { useRef, useState, useEffect } from "react";
-import { loadGoogleMaps } from "@/lib/googleMaps";
+import { useRef, useState } from "react";
 
 type Review = { text: string; name: string; rating: number };
 
-// Google Place ID lokacije (javni podatak). Može se nadjačati env varijablom.
-const GOOGLE_PLACE_ID = "ChIJAXOoMV9lZkcReSnflK6mPdQ";
-
-// Rezerva ako Google recenzije nisu dostupne (nema Place ID-a ili API zakaže) —
-// tako sekcija nikad ne ostane prazna i zadrži isti izgled.
-const fallbackReviews: Review[] = [
+// Recenzije zadovoljnih roditelja. Prije se dohvaćalo uživo s Google Places API-ja,
+// ali taj poziv (polje "reviews") je najskuplji tier i pucao je na svaki posjet -> statično.
+const reviewList: Review[] = [
   { text: "Djeca su bila oduševljena, nismo ih mogli maknuti s napuhanca cijelo popodne.", name: "Ana K.", rating: 5 },
   { text: "Napuhanac je došao čist i uredan, sve je bilo kako smo se dogovorili.", name: "Marko P.", rating: 4.5 },
   { text: "Minecraft napuhanac je bio pun pogodak, klinci su bili oduševljeni.", name: "Ivana M.", rating: 5 },
@@ -24,55 +20,8 @@ const fallbackReviews: Review[] = [
 ];
 
 const ReviewsSection = () => {
-  const [reviews, setReviews] = useState<Review[]>(fallbackReviews);
-  // Ukupna ocjena i broj recenzija s Google-a (null dok se ne dohvati).
-  const [summary, setSummary] = useState<{ rating: number; count: number } | null>(null);
-
-  // Dohvati prave Google recenzije preko Places API-ja i zamijeni rezervu.
-  useEffect(() => {
-    const placeId =
-      (import.meta.env.VITE_GOOGLE_PLACE_ID as string | undefined) || GOOGLE_PLACE_ID;
-    if (!placeId) return; // Place ID nije postavljen -> ostaje rezerva
-
-    let cancelled = false;
-
-    (async () => {
-      try {
-        const google = await loadGoogleMaps();
-        const { Place } = (await google.maps.importLibrary(
-          "places"
-        )) as google.maps.PlacesLibrary;
-
-        const place = new Place({ id: placeId });
-        await place.fetchFields({ fields: ["reviews", "rating", "userRatingCount"] });
-
-        const googleReviews: Review[] = (place.reviews ?? [])
-          .map((r) => ({
-            text: (r.text ?? "").trim(),
-            name: r.authorAttribution?.displayName ?? "Google korisnik",
-            rating: r.rating ?? 5,
-          }))
-          .filter((r) => r.text.length > 0);
-
-        if (!cancelled && googleReviews.length > 0) {
-          setReviews(googleReviews);
-        }
-        if (!cancelled && typeof place.rating === "number" && place.userRatingCount) {
-          setSummary({ rating: place.rating, count: place.userRatingCount });
-        }
-      } catch (err) {
-        // Kod greške zadržavamo rezervne recenzije — sekcija ostaje ispravna.
-        console.error("Dohvat Google recenzija nije uspio:", err);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
   // Duplicate reviews for seamless infinite scroll
-  const duplicatedReviews = [...reviews, ...reviews];
+  const duplicatedReviews = [...reviewList, ...reviewList];
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -154,18 +103,6 @@ const ReviewsSection = () => {
           Što kažu <span className="text-primary">zadovoljni roditelji</span>
         </h2>
         <p className="text-muted-foreground text-center">Recenzije zadovoljnih roditelja i djece</p>
-
-        {summary && (
-          <div className="flex items-center justify-center gap-2 mt-4">
-            <div className="flex gap-1">{renderStars(summary.rating)}</div>
-            <span className="text-foreground font-semibold">
-              {summary.rating.toLocaleString("hr-HR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
-            </span>
-            <span className="text-muted-foreground text-sm">
-              · {summary.count} recenzija na Google-u
-            </span>
-          </div>
-        )}
       </div>
 
       <div 
