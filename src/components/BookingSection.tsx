@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { analytics } from "@/lib/analytics";
 import { useState, useEffect, useRef } from "react";
-import AddressPicker from "@/components/AddressPicker";
+import AddressField from "@/components/AddressField";
 import { usePublishedBounceHouses } from "@/hooks/useBounceHouseOptions";
 import { rawValuesForSlug } from "@/lib/bounceHouseCompat";
 
@@ -327,7 +327,7 @@ const BookingSection = () => {
                                 Lokacija dostave
                               </FormLabel>
                               <FormControl>
-                                <AddressPicker
+                                <AddressField
                                   placeholder="Počnite tipkati adresu..."
                                   value={field.value ?? ""}
                                   onBlur={field.onBlur}

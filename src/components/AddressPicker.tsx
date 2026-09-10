@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { searchAddress, reverseGeocode, type AddressHit, type LatLng } from "@/lib/geo";
+import { searchAddress, reverseGeocode, resolvePlace, type AddressHit, type LatLng } from "@/lib/geo";
 
 type Props = {
   value: string;
@@ -13,14 +13,12 @@ type Props = {
 };
 
 const DEBOUNCE_SUGGEST = 300;
-const DEBOUNCE_TYPE_GEOCODE = 700;
 const DEBOUNCE_REVERSE = 500;
 const ZAGREB: LatLng = { lat: 45.815, lng: 15.982 };
 
-// Adresno polje s ugrađenom kartom: autocomplete (Photon) + karta koja se "spusti" čim
-// korisnik krene tipkati. Fiksni pin = centar karte; pomicanjem karte se namješta lokacija,
-// a pin prati i upisanu adresu (rijedak geocode na pauzu u tipkanju). Sve preko besplatnog
-// OpenStreetMap-a, bez API ključa.
+// Adresno polje s ugrađenom kartom: autocomplete (Google Places) + karta koja se "spusti" čim
+// korisnik krene tipkati. Odabir prijedloga postavi pin; fiksni pin = centar karte, pa se
+// pomicanjem karte lokacija fino namjesti. Karta = besplatni OpenStreetMap tile-ovi.
 export default function AddressPicker({ value, onValueChange, onLocationChange, onBlur, placeholder }: Props) {
   const [suggestions, setSuggestions] = useState<AddressHit[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -37,9 +35,11 @@ export default function AddressPicker({ value, onValueChange, onLocationChange, 
   // callbackovi bez re-triggeranja effecta ako roditelj šalje inline arrow
   const onLocRef = useRef(onLocationChange);
   const onValRef = useRef(onValueChange);
+  const valueRef = useRef(value);
   useEffect(() => {
     onLocRef.current = onLocationChange;
     onValRef.current = onValueChange;
+    valueRef.current = value;
   });
 
   // otvori kartu kad korisnik ozbiljno krene tipkati, zatvori kad isprazni polje
@@ -88,8 +88,8 @@ export default function AddressPicker({ value, onValueChange, onLocationChange, 
       revTimer = setTimeout(async () => {
         const addr = await reverseGeocode(c.lat, c.lng);
         setHint(addr);
-        if (addr) {
-          // pin -> upiši adresu u polje; settledText da forward-geocode ne vrati pin natrag
+        // ne prepisuj adresu koju je korisnik odabrao/utipkao; popuni samo ako je polje prazno
+        if (addr && !valueRef.current.trim()) {
           settledText.current = addr;
           onValRef.current(addr);
         }
@@ -133,39 +133,21 @@ export default function AddressPicker({ value, onValueChange, onLocationChange, 
     };
   }, [value]);
 
-  // "pin prati tekst": tihi forward geocode dok korisnik tipka (samo na pauzu, rijetko)
-  useEffect(() => {
-    const q = value.trim();
-    if (!expanded || q.length < 5 || q === settledText.current) return;
-    const ctrl = new AbortController();
-    const t = setTimeout(async () => {
-      try {
-        const hits = await searchAddress(q, ctrl.signal);
-        if (hits[0]) {
-          settledText.current = q;
-          moveMapTo({ lat: hits[0].lat, lng: hits[0].lng });
-        }
-      } catch {
-        /* aborted */
-      }
-    }, DEBOUNCE_TYPE_GEOCODE);
-    return () => {
-      clearTimeout(t);
-      ctrl.abort();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, expanded]);
+  // ponytail: makli "pin prati tekst" auto-geocode dok se tipka — bio je izvor krivih
+  // skokova pina. Pin se sad postavlja samo odabirom prijedloga ili ručnim pomakom karte.
 
-  const pick = (h: AddressHit) => {
+  const pick = async (h: AddressHit) => {
     settledText.current = h.label;
     onValueChange(h.label);
     setSuggestions([]);
     setDropdownOpen(false);
     setExpanded(true);
     setHint(h.label);
+    const loc = await resolvePlace(h.placeId);
+    if (!loc) return;
     // karta se možda tek montira nakon setExpanded -> pokušaj odmah, pa retry
-    if (mapObj.current) moveMapTo({ lat: h.lat, lng: h.lng });
-    else setTimeout(() => moveMapTo({ lat: h.lat, lng: h.lng }), 400);
+    if (mapObj.current) moveMapTo(loc);
+    else setTimeout(() => moveMapTo(loc), 400);
   };
 
   return (
@@ -183,7 +165,7 @@ export default function AddressPicker({ value, onValueChange, onLocationChange, 
           }}
         />
         {dropdownOpen && (
-          <ul className="absolute z-[1000] mt-1 w-full overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md">
+          <ul className="absolute z-[9999] mt-1 w-full overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md">
             {suggestions.map((s, i) => (
               <li key={`${s.label}-${i}`}>
                 <button
