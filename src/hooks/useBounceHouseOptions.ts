@@ -17,7 +17,7 @@ const toOption = (p: Product): BounceHouseOption => ({
   name: p.name,
   price: p.price,
   discountPrice: p.discount_price,
-  color: colorForSlug(p.slug),
+  color: p.color || colorForSlug(p.slug),
   status: p.status,
 });
 

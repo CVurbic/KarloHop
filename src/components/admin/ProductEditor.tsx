@@ -10,10 +10,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import {
   useProductById,
+  useAllProducts,
   useCreateProduct,
   useUpdateProduct,
 } from "@/hooks/useProducts";
 import { uploadProductImage } from "@/lib/uploadImage";
+import { BOUNCE_HOUSE_PALETTE, nextFreeColor } from "@/lib/bounceHouseColor";
 import ProductSticker, {
   STICKER_COLOR_PRESETS,
   DEFAULT_STICKER_COLOR,
@@ -40,6 +42,7 @@ const ProductEditor = () => {
   const { data: existingProduct, isLoading } = useProductById(
     isEditing ? id! : ""
   );
+  const { data: allProducts = [] } = useAllProducts();
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
 
@@ -61,6 +64,7 @@ const ProductEditor = () => {
   const [discountLabel, setDiscountLabel] = useState("");
   const [stickerText, setStickerText] = useState("");
   const [stickerColor, setStickerColor] = useState("");
+  const [color, setColor] = useState("");
   const [seoTitle, setSeoTitle] = useState("");
   const [seoDescription, setSeoDescription] = useState("");
   const [seoOgImage, setSeoOgImage] = useState("");
@@ -95,6 +99,7 @@ const ProductEditor = () => {
       setDiscountLabel(existingProduct.discount_label || "");
       setStickerText(existingProduct.sticker_text || "");
       setStickerColor(existingProduct.sticker_color || "");
+      setColor(existingProduct.color || "");
       setSeoTitle(existingProduct.seo_title || "");
       setSeoDescription(existingProduct.seo_description || "");
       setSeoOgImage(existingProduct.seo_og_image || "");
@@ -102,6 +107,12 @@ const ProductEditor = () => {
       setHidden(existingProduct.status === "hidden");
     }
   }, [existingProduct]);
+
+  // Colors already taken by other products -> a new product defaults to the first free one.
+  const otherColors = allProducts
+    .filter((p) => p.id !== id && p.color)
+    .map((p) => p.color as string);
+  const effectiveColor = color || nextFreeColor(otherColors);
 
   const handleNameChange = (value: string) => {
     setName(value);
@@ -210,6 +221,7 @@ const ProductEditor = () => {
         discount_label: discountLabel.trim() || null,
         sticker_text: stickerText.trim() || null,
         sticker_color: stickerText.trim() ? stickerColor || STICKER_COLOR_PRESETS[0].value : null,
+        color: effectiveColor,
         seo_title: seoTitle.trim() || null,
         seo_description: seoDescription.trim() || null,
         seo_og_image: seoOgImage || null,
@@ -582,6 +594,51 @@ const ProductEditor = () => {
                   </p>
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          {/* Identity color (calendar dots, dashboard charts, maps) */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm">Boja napuhanca</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-xs text-muted-foreground">
+                Koristi se svugdje jednako — točkice u kalendaru, grafovi na
+                nadzornoj ploči, oznake i karte kod vozača.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {BOUNCE_HOUSE_PALETTE.map((preset) => {
+                  const active = effectiveColor === preset.value;
+                  return (
+                    <button
+                      key={preset.value}
+                      type="button"
+                      onClick={() => setColor(preset.value)}
+                      title={preset.name}
+                      aria-label={preset.name}
+                      className={
+                        "h-9 w-9 rounded-full border-2 transition-all " +
+                        (active
+                          ? "border-foreground ring-2 ring-foreground/20 scale-110"
+                          : "border-border hover:scale-105")
+                      }
+                      style={{ backgroundColor: preset.value }}
+                    />
+                  );
+                })}
+                <label
+                  className="h-9 w-9 rounded-full border-2 border-dashed border-border cursor-pointer flex items-center justify-center text-xs text-muted-foreground hover:border-primary/50"
+                  title="Prilagođena boja"
+                >
+                  +
+                  <input
+                    type="color"
+                    className="sr-only"
+                    onChange={(e) => setColor(e.target.value)}
+                  />
+                </label>
+              </div>
             </CardContent>
           </Card>
 

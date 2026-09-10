@@ -11,6 +11,7 @@ export const LEGACY_BOUNCE_HOUSE_SLUGS: Record<string, string> = {
   "Minecraft Party": "minecraft-napuhanac",
   "Dino Park": "dinosaur-napuhanac",
   "Paw Patrol": "paw-patrol-napuhanac",
+  "Nogometni izazov": "nogomet-napuhanac",
   "Super Mario": "super-mario-tobogan-napuhanac",
 };
 

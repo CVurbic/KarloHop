@@ -23,28 +23,12 @@ import {
 } from "recharts";
 import { useAllBookings, useUpcomingBookings, useBookingsRealtime } from "@/hooks/useBookings";
 import { useAllExpenses } from "@/hooks/useExpenses";
+import { useAllBounceHouses } from "@/hooks/useBounceHouseOptions";
+import { toBounceHouseSlug } from "@/lib/bounceHouseCompat";
 import { useSetting, useUpdateSetting } from "@/hooks/useSettings";
 import { supabase } from "@/integrations/supabase/client";
 
-const BOUNCER_COLORS: Record<string, string> = {
-  "Minecraft Party": "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
-  "Dino Park": "bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-300",
-  "Jednorog": "bg-pink-100 text-pink-800 dark:bg-pink-900/40 dark:text-pink-300",
-  "Paw Patrol": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300",
-  "Nogometni izazov": "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300",
-  "Super Mario": "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300",
-};
-
-const BOUNCER_CHART_COLORS: Record<string, string> = {
-  "Minecraft Party": "#3b82f6",
-  "Dino Park": "#14b8a6",
-  "Jednorog": "#ec4899",
-  "Paw Patrol": "#eab308",
-  "Nogometni izazov": "#22c55e",
-  "Super Mario": "#dc2626",
-};
-
-const PIE_COLORS = ["#3b82f6", "#14b8a6", "#ec4899", "#eab308", "#dc2626", "#a855f7"];
+const FALLBACK_COLOR = "#94a3b8";
 
 const statusBadge = (status: string) => {
   const map: Record<string, string> = {
@@ -72,7 +56,12 @@ const DashboardHome = () => {
   const { data: allBookings = [] } = useAllBookings();
   const { data: upcomingBookings = [] } = useUpcomingBookings(5);
   const { data: allExpenses = [] } = useAllExpenses();
+  const { data: bounceHouses = [] } = useAllBounceHouses();
   const { data: investmentValue = "0" } = useSetting("investment");
+
+  // Raw bookings.selected_bounce_house -> the bouncer's shared identity color.
+  const bouncerColor = (rawName: string) =>
+    bounceHouses.find((b) => b.slug === toBounceHouseSlug(rawName))?.color ?? FALLBACK_COLOR;
   const { data: googleRefreshToken } = useSetting("google_refresh_token");
   const updateSetting = useUpdateSetting();
   const isCalendarConnected = !!googleRefreshToken;
@@ -353,10 +342,7 @@ const DashboardHome = () => {
                     nameKey="name"
                   >
                     {bouncerPopularity.map((entry) => (
-                      <Cell
-                        key={entry.name}
-                        fill={BOUNCER_CHART_COLORS[entry.name] || PIE_COLORS[3]}
-                      />
+                      <Cell key={entry.name} fill={bouncerColor(entry.name)} />
                     ))}
                   </Pie>
                   <Tooltip
@@ -445,7 +431,10 @@ const DashboardHome = () => {
                     {booking.selected_bounce_house && (
                       <Badge
                         variant="secondary"
-                        className={BOUNCER_COLORS[booking.selected_bounce_house] || ""}
+                        style={{
+                          backgroundColor: `${bouncerColor(booking.selected_bounce_house)}22`,
+                          color: bouncerColor(booking.selected_bounce_house),
+                        }}
                       >
                         {booking.selected_bounce_house}
                       </Badge>

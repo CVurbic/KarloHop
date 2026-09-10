@@ -19,6 +19,8 @@ export interface Product {
   discount_label: string | null;
   sticker_text: string | null;
   sticker_color: string | null;
+  /** Identity color for calendar dots / dashboard charts / maps. See lib/bounceHouseColor.ts. */
+  color: string | null;
   seo_title: string | null;
   seo_description: string | null;
   seo_og_image: string | null;
