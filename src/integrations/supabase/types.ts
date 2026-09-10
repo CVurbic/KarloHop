@@ -212,6 +212,42 @@ export type Database = {
         }
         Relationships: []
       }
+      message_log: {
+        Row: {
+          id: string
+          template_key: string
+          channel: string
+          recipient: string | null
+          body: string
+          context: Json
+          status: string
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          template_key: string
+          channel?: string
+          recipient?: string | null
+          body: string
+          context?: Json
+          status?: string
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          template_key?: string
+          channel?: string
+          recipient?: string | null
+          body?: string
+          context?: Json
+          status?: string
+          created_by?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
       message_templates: {
         Row: {
           id: string
