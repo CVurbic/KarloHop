@@ -26,3 +26,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# stray exports / reports downloaded into the repo root
+/My Maps Billing Account_Reports*.csv
