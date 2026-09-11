@@ -1,13 +1,18 @@
-// Geokodiranje preko Photona (Komoot / OpenStreetMap) — besplatno, bez API ključa i bez billinga.
+// Adrese: autocomplete + koordinate preko Google Places API (New) — točni kućni brojevi
+// (OSM/Photon fula ruralne adrese). Reverse (pin -> tekst) ostaje na besplatnom Photonu.
 
 export type LatLng = { lat: number; lng: number };
-export type AddressHit = { label: string; lat: number; lng: number };
+export type AddressHit = { label: string; placeId: string };
+
+const GKEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string;
+const PLACES = "https://places.googleapis.com/v1";
 
 const PHOTON = "https://photon.komoot.io";
 // bias na Hrvatsku (centar zemlje) + lokalna imena
 const BIAS = "&lang=default&lat=45.1&lon=16.4";
 
 const fwdCache = new Map<string, AddressHit[]>();
+const locCache = new Map<string, LatLng | null>();
 const revCache = new Map<string, string | null>();
 
 function toLabel(p: Record<string, string>): string {
@@ -18,29 +23,49 @@ function toLabel(p: Record<string, string>): string {
   return [street, city].filter(Boolean).join(", ") || p.name || "";
 }
 
-/** Prijedlozi adresa za autocomplete. Baca AbortError ako je zahtjev prekinut. */
+/** Prijedlozi adresa (Google Places Autocomplete). Baca AbortError ako je zahtjev prekinut. */
 export async function searchAddress(query: string, signal?: AbortSignal): Promise<AddressHit[]> {
   const q = query.trim();
   if (q.length < 3) return [];
   const cached = fwdCache.get(q);
   if (cached) return cached;
 
-  const res = await fetch(`${PHOTON}/api/?q=${encodeURIComponent(q)}&limit=6${BIAS}`, { signal });
+  // ponytail: bez session tokena -> Places se naplaćuje per-request. Za HopHop volumen
+  // (par upita/dan) zanemarivo. Ako Places račun poraste -> provuci sessionToken kroz
+  // searchAddress + resolvePlace i regeneriraj ga nakon svakog odabira.
+  const res = await fetch(`${PLACES}/places:autocomplete`, {
+    method: "POST",
+    signal,
+    headers: { "Content-Type": "application/json", "X-Goog-Api-Key": GKEY },
+    body: JSON.stringify({ input: q, includedRegionCodes: ["hr"], languageCode: "hr" }),
+  });
   const data = await res.json();
-  const hits: AddressHit[] = (data.features ?? [])
-    .filter(
-      (f: { properties?: Record<string, string>; geometry?: { coordinates?: number[] } }) =>
-        f?.properties?.countrycode === "HR" && Array.isArray(f?.geometry?.coordinates),
-    )
-    .map((f: { properties: Record<string, string>; geometry: { coordinates: number[] } }) => ({
-      label: toLabel(f.properties),
-      lat: f.geometry.coordinates[1],
-      lng: f.geometry.coordinates[0],
-    }))
+  const hits: AddressHit[] = (data.suggestions ?? [])
+    .map((s: { placePrediction?: { placeId: string; text?: { text: string } } }) => s.placePrediction)
+    .filter((p: { placeId?: string } | undefined): p is { placeId: string; text?: { text: string } } => !!p?.placeId)
+    .map((p: { placeId: string; text?: { text: string } }) => ({ label: p.text?.text ?? "", placeId: p.placeId }))
     .filter((h: AddressHit) => h.label);
 
   fwdCache.set(q, hits);
   return hits;
+}
+
+/** Koordinate odabranog prijedloga (Google Place Details). */
+export async function resolvePlace(placeId: string): Promise<LatLng | null> {
+  if (locCache.has(placeId)) return locCache.get(placeId)!;
+  try {
+    const res = await fetch(`${PLACES}/places/${placeId}`, {
+      headers: { "X-Goog-Api-Key": GKEY, "X-Goog-FieldMask": "location" },
+    });
+    const data = await res.json();
+    const loc: LatLng | null = data.location
+      ? { lat: data.location.latitude, lng: data.location.longitude }
+      : null;
+    locCache.set(placeId, loc);
+    return loc;
+  } catch {
+    return null;
+  }
 }
 
 // --- Rute preko OSRM demo servera (besplatno, bez ključa) ---
