@@ -21,6 +21,7 @@ import {
   AlertTriangle,
   Euro,
   CreditCard,
+  Navigation,
 } from "lucide-react";
 import { RouteMap, type RadnikStop, type RouteResult } from "./RouteMap";
 import { LiveTripMap } from "./LiveTripMap";
@@ -188,9 +189,30 @@ function gearItems(count: number) {
   return [...baseItems(count), "produžni kabel", "cerada"];
 }
 
+type NavApp = "google" | "waze" | "apple";
+const NAV_APP_STORAGE_KEY = "radnik-nav-app"; // preferencija je vozačeva navika, ne po turi -> globalni ključ
+
 // jedna destinacija po stopu -> uvijek tocna navigacija cak i nakon rucnog reordera
-export function navHref(stop: RadnikStop) {
-  return `https://www.google.com/maps/dir/?api=1&destination=${stop.lat},${stop.lng}&travelmode=driving`;
+const NAV_APPS: Record<NavApp, { label: string; color: string; href: (stop: RadnikStop) => string }> = {
+  google: {
+    label: "Google Maps",
+    color: "#4285F4",
+    href: (s) => `https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}&travelmode=driving`,
+  },
+  waze: {
+    label: "Waze",
+    color: "#05C3DE",
+    href: (s) => `https://waze.com/ul?ll=${s.lat},${s.lng}&navigate=yes`,
+  },
+  apple: {
+    label: "Apple Maps",
+    color: "#000000",
+    href: (s) => `https://maps.apple.com/?daddr=${s.lat},${s.lng}&dirflg=d`,
+  },
+};
+
+export function navHref(stop: RadnikStop, app: NavApp = "google") {
+  return NAV_APPS[app].href(stop);
 }
 
 type SavedTrip = {
@@ -365,6 +387,25 @@ export function TripCard({
 
   const { data: etaTemplate } = useMessageTemplate("eta_sms");
   const { data: etaFallbackTemplate } = useMessageTemplate("eta_sms_fallback");
+
+  // koju app za navigaciju vozač preferira -> pamti se na uređaju, ne po turi
+  const [navApp, setNavApp] = useState<NavApp>(() => {
+    try {
+      return (localStorage.getItem(NAV_APP_STORAGE_KEY) as NavApp) || "google";
+    } catch {
+      return "google";
+    }
+  });
+  const [navPickerOpen, setNavPickerOpen] = useState(false);
+  const chooseNavApp = (app: NavApp) => {
+    setNavApp(app);
+    setNavPickerOpen(false);
+    try {
+      localStorage.setItem(NAV_APP_STORAGE_KEY, app);
+    } catch {
+      // ponytail: privatni mod/storage full -> preferencija se ne pamti, ne blokiraj app
+    }
+  };
 
   const [smsLoading, setSmsLoading] = useState(false);
   const sendEtaSms = async (stop: RadnikStop) => {
@@ -652,16 +693,45 @@ export function TripCard({
                   <ArrowLeft className="h-5 w-5 " />
                 </button>
 
-                {/* skok u Google Maps preko karte (rezerva za nepoznatu adresu) */}
-                <a
-                  href={navHref(activeStop)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="absolute bottom-3 left-3 z-[1000] flex items-center gap-2 rounded-full bg-white px-3.5 py-2 text-xs font-semibold text-[#3c4043] shadow-md transition-transform active:scale-95"
-                >
-                  <MapPin className="h-4 w-4 text-[#4285F4]" />
-                  Google Maps
-                </a>
+                {/* skok u navigacijsku app preko karte (rezerva za nepoznatu adresu) — tap otvara, strelica bira app */}
+                <div className="absolute bottom-3 left-3 z-[1000] flex items-end gap-1.5">
+                  {navPickerOpen && (
+                    <div className="absolute bottom-full left-0 mb-2 w-40 overflow-hidden rounded-xl bg-white shadow-lg">
+                      {(Object.keys(NAV_APPS) as NavApp[]).map((app) => (
+                        <a
+                          key={app}
+                          href={NAV_APPS[app].href(activeStop)}
+                          target="_blank"
+                          rel="noreferrer"
+                          onClick={() => chooseNavApp(app)}
+                          className={`flex items-center gap-2 px-3.5 py-2.5 text-xs font-semibold text-[#3c4043] hover:bg-muted/60 ${app === navApp ? "bg-muted/40" : ""
+                            }`}
+                        >
+                          <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: NAV_APPS[app].color }} />
+                          {NAV_APPS[app].label}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                  <a
+                    href={navHref(activeStop, navApp)}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => setNavPickerOpen(false)}
+                    className="flex items-center gap-2 rounded-full bg-white px-3.5 py-2 text-xs font-semibold text-[#3c4043] shadow-md transition-transform active:scale-95"
+                  >
+                    <Navigation className="h-4 w-4" style={{ color: NAV_APPS[navApp].color }} />
+                    {NAV_APPS[navApp].label}
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => setNavPickerOpen((v) => !v)}
+                    aria-label="Promijeni aplikaciju za navigaciju"
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-[#3c4043] shadow-md transition-transform active:scale-90"
+                  >
+                    {navPickerOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+                  </button>
+                </div>
               </div>
 
               {/* info panel — spušten (vidi se karta) / podignut (checklist); karta se resize-a između */}
