@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
-import { FileText, LogOut, Package, LayoutDashboard, CalendarDays, TrendingUp, Receipt, Menu, Moon, Sun, MessageCircle, MessageSquareText, Users } from "lucide-react";
+import { FileText, LogOut, Package, LayoutDashboard, CalendarDays, TrendingUp, Receipt, Menu, Moon, Sun, MessageCircle, MessageSquareText, Users, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useAdmin } from "@/hooks/useAdmin";
@@ -41,6 +41,11 @@ const businessItems = [
     to: "/hop-upravljanje/poruke",
     label: "Automatske poruke",
     icon: MessageSquareText,
+  },
+  {
+    to: "/hop-upravljanje/naplata",
+    label: "Linkovi za naplatu",
+    icon: CreditCard,
   },
 ];
 

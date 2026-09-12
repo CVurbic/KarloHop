@@ -19,12 +19,16 @@ import {
   Minus,
   Plus,
   AlertTriangle,
+  Euro,
+  CreditCard,
 } from "lucide-react";
 import { RouteMap, type RadnikStop, type RouteResult } from "./RouteMap";
 import { LiveTripMap } from "./LiveTripMap";
 import { drivingRoute } from "@/lib/geo";
 import { format } from "date-fns";
 import { useMessageTemplate, fillTemplate } from "@/hooks/useMessageTemplates";
+import { usePaymentLinks, findPaymentLink } from "@/hooks/usePaymentLinks";
+import { toast } from "sonner";
 import { useBookingReports, useUpsertBookingReport } from "@/hooks/useBookingReports";
 import { uploadRadnikPhoto } from "@/lib/uploadImage";
 import { supabase } from "@/integrations/supabase/client";
@@ -115,6 +119,10 @@ const NAPUHANAC_LABELS: Record<string, string> = {
   "Nogometni izazov": "Nogometni izazov",
   "Super Mario": "Super Mario Tobogan",
 };
+
+function formatPrice(price: number | null | undefined) {
+  return price != null ? `${price.toFixed(2)} €` : null;
+}
 
 function napuhanacLabels(names: string[]) {
   return names.map((n) => NAPUHANAC_LABELS[n] ?? n).join(", ");
@@ -268,7 +276,17 @@ export function TripCard({
   onActiveStopChange?: (stop: RadnikStop | null) => void;
 }) {
   const { data: bounceHouses = [] } = useAllBounceHouses();
+  const { data: paymentLinks = [] } = usePaymentLinks();
   const L = MODE_COPY[mode];
+
+  const openPaymentLink = (price: number | null | undefined) => {
+    const link = findPaymentLink(paymentLinks, price);
+    if (!link) {
+      toast.error(`Nema linka za naplatu za ${formatPrice(price)} — dodaj ga u Admin → Linkovi za naplatu.`);
+      return;
+    }
+    window.open(link.url, "_blank", "noopener,noreferrer");
+  };
 
   // skupljanje cita sto je dostava zabiljezila (klinovi, napomena); dostava samo pise
   const tripBookingIds = useMemo(() => stops.flatMap((s) => s.bookingIds ?? []), [stops]);
@@ -309,6 +327,8 @@ export function TripCard({
   const [photos, setPhotos] = useState<Record<string, string>>({});
   const [photoUploading, setPhotoUploading] = useState<Record<string, boolean>>({});
   const photoInputRef = useRef<HTMLInputElement>(null);
+  // panel scrolla se dolje do prošlog koraka -> resetiraj na vrh kad radnik prijeđe na sljedeću lokaciju
+  const sheetScrollRef = useRef<HTMLDivElement>(null);
 
   const setPhoto = async (stop: RadnikStop, file: File | null) => {
     if (!file) return;
@@ -413,6 +433,10 @@ export function TripCard({
     onActiveStopChange?.(started ? activeStop ?? null : null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [started, activeStop]);
+
+  useEffect(() => {
+    sheetScrollRef.current?.scrollTo({ top: 0 });
+  }, [stepIndex]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -526,6 +550,22 @@ export function TripCard({
                       </div>
                       <div className="truncate text-xs text-muted-foreground">{label}</div>
                       <div className="mt-1 break-words text-xs text-muted-foreground">{s.address}</div>
+                      {formatPrice(s.price) && (
+                        <div className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                          <span>Naplatiti: {formatPrice(s.price)}</span>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openPaymentLink(s.price);
+                            }}
+                            aria-label="Naplati karticom"
+                            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform hover:bg-primary/20 active:scale-90"
+                          >
+                            <CreditCard className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      )}
                     </div>
                     {!started && !finished && orderedStops.length > 1 && (
                       <div className="-my-1 flex shrink-0 flex-col">
@@ -625,9 +665,10 @@ export function TripCard({
               </div>
 
               {/* info panel — spušten (vidi se karta) / podignut (checklist); karta se resize-a između */}
-              <div
-                className={`relative z-10 flex shrink-0 flex-col overflow-hidden rounded-t-2xl border-t bg-background shadow-[0_-8px_24px_rgba(0,0,0,0.14)] transition-[height] duration-300 ease-out ${sheetExpanded ? "h-[62vh]" : "h-[190px]"
-                  }`}
+              <motion.div
+                animate={{ height: sheetExpanded ? "62vh" : 190 }}
+                transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                className="relative z-10 flex shrink-0 flex-col overflow-hidden rounded-t-2xl border-t bg-background shadow-[0_-8px_24px_rgba(0,0,0,0.14)]"
               >
                 <button
                   type="button"
@@ -638,13 +679,25 @@ export function TripCard({
                   <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
                 </button>
 
-                <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 pb-4">
+                <div ref={sheetScrollRef} className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 pb-4">
                   <div className="flex gap-1">
                     {orderedStops.map((_, si) => (
-                      <div key={si} className={`h-1 flex-1 rounded-full ${si <= stepIndex ? "bg-primary" : "bg-muted"}`} />
+                      <div
+                        key={si}
+                        className={`h-1 flex-1 rounded-full transition-colors duration-300 ${si <= stepIndex ? "bg-primary" : "bg-muted"}`}
+                      />
                     ))}
                   </div>
 
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={activeStop.address}
+                      initial={{ opacity: 0, x: 16 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -16 }}
+                      transition={{ duration: 0.18, ease: "easeOut" }}
+                      className="space-y-4"
+                    >
                   <div>
                     <p className="font-semibold leading-tight">{activeStop.name}</p>
                     <p className="text-xs text-muted-foreground">
@@ -664,6 +717,20 @@ export function TripCard({
                         <PartyPopper className="h-4 w-4 shrink-0 text-muted-foreground" />
                         <span>{napuhanacLabels(activeStop.napuhanac)}</span>
                       </div>
+                      {formatPrice(activeStop.price) && (
+                        <div className="flex items-center gap-2 font-semibold">
+                          <Euro className="h-4 w-4 shrink-0 text-muted-foreground" />
+                          <span>Naplatiti: {formatPrice(activeStop.price)}</span>
+                          <button
+                            type="button"
+                            onClick={() => openPaymentLink(activeStop.price)}
+                            aria-label="Naplati karticom"
+                            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform hover:bg-primary/20 active:scale-90"
+                          >
+                            <CreditCard className="h-4 w-4" />
+                          </button>
+                        </div>
+                      )}
                       {activeStop.phone && (
                         <div className="flex min-w-0 items-center gap-2">
                           <Phone className="h-4 w-4 shrink-0 text-muted-foreground" />
@@ -811,8 +878,10 @@ export function TripCard({
                       onChange={(e) => setPhoto(activeStop, e.target.files?.[0] ?? null)}
                     />
                   </div>
+                    </motion.div>
+                  </AnimatePresence>
                 </div>
-              </div>
+              </motion.div>
 
               <div className="z-20 flex shrink-0 flex-row items-center justify-between gap-2 border-t bg-background p-4">
                 <Button

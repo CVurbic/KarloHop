@@ -28,3 +28,9 @@ export function rawValuesForSlug(slug: string): string[] {
     .map(([legacyName]) => legacyName);
   return [slug, ...legacyNames];
 }
+
+/** Slug -> its old display name (e.g. "paw-patrol-napuhanac" -> "Paw Patrol"), for admin views that still want the legacy label over today's product name. */
+export function legacyNameForSlug(slug: string): string | null {
+  const entry = Object.entries(LEGACY_BOUNCE_HOUSE_SLUGS).find(([, s]) => s === slug);
+  return entry ? entry[0] : null;
+}

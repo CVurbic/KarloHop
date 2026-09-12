@@ -109,6 +109,7 @@ const BookingManager = () => {
         additional_notes: formData.additional_notes || null,
         add_table_set: null,
         multiple_days: null,
+        late_pickup: null,
         status: formData.status,
         price: formData.price ? Number(formData.price) : null,
       };
@@ -326,6 +327,9 @@ const BookingManager = () => {
                 <div><span className="text-muted-foreground">Datum:</span> {format(new Date(viewBooking.booking_start_date), "d. MMMM yyyy.", { locale: hr })}</div>
                 <div><span className="text-muted-foreground">Cijena:</span> {viewBooking.price != null ? `${Number(viewBooking.price).toFixed(2)} €` : "-"}</div>
                 <div><span className="text-muted-foreground">Status:</span> {STATUS_OPTIONS.find(s => s.value === viewBooking.status)?.label || viewBooking.status}</div>
+                {viewBooking.late_pickup && (
+                  <div><span className="text-muted-foreground">Kasno preuzimanje:</span> Da — odvoz nakon 22:00 (+30 €)</div>
+                )}
               </div>
               {viewBooking.additional_notes && (
                 <div><span className="text-muted-foreground">Napomene:</span> {viewBooking.additional_notes}</div>

@@ -18,6 +18,40 @@ const REROUTE_MS = 45000;
 const ACCURACY_GATE_M = 60;
 // zoom u navigacijskom modu ("Kreni") — tijesan, ulična razina
 const NAV_ZOOM = 17;
+// map-matching: zaključaj marker na liniju rute unutar ovoliko metara
+const SNAP_LOCK_M = 20;
+// ...otključaj tek kad odluta dalje od ovoga (histereza, sprječava treperenje snap/raw na granici)
+const SNAP_UNLOCK_M = 35;
+
+// najbliža točka na ruti vozaču (pixel-projekcija, traži samo unaprijed od zadnjeg pogotka
+// da GPS šum ne vuče marker unazad po ruti) -> null ako nema rute ili nema blizu segmenta
+function projectOntoRoute(
+  map: L.Map,
+  routeLatLngs: L.LatLng[],
+  fix: L.LatLngLiteral,
+  fromIdx: number,
+): { point: L.LatLngLiteral; distM: number; idx: number } | null {
+  if (routeLatLngs.length < 2) return null;
+  const p = map.latLngToLayerPoint(fix);
+  const searchFrom = Math.max(0, fromIdx - 2);
+  let best: { x: number; y: number; distSq: number; idx: number } | null = null;
+  for (let i = searchFrom; i < routeLatLngs.length - 1; i++) {
+    const a = map.latLngToLayerPoint(routeLatLngs[i]);
+    const b = map.latLngToLayerPoint(routeLatLngs[i + 1]);
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const lenSq = dx * dx + dy * dy || 1;
+    let t = ((p.x - a.x) * dx + (p.y - a.y) * dy) / lenSq;
+    t = Math.max(0, Math.min(1, t));
+    const x = a.x + t * dx;
+    const y = a.y + t * dy;
+    const distSq = (p.x - x) ** 2 + (p.y - y) ** 2;
+    if (!best || distSq < best.distSq) best = { x, y, distSq, idx: i };
+  }
+  if (!best) return null;
+  const point = map.layerPointToLatLng(L.point(best.x, best.y));
+  return { point: { lat: point.lat, lng: point.lng }, distM: map.distance(fix, point), idx: best.idx };
+}
 
 function stopColor(stop: RadnikStop, colorBySlug: Record<string, string>): string {
   const slug = toBounceHouseSlug(stop.napuhanac[0]);
@@ -91,7 +125,8 @@ export function LiveTripMap({ origin, stops, activeIndex, onSelectStop }: Props)
   const accCircle = useRef<L.Circle | null>(null);
   const routeLine = useRef<L.Polyline | null>(null);
   const stopMarkers = useRef<L.Marker[]>([]);
-  const driverPos = useRef<L.LatLngLiteral | null>(null);
+  const driverPos = useRef<L.LatLngLiteral | null>(null); // zadnji sirovi GPS fix
+  const renderedPos = useRef<L.LatLngLiteral | null>(null); // pozicija trenutno prikazana na karti (glača se prema driverPos)
   // follow = navigacijski mod ("Kreni"): karta prati vozača i drži tijesan zoom
   const followRef = useRef(false);
   const [follow, setFollow] = useState(false);
@@ -112,6 +147,9 @@ export function LiveTripMap({ origin, stops, activeIndex, onSelectStop }: Props)
 
   const lastRouteAt = useRef(0);
   const routedIndex = useRef(-1);
+  // map-matching state: gdje smo zadnje pogodili na ruti + jesmo li trenutno zaključani na nju
+  const lastMatchedIdx = useRef(0);
+  const lockedToRoute = useRef(false);
 
   // aktualne vrijednosti za closure-e u [] effect-ima
   const activeIndexRef = useRef(activeIndex);
@@ -155,6 +193,9 @@ export function LiveTripMap({ origin, stops, activeIndex, onSelectStop }: Props)
     }
     lastRouteAt.current = Date.now();
     routedIndex.current = activeIndexRef.current;
+    // nova geometrija -> stari indeks segmenta više ne vrijedi, traži od početka
+    lastMatchedIdx.current = 0;
+    lockedToRoute.current = false;
   };
 
   // init karte jednom
@@ -239,7 +280,7 @@ export function LiveTripMap({ origin, stops, activeIndex, onSelectStop }: Props)
       if (f) pts.push([f.lat, f.lng]);
       const d = driverPos.current;
       pts.push(d ? [d.lat, d.lng] : [origin.lat, origin.lng]);
-      map.fitBounds(L.latLngBounds(pts), { padding: [70, 70] });
+      map.flyToBounds(L.latLngBounds(pts), { padding: [70, 70] });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeIndex]);
@@ -266,25 +307,44 @@ export function LiveTripMap({ origin, stops, activeIndex, onSelectStop }: Props)
       const p = { lat: pos.coords.latitude, lng: pos.coords.longitude };
       const acc = pos.coords.accuracy; // metri (68% pouzdanost)
       const heading = pos.coords.heading; // stupnjevi od sjevera, null dok miruje / nepodržano
-      driverPos.current = p;
       setHasFix(true);
       setGeoMsg(null);
 
       const map = mapObj.current;
-      if (!map) return;
+      if (!map) {
+        driverPos.current = p;
+        return;
+      }
+
+      // map-matching: dok smo blizu izračunate rute, prikaži marker na njoj umjesto sirovog fixa
+      // (histereza gornja/donja granica -> ne treperi na rubu; ako vozač skrene/parkira, otključa se)
+      const routeLatLngs = routeLine.current?.getLatLngs() as L.LatLng[] | undefined;
+      const match = routeLatLngs
+        ? projectOntoRoute(map, routeLatLngs, p, lastMatchedIdx.current)
+        : null;
+      const lockThreshold = lockedToRoute.current ? SNAP_UNLOCK_M : SNAP_LOCK_M;
+      if (match && match.distM <= lockThreshold) {
+        driverPos.current = match.point;
+        lastMatchedIdx.current = match.idx;
+        lockedToRoute.current = true;
+      } else {
+        driverPos.current = p;
+        lockedToRoute.current = false;
+      }
 
       const validHeading = heading != null && !Number.isNaN(heading);
       const moving = validHeading && (pos.coords.speed ?? 0) > 0.5;
       // u nav modu je karta zaključana na smjer vožnje -> arrow uvijek gleda gore (0)
       const icon = driverIcon(followRef.current ? 0 : heading, moving);
       if (!driverMarker.current) {
+        // prvi fix -> nacrtaj odmah bez animacije; svaki sljedeći pomak glača smoothPositionLoop niže
+        renderedPos.current = p;
         driverMarker.current = L.marker(p, { icon, zIndexOffset: 2000 }).addTo(map);
       } else {
-        driverMarker.current.setLatLng(p);
         driverMarker.current.setIcon(icon);
       }
 
-      // krug točnosti -> vozač vidi koliko je fix pouzdan
+      // krug točnosti -> vozač vidi koliko je fix pouzdan (pozicija mu se glača zajedno s markerom)
       if (!accCircle.current) {
         accCircle.current = L.circle(p, {
           radius: acc || 0,
@@ -295,18 +355,14 @@ export function LiveTripMap({ origin, stops, activeIndex, onSelectStop }: Props)
           fillOpacity: 0.1,
         }).addTo(map);
       } else {
-        accCircle.current.setLatLng(p);
         accCircle.current.setRadius(acc || 0);
       }
 
-      if (followRef.current) {
-        map.panTo(p);
+      if (followRef.current && !compassOnRef.current && moving) {
         // fallback: ako kompas mobitela nije aktivan (nema senzora / dozvola odbijena),
         // rotiraj kartu po GPS smjeru dok se vozi. -heading da smjer vožnje bude gore.
         // ponytail: predznak (-heading) potvrditi na terenu, okrenuti ako se vrti krivo.
-        if (!compassOnRef.current && moving) {
-          (map as unknown as { setBearing?: (deg: number) => void }).setBearing?.(-(heading as number));
-        }
+        (map as unknown as { setBearing?: (deg: number) => void }).setBearing?.(-(heading as number));
       }
 
       // reroute: na promjenu stopa uvijek; periodično samo iz dovoljno točnog fixa
@@ -330,6 +386,30 @@ export function LiveTripMap({ origin, stops, activeIndex, onSelectStop }: Props)
     });
     return () => navigator.geolocation.clearWatch(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // glatko klizanje markera/kruga/kamere prema zadnjem GPS fixu -> vozač ne "teleportira" između fixova
+  useEffect(() => {
+    let raf = 0;
+    const tick = () => {
+      const map = mapObj.current;
+      const target = driverPos.current;
+      const marker = driverMarker.current;
+      if (map && target && marker) {
+        const cur = renderedPos.current ?? target;
+        // ponytail: fiksni lerp-faktor po frameu (ne delta-time) -> ovisi lagano o fps-u,
+        // dovoljno glatko na 60fps mobitelima; ako trza na sporijem uređaju, prijeći na delta-time easing
+        const lat = cur.lat + (target.lat - cur.lat) * 0.15;
+        const lng = cur.lng + (target.lng - cur.lng) * 0.15;
+        renderedPos.current = { lat, lng };
+        marker.setLatLng([lat, lng]);
+        accCircle.current?.setLatLng([lat, lng]);
+        if (followRef.current) map.panTo([lat, lng], { animate: false });
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
   }, []);
 
   // ekran ne spava dok je karta otvorena

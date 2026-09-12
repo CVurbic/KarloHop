@@ -24,7 +24,7 @@ import {
 import { useAllBookings, useUpcomingBookings, useBookingsRealtime } from "@/hooks/useBookings";
 import { useAllExpenses } from "@/hooks/useExpenses";
 import { useAllBounceHouses } from "@/hooks/useBounceHouseOptions";
-import { toBounceHouseSlug } from "@/lib/bounceHouseCompat";
+import { toBounceHouseSlug, legacyNameForSlug } from "@/lib/bounceHouseCompat";
 import { useSetting, useUpdateSetting } from "@/hooks/useSettings";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -125,17 +125,23 @@ const DashboardHome = () => {
     return months;
   }, [allBookings]);
 
-  // Chart: Bouncer popularity (pie chart)
+  // Chart: Bouncer popularity (pie chart) — group by product slug first so a
+  // legacy raw name ("Paw Patrol") and its slug ("paw-patrol-napuhanac") land
+  // in the same slice instead of splitting the count in two.
   const bouncerPopularity = useMemo(() => {
     const counts: Record<string, number> = {};
     allBookings
       .filter((b) => b.status !== "cancelled" && b.selected_bounce_house)
       .forEach((b) => {
-        const name = b.selected_bounce_house!;
-        counts[name] = (counts[name] || 0) + 1;
+        const slug = toBounceHouseSlug(b.selected_bounce_house)!;
+        counts[slug] = (counts[slug] || 0) + 1;
       });
-    return Object.entries(counts).map(([name, value]) => ({ name, value }));
-  }, [allBookings]);
+    return Object.entries(counts).map(([slug, value]) => ({
+      slug,
+      name: legacyNameForSlug(slug) ?? bounceHouses.find((b) => b.slug === slug)?.name ?? slug,
+      value,
+    }));
+  }, [allBookings, bounceHouses]);
 
   // Chart: Revenue trend (line chart, last 6 months)
   const revenueTrend = useMemo(() => {
@@ -342,7 +348,7 @@ const DashboardHome = () => {
                     nameKey="name"
                   >
                     {bouncerPopularity.map((entry) => (
-                      <Cell key={entry.name} fill={bouncerColor(entry.name)} />
+                      <Cell key={entry.slug} fill={bouncerColor(entry.slug)} />
                     ))}
                   </Pie>
                   <Tooltip

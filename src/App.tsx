@@ -25,6 +25,7 @@ const ProductEditorPage = lazy(() => import("./components/admin/ProductEditor"))
 const ChatLogManager = lazy(() => import("./components/admin/ChatLogManager"));
 const AccountManager = lazy(() => import("./components/admin/AccountManager"));
 const MessageTemplateManager = lazy(() => import("./components/admin/MessageTemplateManager"));
+const PaymentLinkManager = lazy(() => import("./components/admin/PaymentLinkManager"));
 
 const queryClient = new QueryClient();
 
@@ -67,6 +68,7 @@ const App = () => (
                 <Route path="proizvodi/:id" element={<Suspense fallback={<PageLoader />}><ProductEditorPage /></Suspense>} />
                 <Route path="racuni" element={<Suspense fallback={<PageLoader />}><AccountManager /></Suspense>} />
                 <Route path="poruke" element={<Suspense fallback={<PageLoader />}><MessageTemplateManager /></Suspense>} />
+                <Route path="naplata" element={<Suspense fallback={<PageLoader />}><PaymentLinkManager /></Suspense>} />
               </Route>
             </Route>
             <Route path="/radnik" element={<Navigate to="/radnik/dostava" replace />} />

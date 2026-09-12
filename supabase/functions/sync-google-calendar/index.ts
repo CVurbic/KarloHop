@@ -23,6 +23,7 @@ interface BookingPayload {
   selected_bounce_house: string | null;
   additional_notes: string | null;
   price: number | null;
+  late_pickup: boolean | null;
   status: string;
 }
 
@@ -124,6 +125,7 @@ serve(async (req: Request) => {
     if (booking.phone) descriptionParts.push(`Telefon: ${booking.phone}`);
     if (booking.email) descriptionParts.push(`Email: ${booking.email}`);
     if (booking.price != null) descriptionParts.push(`Cijena: ${booking.price} \u20ac`);
+    if (booking.late_pickup) descriptionParts.push("Kasno preuzimanje: odvoz nakon 22:00 (+30 \u20ac)");
     if (booking.additional_notes) descriptionParts.push(`Napomene: ${booking.additional_notes}`);
     descriptionParts.push(`Status: ${booking.status}`);
 

@@ -17,6 +17,7 @@ export interface Booking {
   additional_notes: string | null;
   add_table_set: boolean | null;
   multiple_days: boolean | null;
+  late_pickup: boolean | null;
   status: string;
   price: number | null;
   google_calendar_event_id: string | null;
