@@ -281,6 +281,33 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_links: {
+        Row: {
+          id: string
+          price: number
+          url: string
+          label: string | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          price: number
+          url: string
+          label?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          price?: number
+          url?: string
+          label?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       settings: {
         Row: {
           key: string

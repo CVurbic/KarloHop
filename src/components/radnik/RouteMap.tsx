@@ -15,6 +15,8 @@ export type RadnikStop = {
   napuhanac: string[];
   // rezervacije na ovoj adresi (merge po adresi moze spojiti vise) -> lookup booking_reports handoffa
   bookingIds?: string[];
+  // cijena za naplatu na vratima (gotovina); zbroj svih rezervacija na ovoj adresi
+  price?: number | null;
 };
 
 export type Leg = { minutes: number };

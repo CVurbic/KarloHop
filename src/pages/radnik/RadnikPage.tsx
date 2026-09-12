@@ -89,6 +89,7 @@ function mergeStopsByAddress(list: LocalStop[]): LocalStop[] {
       const existing = merged[existingIdx];
       existing.napuhanac.push(...s.napuhanac);
       existing.bookingIds = [...(existing.bookingIds ?? []), ...(s.bookingIds ?? [])];
+      existing.price = (existing.price ?? 0) + (s.price ?? 0);
       if (!existing.phone && s.phone) existing.phone = s.phone;
       if (existing.geocodeFailed && !s.geocodeFailed) existing.geocodeFailed = false;
     }
@@ -196,6 +197,7 @@ export default function RadnikPage({ mode = "delivery" }: { mode?: Mode }) {
           lng: coords?.lng ?? 0,
           napuhanac: [b.selected_bounce_house ?? ""],
           bookingIds: [b.id],
+          price: b.price,
           geocodeFailed: !coords,
         });
       }),
