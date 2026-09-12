@@ -327,6 +327,8 @@ export function TripCard({
   const [photos, setPhotos] = useState<Record<string, string>>({});
   const [photoUploading, setPhotoUploading] = useState<Record<string, boolean>>({});
   const photoInputRef = useRef<HTMLInputElement>(null);
+  // panel scrolla se dolje do prošlog koraka -> resetiraj na vrh kad radnik prijeđe na sljedeću lokaciju
+  const sheetScrollRef = useRef<HTMLDivElement>(null);
 
   const setPhoto = async (stop: RadnikStop, file: File | null) => {
     if (!file) return;
@@ -431,6 +433,10 @@ export function TripCard({
     onActiveStopChange?.(started ? activeStop ?? null : null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [started, activeStop]);
+
+  useEffect(() => {
+    sheetScrollRef.current?.scrollTo({ top: 0 });
+  }, [stepIndex]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -659,9 +665,10 @@ export function TripCard({
               </div>
 
               {/* info panel — spušten (vidi se karta) / podignut (checklist); karta se resize-a između */}
-              <div
-                className={`relative z-10 flex shrink-0 flex-col overflow-hidden rounded-t-2xl border-t bg-background shadow-[0_-8px_24px_rgba(0,0,0,0.14)] transition-[height] duration-300 ease-out ${sheetExpanded ? "h-[62vh]" : "h-[190px]"
-                  }`}
+              <motion.div
+                animate={{ height: sheetExpanded ? "62vh" : 190 }}
+                transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                className="relative z-10 flex shrink-0 flex-col overflow-hidden rounded-t-2xl border-t bg-background shadow-[0_-8px_24px_rgba(0,0,0,0.14)]"
               >
                 <button
                   type="button"
@@ -672,13 +679,25 @@ export function TripCard({
                   <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
                 </button>
 
-                <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 pb-4">
+                <div ref={sheetScrollRef} className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 pb-4">
                   <div className="flex gap-1">
                     {orderedStops.map((_, si) => (
-                      <div key={si} className={`h-1 flex-1 rounded-full ${si <= stepIndex ? "bg-primary" : "bg-muted"}`} />
+                      <div
+                        key={si}
+                        className={`h-1 flex-1 rounded-full transition-colors duration-300 ${si <= stepIndex ? "bg-primary" : "bg-muted"}`}
+                      />
                     ))}
                   </div>
 
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={activeStop.address}
+                      initial={{ opacity: 0, x: 16 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -16 }}
+                      transition={{ duration: 0.18, ease: "easeOut" }}
+                      className="space-y-4"
+                    >
                   <div>
                     <p className="font-semibold leading-tight">{activeStop.name}</p>
                     <p className="text-xs text-muted-foreground">
@@ -859,8 +878,10 @@ export function TripCard({
                       onChange={(e) => setPhoto(activeStop, e.target.files?.[0] ?? null)}
                     />
                   </div>
+                    </motion.div>
+                  </AnimatePresence>
                 </div>
-              </div>
+              </motion.div>
 
               <div className="z-20 flex shrink-0 flex-row items-center justify-between gap-2 border-t bg-background p-4">
                 <Button
